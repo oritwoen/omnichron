@@ -1,0 +1,12 @@
+{
+  "name": "omnichron-playground",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "omnichron": "link:..",
+    "omnichron-playground": "link:"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "name": "omnichron",
+  "version": "0.1.0",
+  "description": "Unified interface for web archive platforms",
+  "license": "MIT",
+  "author": "oritwoen",
+  "homepage": "https://github.com/oritwoen/omnichron",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oritwoen/omnichron"
+  },
+  "bugs": {
+    "url": "https://github.com/oritwoen/omnichron/issues"
+  },
+  "keywords": [
+    "archive",
+    "web-archive",
+    "wayback",
+    "history",
+    "commoncrawl",
+    "permacc",
+    "archive-today"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./platforms/*": {
+      "types": "./dist/platforms/*.d.ts",
+      "default": "./dist/platforms/*.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "module": "./dist/index.mjs",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vitest dev",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "unbuild",
+    "prepack": "pnpm build",
+    "release": "pnpm test && changelogen --release --push && pnpm publish",
+    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
+    "test:types": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "ofetch": "1.4.1",
+    "ufo": "1.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.14.1",
+    "@vitest/coverage-v8": "3.1.1",
+    "eslint": "9.24.0",
+    "eslint-config-unjs": "0.4.2",
+    "typescript": "5.8.3",
+    "unbuild": "3.5.0",
+    "vitest": "3.1.1",
+    "changelogen": "0.6.1"
+  },
+  "packageManager": "pnpm@10.7.0"
+}
