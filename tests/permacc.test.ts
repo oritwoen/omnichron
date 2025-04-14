@@ -34,7 +34,7 @@ describe('Perma.cc Platform', () => {
 
   it('should require an API key', async () => {
     const permacc = createPermacc({} as PermaccOptions)
-    const result = await permacc.listPages('example.com')
+    const result = await permacc.getSnapshots('example.com')
     
     expect(result.success).toBe(false)
     expect(result.error).toBe('API key is required for Perma.cc')
@@ -42,7 +42,7 @@ describe('Perma.cc Platform', () => {
 
   it('should fetch and format archived pages', async () => {
     const permacc = createPermacc({ apiKey: 'test_key' })
-    const result = await permacc.listPages('example.com')
+    const result = await permacc.getSnapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(1)
@@ -60,7 +60,7 @@ describe('Perma.cc Platform', () => {
       limit: 50
     })
     
-    const result = await permacc.listPages('example.com')
+    const result = await permacc.getSnapshots('example.com')
     expect(result.success).toBe(true)
     expect(result.pages[0].snapshot).toBe('https://perma.cc/ABC123')
   })

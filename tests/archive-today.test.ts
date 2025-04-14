@@ -28,7 +28,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.listPages('example.com')
+    const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(2)
@@ -57,7 +57,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.listPages('example.com')
+    const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(0)
@@ -68,7 +68,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.listPages('example.com')
+    const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(false)
     expect(result.error).toBe('Network error')

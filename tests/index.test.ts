@@ -21,7 +21,7 @@ describe('createArchive', () => {
     // Create a mock platform
     const mockPlatform: ArchivePlatform = {
       name: 'Mock Platform',
-      listPages: vi.fn().mockResolvedValue({ success: true, pages: [] })
+      getSnapshots: vi.fn().mockResolvedValue({ success: true, pages: [] })
     }
     
     const globalOptions = { 
@@ -34,9 +34,9 @@ describe('createArchive', () => {
     }
     
     const archive = createArchive(mockPlatform, globalOptions)
-    await archive.listPages('example.com', requestOptions)
+    await archive.getSnapshots('example.com', requestOptions)
     
-    expect(mockPlatform.listPages).toHaveBeenCalledWith(
+    expect(mockPlatform.getSnapshots).toHaveBeenCalledWith(
       'example.com',
       {
         timeout: 10_000,

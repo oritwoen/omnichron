@@ -22,7 +22,7 @@ describe('Common Crawl', () => {
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
-    const result = await archive.listPages('example.com')
+    const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(2)
@@ -64,7 +64,7 @@ describe('Common Crawl', () => {
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
-    const result = await archive.listPages('nonexistentdomain.com')
+    const result = await archive.getSnapshots('nonexistentdomain.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(0)
@@ -76,7 +76,7 @@ describe('Common Crawl', () => {
     
     const ccInstance = createCommonCrawl({ collection: 'CC-MAIN-2023-50' })
     const archive = createArchive(ccInstance)
-    const result = await archive.listPages('example.com')
+    const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(false)
     expect(result.error).toBe('Network error')
@@ -94,7 +94,7 @@ describe('Common Crawl', () => {
     })
     
     const archive = createArchive(ccInstance)
-    await archive.listPages('example.com')
+    await archive.getSnapshots('example.com')
     
     expect(ofetch).toHaveBeenCalledWith(
       '/CC-MAIN-2023-50/cdx',
