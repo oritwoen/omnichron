@@ -10,7 +10,7 @@ import {
   mergeOptions 
 } from '../utils'
 
-export function createWayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
+export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'Internet Archive Wayback Machine',
     
@@ -79,4 +79,3 @@ export function createWayback(initOptions: ArchiveOptions = {}): ArchiveProvider
   }
 }
 
-export default createWayback

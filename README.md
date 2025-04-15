@@ -22,7 +22,7 @@
   - Common Crawl (commoncrawl.org)
   - UK Web Archive (webarchive.org.uk)
 - Consistent, standardized response format with platform-specific metadata
-- Tree-shakable design: import only the platforms you need
+- Tree-shakable design: import only the providers you need
 - Configurable request options
 - TypeScript support
 
@@ -233,7 +233,7 @@ Gets archived snapshots for a domain from the archive provider.
 
 ## Roadmap
 
-### Future Platforms
+### Future Providers
 - ✅ Internet Archive's Wayback Machine
 - ✅ Archive.today
 - ✅ Perma.cc

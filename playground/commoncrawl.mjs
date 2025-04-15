@@ -1,8 +1,8 @@
-import { createArchive } from '../dist/index.mjs'
-import createCommonCrawl from '../dist/platforms/commoncrawl.mjs'
+import { createArchive } from 'omnichron'
+import commonCrawl from 'omnichron/providers/commoncrawl'
 
 // Create CommonCrawl instance with optional parameters
-const commonCrawlInstance = createCommonCrawl({
+const commonCrawlInstance = commonCrawl({
   // Specify collection (or use default 'CC-MAIN-latest')
   collection: 'CC-MAIN-2023-50',
   
@@ -19,7 +19,7 @@ const domain = 'example.com'
 console.log(`Looking for archives for domain: ${domain} in collection CC-MAIN-2023-50`)
 
 try {
-  const result = await archive.listPages(domain)
+  const result = await archive.getSnapshots(domain)
   
   if (result.success) {
     console.log(`Found ${result.pages.length} archived pages:`)

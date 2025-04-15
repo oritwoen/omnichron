@@ -4,7 +4,7 @@ import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
 
-export function createPermacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
+export default function permacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
     name: 'Perma.cc',
     
@@ -107,4 +107,3 @@ export function createPermacc(initOptions: Partial<PermaccOptions> = {}): Archiv
   }
 }
 
-export default createPermacc

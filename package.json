@@ -1,7 +1,7 @@
 {
   "name": "omnichron",
   "version": "0.1.2",
-  "description": "Unified interface for web archive platforms",
+  "description": "Unified interface for web archive providers",
   "license": "MIT",
   "author": "oritwoen",
   "homepage": "https://github.com/oritwoen/omnichron",
@@ -27,9 +27,13 @@
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     },
-    "./platforms/*": {
-      "types": "./dist/platforms/*.d.ts",
-      "default": "./dist/platforms/*.mjs"
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "default": "./dist/utils.mjs"
+    },
+    "./providers/*": {
+      "types": "./dist/providers/*.d.ts",
+      "default": "./dist/providers/*.mjs"
     }
   },
   "main": "./dist/index.mjs",

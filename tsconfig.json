@@ -5,7 +5,7 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "paths": {
-      "archivepkg/platforms/*": ["./src/platforms/*"]
+      "omnichron/providers/*": ["./src/providers/*"]
     }
   },
   "include": [

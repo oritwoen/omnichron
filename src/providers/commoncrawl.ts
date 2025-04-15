@@ -11,7 +11,7 @@ import {
   mergeOptions 
 } from '../utils'
 
-export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
+export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
   return {
     name: 'Common Crawl',
     
@@ -109,4 +109,3 @@ export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {})
   }
 }
 
-export default createCommonCrawl

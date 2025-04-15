@@ -10,7 +10,7 @@ import {
   mergeOptions 
 } from '../utils'
 
-export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
+export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'UK Web Archive',
     
@@ -78,4 +78,3 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePro
   }
 }
 
-export default createUkWebArchive

@@ -3,7 +3,7 @@ import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
 
-export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
+export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'Archive.today',
     
@@ -103,4 +103,3 @@ export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchivePro
   }
 }
 
-export default createArchiveToday

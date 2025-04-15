@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node index.js"
+    "dev": "node index.mjs"
   },
   "dependencies": {
     "omnichron": "link:..",

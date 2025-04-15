@@ -1,6 +1,5 @@
-// Example usage for UK Web Archive platform
-import { createArchive } from '../src/index.js'
-import createUkWebArchive from '../src/platforms/uk-web-archive.js'
+import { createArchive } from 'omnichron'
+import createUkWebArchive from 'omnichron/providers/uk-web-archive'
 
 // Create a UK Web Archive platform instance
 const ukWebArchive = createUkWebArchive()
