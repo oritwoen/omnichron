@@ -1,7 +1,8 @@
-import { ofetch, FetchOptions } from 'ofetch'
+import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
+import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
 
 export function createPermacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
@@ -9,18 +10,11 @@ export function createPermacc(initOptions: Partial<PermaccOptions> = {}): Archiv
     
     async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = { ...initOptions, ...reqOptions }
+      const options = mergeOptions(initOptions, reqOptions)
       
       // Ensure API key is provided
       if (!options.apiKey) {
-        return {
-          success: false,
-          pages: [],
-          error: 'API key is required for Perma.cc',
-          _meta: {
-            source: 'permacc'
-          }
-        }
+        return createErrorResponse('API key is required for Perma.cc', 'permacc')
       }
       
       // Use default values and required apiKey
@@ -31,22 +25,17 @@ export function createPermacc(initOptions: Partial<PermaccOptions> = {}): Archiv
       // Clean domain for search
       const cleanDomain = domain.replace(/^https?:\/\//, '')
       
-      // Prepare fetch options
-      const fetchOptions: FetchOptions = {
-        method: 'GET',
-        baseURL: baseUrl,
+      // Prepare fetch options using common utility with specific headers for Perma.cc
+      const fetchOptions = createFetchOptions(baseUrl, {
+        // Perma.cc pagination and filtering
+        limit: options?.limit || 100,
+        url: cleanDomain // Search by URL
+      }, {
         headers: {
           'Authorization': `ApiKey ${apiKey}`,
           'Content-Type': 'application/json'
-        },
-        retry: 2,
-        timeout: 30_000,
-        params: {
-          // Perma.cc pagination and filtering
-          limit: options?.limit || 100,
-          url: cleanDomain // Search by URL
         }
-      }
+      })
       
       try {
         // Fetch archives from Perma.cc API
@@ -75,14 +64,7 @@ export function createPermacc(initOptions: Partial<PermaccOptions> = {}): Archiv
         const response = await ofetch('/v1/public/archives/', fetchOptions) as PermaccResponse
         
         if (!response.objects || response.objects.length === 0) {
-          return {
-            success: true,
-            pages: [],
-            _meta: {
-              source: 'permacc',
-              queryParams: fetchOptions.params
-            }
-          }
+          return createSuccessResponse([], 'permacc', { queryParams: fetchOptions.params })
         }
         
         // Map the data to our ArchivedPage interface
@@ -114,25 +96,12 @@ export function createPermacc(initOptions: Partial<PermaccOptions> = {}): Archiv
             }
           })
         
-        return {
-          success: true,
-          pages,
-          _meta: {
-            source: 'permacc',
-            queryParams: fetchOptions.params,
-            meta: response.meta || {}
-          }
-        }
+        return createSuccessResponse(pages, 'permacc', {
+          queryParams: fetchOptions.params,
+          meta: response.meta || {}
+        })
       } catch (error: any) {
-        return {
-          success: false,
-          pages: [],
-          error: error.message || String(error),
-          _meta: {
-            source: 'permacc',
-            errorDetails: error
-          }
-        }
+        return createErrorResponse(error, 'permacc')
       }
     }
   }

@@ -1,8 +1,15 @@
-import { ofetch, FetchOptions } from 'ofetch'
-import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
+import { ofetch } from 'ofetch'
+import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { CommonCrawlOptions } from '../_providers'
-import { waybackTimestampToISO } from '../utils'
+import { 
+  waybackTimestampToISO, 
+  normalizeDomain, 
+  createSuccessResponse, 
+  createErrorResponse, 
+  createFetchOptions, 
+  mergeOptions 
+} from '../utils'
 
 export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
   return {
@@ -10,37 +17,26 @@ export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {})
     
     async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = { ...initOptions, ...reqOptions }
+      const options = mergeOptions(initOptions, reqOptions)
       
       // Use default values
       const baseUrl = 'https://index.commoncrawl.org'
       const snapshotUrl = 'https://data.commoncrawl.org'
       const collection = options.collection || 'CC-MAIN-latest'
       
-      // Normalize domain input using ufo
-      const normalizedDomain = hasProtocol(domain) 
-        ? withoutProtocol(domain) 
-        : domain
+      // Normalize domain and create URL pattern for search
+      const urlPattern = normalizeDomain(domain)
       
-      // Create URL pattern for search
-      const urlPattern = domain.includes('*') 
-        ? normalizedDomain 
-        : withTrailingSlash(normalizedDomain) + '*'
-      
-      // Prepare fetch options using ofetch's rich options
-      const fetchOptions: FetchOptions = {
-        method: 'GET',
-        baseURL: baseUrl,
-        params: {
-          url: urlPattern,
-          output: 'json',
-          fl: 'url,timestamp,status,digest',
-          collapse: 'digest',
-          limit: options?.limit ? String(options.limit) : '1000'
-        },
-        retry: 2,
+      // Prepare fetch options using common utility
+      const fetchOptions = createFetchOptions(baseUrl, {
+        url: urlPattern,
+        output: 'json',
+        fl: 'url,timestamp,status,digest',
+        collapse: 'digest',
+        limit: options?.limit ? String(options.limit) : '1000'
+      }, {
         timeout: 60_000 // CommonCrawl may need a longer timeout
-      }
+      })
       
       try {
         // Use ofetch with CDX Server API path
@@ -53,17 +49,12 @@ export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {})
         }
         const response = await ofetch(`/${collection}/cdx`, fetchOptions) as CCResponse
         
-        // Brak wyników lub nieprawidłowa odpowiedź
+        // No results or invalid response
         if (!response.lines || !Array.isArray(response.lines) || response.lines.length === 0) {
-          return {
-            success: true,
-            pages: [],
-            _meta: {
-              source: 'commoncrawl',
-              collection,
-              queryParams: fetchOptions.params
-            }
-          }
+          return createSuccessResponse([], 'commoncrawl', {
+            collection,
+            queryParams: fetchOptions.params
+          })
         }
         
         // Extract fields and data rows
@@ -88,7 +79,6 @@ export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {})
           
           // Create direct link to the snapshot
           // CommonCrawl uses WARC format, build a link based on available data
-          // May need adjustments based on actual URL format
           const snapUrl = `${snapshotUrl}/warc/${collection}/${rowData.digest}`
           
           return {
@@ -106,28 +96,14 @@ export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {})
           }
         })
         
-        return {
-          success: true,
-          pages,
-          _meta: {
-            source: 'commoncrawl',
-            collection,
-            pageCount: response.pageCount,
-            blocks_with_urls: response.blocks_with_urls,
-            queryParams: fetchOptions.params
-          }
-        }
+        return createSuccessResponse(pages, 'commoncrawl', {
+          collection,
+          pageCount: response.pageCount,
+          blocks_with_urls: response.blocks_with_urls,
+          queryParams: fetchOptions.params
+        })
       } catch (error: any) {
-        return {
-          success: false,
-          pages: [],
-          error: error.message || String(error),
-          _meta: {
-            source: 'commoncrawl',
-            collection,
-            errorDetails: error
-          }
-        }
+        return createErrorResponse(error, 'commoncrawl', { collection })
       }
     }
   }

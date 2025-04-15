@@ -1,7 +1,14 @@
-import { ofetch, FetchOptions } from 'ofetch'
-import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
+import { ofetch } from 'ofetch'
+import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
-import { waybackTimestampToISO } from '../utils'
+import { 
+  waybackTimestampToISO, 
+  normalizeDomain, 
+  createSuccessResponse,
+  createErrorResponse,
+  createFetchOptions,
+  mergeOptions 
+} from '../utils'
 
 export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
@@ -9,35 +16,22 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePro
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = { ...initOptions, ...reqOptions }
+      const options = mergeOptions(initOptions, reqOptions)
       
       // Use default values for UK Web Archive
       const baseUrl = 'https://www.webarchive.org.uk/wayback/archive'
       const snapshotUrl = 'https://www.webarchive.org.uk/wayback/archive/web'
       
-      // Normalize domain input using ufo
-      const normalizedDomain = hasProtocol(domain) 
-        ? withoutProtocol(domain) 
-        : domain
+      // Normalize domain and create URL pattern for search
+      const urlPattern = normalizeDomain(domain)
       
-      // Create URL pattern for search
-      const urlPattern = domain.includes('*') 
-        ? normalizedDomain 
-        : withTrailingSlash(normalizedDomain) + '*'
-      
-      // Prepare fetch options using ofetch's rich options
-      const fetchOptions: FetchOptions = {
-        method: 'GET',
-        baseURL: baseUrl,
-        params: {
-          url: urlPattern,
-          output: 'json',
-          fl: 'original,timestamp,statuscode',
-          limit: options?.limit ? String(options.limit) : '1000', // Configurable limit
-        },
-        retry: 2,
-        timeout: 30_000
-      }
+      // Prepare fetch options using common utility
+      const fetchOptions = createFetchOptions(baseUrl, {
+        url: urlPattern,
+        output: 'json',
+        fl: 'original,timestamp,statuscode',
+        limit: options?.limit ? String(options.limit) : '1000', // Configurable limit
+      })
       
       try {
         // Use ofetch with CDX Server API path
@@ -48,14 +42,7 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePro
         // The response is an array where the first element is the header
         // and the rest are the actual data rows
         if (!Array.isArray(response) || response.length <= 1) {
-          return {
-            success: true,
-            pages: [],
-            _meta: {
-              source: 'uk-web-archive',
-              queryParams: fetchOptions.params
-            }
-          }
+          return createSuccessResponse([], 'uk-web-archive', { queryParams: fetchOptions.params })
         }
         
         // Remove the header row
@@ -83,24 +70,9 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePro
           }
         })
         
-        return {
-          success: true,
-          pages,
-          _meta: {
-            source: 'uk-web-archive',
-            queryParams: fetchOptions.params
-          }
-        }
+        return createSuccessResponse(pages, 'uk-web-archive', { queryParams: fetchOptions.params })
       } catch (error: any) {
-        return {
-          success: false,
-          pages: [],
-          error: error.message || String(error),
-          _meta: {
-            source: 'uk-web-archive',
-            errorDetails: error
-          }
-        }
+        return createErrorResponse(error, 'uk-web-archive')
       }
     }
   }

@@ -1,6 +1,7 @@
-import { ofetch, FetchOptions } from 'ofetch'
+import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
 
 export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
@@ -8,27 +9,23 @@ export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchivePro
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = { ...initOptions, ...reqOptions }
-      // Use limit option if provided
-      const _limit = options.limit
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const options = mergeOptions(initOptions, reqOptions)
       
       // Use default values
       const baseUrl = 'https://archive.ph'
       const snapshotUrl = 'https://archive.ph'
       
+      // Clean domain by removing protocol
       const cleanDomain = domain.replace(/^https?:\/\//, '')
       
-      // Prepare fetch options using ofetch's rich options
-      const fetchOptions: FetchOptions = {
-        method: 'GET',
-        baseURL: baseUrl,
-        retry: 3,
-        timeout: 30_000,
+      // Prepare fetch options using common utility
+      const fetchOptions = createFetchOptions(baseUrl, {
         // Add cache buster to avoid cached results
-        params: {
-          t: Date.now(),
-        }
-      }
+        t: Date.now(),
+      }, {
+        retry: 3 // More retries for archive.today
+      })
       
       try {
         // Get HTML response, using path format
@@ -93,26 +90,14 @@ export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchivePro
           }
         }
         
-        return {
-          success: true,
-          pages,
-          _meta: {
-            source: 'archive-today',
-            domain: cleanDomain,
-            page: 1
-          }
-        }
+        return createSuccessResponse(pages, 'archive-today', {
+          domain: cleanDomain,
+          page: 1
+        })
       } catch (error: any) {
-        return {
-          success: false,
-          pages: [],
-          error: error.message || String(error),
-          _meta: {
-            source: 'archive-today',
-            domain: cleanDomain,
-            errorDetails: error
-          }
-        }
+        return createErrorResponse(error, 'archive-today', {
+          domain: cleanDomain
+        })
       }
     }
   }
