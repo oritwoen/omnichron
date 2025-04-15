@@ -7,12 +7,15 @@
 [![npm downloads](https://img.shields.io/npm/dm/omnichron.svg?color=black)](https://www.npmjs.com/package/omnichron)
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/omnichron?color=black)](https://bundlephobia.com/package/omnichron)
 
-> Unified interface for web archive platforms
+> [!WARNING]
+> **Early Development Stage**: This project is under active development and may undergo significant API changes between versions.
+
+> Unified interface for web archive providers
 
 ## Features
 
 - Simple API for listing archived URLs for a domain
-- Support for multiple archive platforms:
+- Support for multiple archive providers:
   - Internet Archive's Wayback Machine (web.archive.org)
   - Archive.today (archive.ph)
   - Perma.cc (perma.cc)
@@ -39,10 +42,10 @@ pnpm add omnichron
 ## Usage
 
 ```ts
-import { createArchive, platforms } from 'omnichron'
+import { createArchive, providers } from 'omnichron'
 
 // Create an archive client for Wayback Machine
-const waybackArchive = createArchive(platforms.wayback)
+const waybackArchive = createArchive(providers.wayback)
 
 // Or with custom URLs
 const customWayback = createArchive(createWayback({
@@ -78,21 +81,21 @@ const response = await waybackArchive.getSnapshots('example.com', {
 })
 
 // Using archive.today
-const archiveTodayArchive = createArchive(platforms.archive)
+const archiveTodayArchive = createArchive(providers.archive)
 const response = await archiveTodayArchive.getSnapshots('example.com')
 ```
 
 ### Tree-shaking support
 
-For better performance and smaller bundle size, you can import only the platforms you need:
+For better performance and smaller bundle size, you can import only the providers you need:
 
 ```ts
 // Only import Wayback Machine
 import { createArchive } from 'omnichron'
-import createWayback from 'omnichron/platforms/wayback'
+import createWayback from 'omnichron/providers/wayback'
 
-const waybackPlatform = createWayback()
-const archive = createArchive(waybackPlatform)
+const waybackProvider = createWayback()
+const archive = createArchive(waybackProvider)
 ```
 
 ### TypeScript support
@@ -126,14 +129,14 @@ Perma.cc requires an API key for authentication:
 
 ```ts
 import { createArchive } from 'omnichron'
-import createPermacc from 'omnichron/platforms/permacc'
+import createPermacc from 'omnichron/providers/permacc'
 
 // Create with required API key
-const permaccPlatform = createPermacc({
+const permaccProvider = createPermacc({
   apiKey: 'YOUR_API_KEY'
 })
 
-const archive = createArchive(permaccPlatform)
+const archive = createArchive(permaccProvider)
 const response = await archive.getSnapshots('example.com')
 ```
 
@@ -143,35 +146,35 @@ CommonCrawl provides access to massive web archives through different crawl coll
 
 ```ts
 import { createArchive } from 'omnichron'
-import createCommonCrawl from 'omnichron/platforms/commoncrawl'
+import createCommonCrawl from 'omnichron/providers/commoncrawl'
 
 // Create with a specific collection or use latest (default)
-const commonCrawlPlatform = createCommonCrawl({
+const commonCrawlProvider = createCommonCrawl({
   collection: 'CC-MAIN-2023-50',
   limit: 50  // Maximum number of results
 })
 
-const archive = createArchive(commonCrawlPlatform)
+const archive = createArchive(commonCrawlProvider)
 const response = await archive.getSnapshots('example.com')
 ```
 
 ## Response format
 
-All platforms return data in a consistent format with standardized fields plus platform-specific metadata:
+All providers return data in a consistent format with standardized fields plus provider-specific metadata:
 
 ```typescript
 interface ArchiveResponse {
   success: boolean;  // Boolean indicating success/failure
   pages: ArchivedPage[];  // Array of archived pages
   error?: string;  // Error message if success is false
-  _meta?: Record<string, any>;  // Response-level platform-specific metadata
+  _meta?: Record<string, any>;  // Response-level provider-specific metadata
 }
 
 interface ArchivedPage {
-  url: string;  // The original URL (consistent across all platforms)
-  timestamp: string;  // ISO 8601 date format (consistent across all platforms)
+  url: string;  // The original URL (consistent across all providers)
+  timestamp: string;  // ISO 8601 date format (consistent across all providers)
   snapshot: string;  // Direct URL to the archived version of the page
-  _meta: {  // Platform-specific metadata
+  _meta: {  // Provider-specific metadata
     // For Wayback Machine:
     timestamp?: string;  // Original timestamp format
     status?: number;  // HTTP status code
@@ -201,28 +204,28 @@ interface ArchivedPage {
 
 ## API
 
-### createArchive(platform, options?)
+### createArchive(provider, options?)
 
-Creates an archive client for the specified platform.
+Creates an archive client for the specified provider.
 
-- `platform`: An archive platform instance
+- `provider`: An archive provider instance
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
 - `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain
 
-### platforms
+### providers
 
-Object containing platform mappings for dynamic imports:
-- `platforms['wayback']`: Wayback Machine (web.archive.org)
-- `platforms['archive-today']`: Archive.today (archive.ph)
-- `platforms['permacc']`: Perma.cc (perma.cc)
-- `platforms['commoncrawl']`: Common Crawl (commoncrawl.org)
-- `platforms['uk-web-archive']`: UK Web Archive (webarchive.org.uk)
+Object containing provider mappings for dynamic imports:
+- `providers['wayback']`: Wayback Machine (web.archive.org)
+- `providers['archive-today']`: Archive.today (archive.ph)
+- `providers['permacc']`: Perma.cc (perma.cc)
+- `providers['commoncrawl']`: Common Crawl (commoncrawl.org)
+- `providers['uk-web-archive']`: UK Web Archive (webarchive.org.uk)
 
 ### getSnapshots(domain, options?)
 
-Gets archived snapshots for a domain from the archive platform.
+Gets archived snapshots for a domain from the archive provider.
 
 - `domain`: The domain to get archived snapshots for
 - `options`: Request-specific options (optional)
