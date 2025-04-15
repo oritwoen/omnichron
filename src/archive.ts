@@ -1,9 +1,9 @@
-import type { ArchiveOptions, ArchiveResponse, ArchivePlatform } from './types'
+import type { ArchiveOptions, ArchiveResponse, ArchiveProvider } from './types'
 
-export function createArchive(platform: ArchivePlatform, options?: ArchiveOptions) {
+export function createArchive(provider: ArchiveProvider, options?: ArchiveOptions) {
   return {
     async getSnapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse> {
-      return await platform.getSnapshots(domain, { ...options, ...listOptions })
+      return await provider.getSnapshots(domain, { ...options, ...listOptions })
     }
   }
 }

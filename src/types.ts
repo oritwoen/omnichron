@@ -4,12 +4,12 @@ export interface ArchiveOptions {
 }
 
 export interface ArchivedPage {
-  // Common fields for all platforms
+  // Common fields for all providers
   url: string         // Original URL of the page
   timestamp: string   // ISO 8601 date format (YYYY-MM-DDTHH:mm:ss.sssZ)
   snapshot: string    // Direct URL to the archived version
   
-  // Platform-specific metadata
+  // Provider-specific metadata
   _meta: Record<string, any>
 }
 
@@ -18,11 +18,12 @@ export interface ArchiveResponse {
   pages: ArchivedPage[]
   error?: string
   
-  // Platform-specific metadata
+  // Provider-specific metadata
   _meta?: Record<string, any>
 }
 
-export interface ArchivePlatform {
+export interface ArchiveProvider {
   name: string
   getSnapshots: (domain: string, options?: ArchiveOptions) => Promise<ArchiveResponse>
 }
+

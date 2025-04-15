@@ -1,10 +1,10 @@
 import { ofetch, FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
-import type { ArchivePlatform, ArchiveResponse, ArchivedPage } from '../types'
-import type { CommonCrawlOptions } from '../_platforms'
+import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { CommonCrawlOptions } from '../_providers'
 import { waybackTimestampToISO } from '../utils'
 
-export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchivePlatform {
+export function createCommonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
   return {
     name: 'Common Crawl',
     

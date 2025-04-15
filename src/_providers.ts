@@ -1,6 +1,6 @@
 import type { ArchiveOptions } from './types'
 
-export type PlatformName = 'wayback' | 'archive-today' | 'permacc' | 'commoncrawl' | 'uk-web-archive'
+export type ProviderName = 'wayback' | 'archive-today' | 'permacc' | 'commoncrawl' | 'uk-web-archive'
 
 export interface WaybackOptions extends ArchiveOptions {
   collapse?: string
@@ -23,7 +23,7 @@ export interface UkWebArchiveOptions extends ArchiveOptions {
   filter?: string
 }
 
-export type PlatformOptions = {
+export type ProviderOptions = {
   'wayback': WaybackOptions
   'archive-today': ArchiveTodayOptions
   'permacc': PermaccOptions
@@ -31,11 +31,11 @@ export type PlatformOptions = {
   'uk-web-archive': UkWebArchiveOptions
 }
 
-// Platform map and modules - using paths from tsconfig.json
-export const platforms = Object.freeze({
-  'wayback': 'archivepkg/platforms/wayback',
-  'archive-today': 'archivepkg/platforms/archive-today',
-  'permacc': 'archivepkg/platforms/permacc',
-  'commoncrawl': 'archivepkg/platforms/commoncrawl',
-  'uk-web-archive': 'archivepkg/platforms/uk-web-archive'
+// Provider map and modules - using paths from tsconfig.json
+export const providers = Object.freeze({
+  'wayback': 'archivepkg/providers/wayback',
+  'archive-today': 'archivepkg/providers/archive-today',
+  'permacc': 'archivepkg/providers/permacc',
+  'commoncrawl': 'archivepkg/providers/commoncrawl',
+  'uk-web-archive': 'archivepkg/providers/uk-web-archive'
 })

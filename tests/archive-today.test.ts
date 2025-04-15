@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ofetch } from 'ofetch'
 import { createArchive as createArchiveClient } from '../src'
-import createArchiveToday from '../src/platforms/archive-today'
+import createArchiveToday from '../src/providers/archive-today'
 
 vi.mock('ofetch', () => ({
   ofetch: vi.fn()

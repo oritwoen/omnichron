@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ofetch } from 'ofetch'
 import { createArchive } from '../src'
-import createCommonCrawl from '../src/platforms/commoncrawl'
+import createCommonCrawl from '../src/providers/commoncrawl'
 
 vi.mock('ofetch', () => ({
   ofetch: vi.fn()

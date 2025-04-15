@@ -1,9 +1,9 @@
 import { ofetch, FetchOptions } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import type { ArchivePlatform, ArchiveResponse, ArchivedPage } from '../types'
-import type { PermaccOptions } from '../_platforms'
+import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { PermaccOptions } from '../_providers'
 
-export function createPermacc(initOptions: Partial<PermaccOptions> = {}): ArchivePlatform {
+export function createPermacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
     name: 'Perma.cc',
     

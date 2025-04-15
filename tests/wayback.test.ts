@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ofetch } from 'ofetch'
 import { createArchive } from '../src'
-import createWayback from '../src/platforms/wayback'
+import createWayback from '../src/providers/wayback'
 
 vi.mock('ofetch', () => ({
   ofetch: vi.fn()

@@ -1,19 +1,19 @@
 import { ofetch, FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
-import type { ArchiveOptions, ArchivePlatform, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import { waybackTimestampToISO } from '../utils'
 
-export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePlatform {
+export function createWayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
-    name: 'UK Web Archive',
+    name: 'Internet Archive Wayback Machine',
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = { ...initOptions, ...reqOptions }
       
-      // Use default values for UK Web Archive
-      const baseUrl = 'https://www.webarchive.org.uk/wayback/archive'
-      const snapshotUrl = 'https://www.webarchive.org.uk/wayback/archive/web'
+      // Use default values
+      const baseUrl = 'https://web.archive.org'
+      const snapshotUrl = 'https://web.archive.org/web'
       
       // Normalize domain input using ufo
       const normalizedDomain = hasProtocol(domain) 
@@ -33,6 +33,7 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
           url: urlPattern,
           output: 'json',
           fl: 'original,timestamp,statuscode',
+          collapse: 'timestamp:4', // Collapse by year to reduce results
           limit: options?.limit ? String(options.limit) : '1000', // Configurable limit
         },
         retry: 2,
@@ -42,8 +43,8 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
       try {
         // Use ofetch with CDX Server API path
         // TypeScript type assertion for the response
-        type UkWebArchiveResponse = [string[], ...string[][]]
-        const response = await ofetch('/cdx/search/cdx', fetchOptions) as UkWebArchiveResponse
+        type WaybackResponse = [string[], ...string[][]]
+        const response = await ofetch('/cdx/search/cdx', fetchOptions) as WaybackResponse
         
         // The response is an array where the first element is the header
         // and the rest are the actual data rows
@@ -52,7 +53,7 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
             success: true,
             pages: [],
             _meta: {
-              source: 'uk-web-archive',
+              source: 'wayback',
               queryParams: fetchOptions.params
             }
           }
@@ -87,7 +88,7 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
           success: true,
           pages,
           _meta: {
-            source: 'uk-web-archive',
+            source: 'wayback',
             queryParams: fetchOptions.params
           }
         }
@@ -97,7 +98,7 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
           pages: [],
           error: error.message || String(error),
           _meta: {
-            source: 'uk-web-archive',
+            source: 'wayback',
             errorDetails: error
           }
         }
@@ -106,4 +107,4 @@ export function createUkWebArchive(initOptions: ArchiveOptions = {}): ArchivePla
   }
 }
 
-export default createUkWebArchive
+export default createWayback

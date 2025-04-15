@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import createPermacc from '../src/platforms/permacc'
-import { PermaccOptions } from '../src/_platforms'
+import createPermacc from '../src/providers/permacc'
+import { PermaccOptions } from '../src/_providers'
 
 // Mock fetch
 vi.mock('ofetch', () => {

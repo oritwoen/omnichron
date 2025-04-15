@@ -1,15 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
 import { createArchive } from '../src'
-import createWayback from '../src/platforms/wayback'
-import type { ArchivePlatform } from '../src/types'
+import createWayback from '../src/providers/wayback'
+import type { ArchiveProvider } from '../src/types'
 
 describe('createArchive', () => {
-  it('accepts a platform instance', () => {
+  it('accepts a provider instance', () => {
     const waybackInstance = createWayback()
     expect(() => createArchive(waybackInstance)).not.toThrow()
   })
   
-  it('returns platform api', () => {
+  it('returns provider api', () => {
     const waybackInstance = createWayback()
     const archive = createArchive(waybackInstance)
     
@@ -18,9 +18,9 @@ describe('createArchive', () => {
   })
   
   it('merges global and request options', async () => {
-    // Create a mock platform
-    const mockPlatform: ArchivePlatform = {
-      name: 'Mock Platform',
+    // Create a mock provider
+    const mockProvider: ArchiveProvider = {
+      name: 'Mock Provider',
       getSnapshots: vi.fn().mockResolvedValue({ success: true, pages: [] })
     }
     
@@ -33,10 +33,10 @@ describe('createArchive', () => {
       limit: 100
     }
     
-    const archive = createArchive(mockPlatform, globalOptions)
+    const archive = createArchive(mockProvider, globalOptions)
     await archive.getSnapshots('example.com', requestOptions)
     
-    expect(mockPlatform.getSnapshots).toHaveBeenCalledWith(
+    expect(mockProvider.getSnapshots).toHaveBeenCalledWith(
       'example.com',
       {
         timeout: 10_000,

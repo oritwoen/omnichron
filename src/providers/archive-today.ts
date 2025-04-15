@@ -1,8 +1,8 @@
 import { ofetch, FetchOptions } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import type { ArchiveOptions, ArchivePlatform, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 
-export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchivePlatform {
+export function createArchiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'Archive.today',
     
