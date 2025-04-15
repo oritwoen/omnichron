@@ -17,6 +17,7 @@
   - Archive.today (archive.ph)
   - Perma.cc (perma.cc)
   - Common Crawl (commoncrawl.org)
+  - UK Web Archive (webarchive.org.uk)
 - Consistent, standardized response format with platform-specific metadata
 - Tree-shakable design: import only the platforms you need
 - Configurable request options
@@ -190,6 +191,10 @@ interface ArchivedPage {
     mime?: string;  // MIME type of the content
     length?: string;  // Content length
     collection?: string;  // Common Crawl collection identifier
+    
+    // For UK Web Archive:
+    timestamp?: string;  // Original timestamp format
+    status?: number;  // HTTP status code
   };
 }
 ```
@@ -213,6 +218,7 @@ Object containing platform mappings for dynamic imports:
 - `platforms['archive-today']`: Archive.today (archive.ph)
 - `platforms['permacc']`: Perma.cc (perma.cc)
 - `platforms['commoncrawl']`: Common Crawl (commoncrawl.org)
+- `platforms['uk-web-archive']`: UK Web Archive (webarchive.org.uk)
 
 ### getSnapshots(domain, options?)
 
@@ -229,7 +235,7 @@ Gets archived snapshots for a domain from the archive platform.
 - ✅ Archive.today
 - ✅ Perma.cc
 - ✅ Common Crawl
-- 🔜 UK Web Archive
+- ✅ UK Web Archive
 - 🔜 Archive-It
 - 🔜 Memento Time Travel
 - 🔜 WebCite
