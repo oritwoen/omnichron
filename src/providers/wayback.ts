@@ -8,7 +8,7 @@ import {
   createErrorResponse,
   createFetchOptions,
   mergeOptions 
-} from 'omnichron/utils'
+} from '../utils'
 
 export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {

@@ -69,4 +69,4 @@ async function runDemo() {
   console.log(`Found ${fourthResponse.pages.length} pages`)
 }
 
-runDemo().catch(console.error)
+await runDemo().catch(console.error)
