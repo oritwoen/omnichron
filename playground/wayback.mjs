@@ -1,7 +1,7 @@
 // @ts-check
 
-import { createArchive } from 'omnichron'
-import wayback from 'omnichron/providers/wayback'
+import { createArchive } from '../dist/index.mjs'
+import wayback from '../dist/providers/wayback.mjs'
 
 // Simple test for retrieving data from Wayback Machine
 const waybackArchive = createArchive(wayback())

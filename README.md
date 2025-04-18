@@ -25,6 +25,7 @@
 - Tree-shakable design: import only the providers you need
 - Configurable request options
 - TypeScript support
+- Integrated caching system with unstorage
 
 ## Install
 
@@ -140,6 +141,36 @@ const archive = createArchive(permaccProvider)
 const response = await archive.getSnapshots('example.com')
 ```
 
+### Using the Cache
+
+omnichron provides an integrated caching system that helps reduce API calls and improve performance:
+
+```ts
+import { createArchive, providers, configureCache } from 'omnichron'
+import fsDriver from 'unstorage/drivers/fs'
+
+// Configure the cache with custom settings
+configureCache({
+  // Use filesystem driver for persistent cache
+  driver: fsDriver({ base: './cache' }),
+  // Set cache TTL (time-to-live) in milliseconds (default: 7 days)
+  ttl: 24 * 60 * 60 * 1000, // 1 day
+  // Enable/disable cache globally (default: true)
+  cache: true
+})
+
+const archive = createArchive(providers.wayback)
+
+// Use cache (default behavior)
+const response1 = await archive.getSnapshots('example.com')
+// First call hits API, subsequent calls use cache
+const response2 = await archive.getSnapshots('example.com')
+console.log('From cache:', response2.fromCache) // true
+
+// Bypass cache for specific requests
+const freshResponse = await archive.getSnapshots('example.com', { cache: false })
+```
+
 ### Using Common Crawl
 
 CommonCrawl provides access to massive web archives through different crawl collections:
@@ -168,6 +199,7 @@ interface ArchiveResponse {
   pages: ArchivedPage[];  // Array of archived pages
   error?: string;  // Error message if success is false
   _meta?: Record<string, any>;  // Response-level provider-specific metadata
+  fromCache?: boolean;  // Indicates if response came from cache
 }
 
 interface ArchivedPage {
@@ -230,6 +262,27 @@ Gets archived snapshots for a domain from the archive provider.
 - `domain`: The domain to get archived snapshots for
 - `options`: Request-specific options (optional)
   - `limit`: Maximum number of results to return
+  - `cache`: Enable/disable caching for this request
+  - `ttl`: Cache TTL in milliseconds for this request
+
+### configureCache(options?)
+
+Configures the caching system.
+
+- `options`: Configuration options (optional)
+  - `driver`: Custom storage driver from unstorage
+  - `ttl`: Default TTL in milliseconds
+  - `cache`: Enable/disable cache globally
+
+### clearCache()
+
+Clears all cached responses.
+
+### clearProviderCache(providerName)
+
+Clears cached responses for a specific provider.
+
+- `providerName`: Name of the provider to clear cache for
 
 ## Roadmap
 
@@ -246,7 +299,7 @@ Gets archived snapshots for a domain from the archive provider.
 
 ### Future Features
 - 🔜 Page Archiving API - create archives in addition to retrieving them
-- 🔜 Local and persistent caching layer using unstorage
+- ✅ Local and persistent caching layer using unstorage
 - 🔜 Performance optimizations for high-volume requests
 
 ## License

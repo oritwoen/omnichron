@@ -5,6 +5,7 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "paths": {
+      "omnichron/utils": ["./src/utils"],
       "omnichron/providers/*": ["./src/providers/*"]
     }
   },

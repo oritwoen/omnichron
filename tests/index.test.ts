@@ -38,10 +38,10 @@ describe('createArchive', () => {
     
     expect(mockProvider.getSnapshots).toHaveBeenCalledWith(
       'example.com',
-      {
+      expect.objectContaining({
         timeout: 10_000,
         limit: 100
-      }
+      })
     )
   })
 })

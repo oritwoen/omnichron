@@ -1,8 +1,8 @@
 // @ts-check
 
-import { createArchive } from 'omnichron'
-import wayback from 'omnichron/providers/wayback'
-import archiveToday from 'omnichron/providers/archive-today'
+import { createArchive } from '../dist/index.mjs'
+import wayback from '../dist/providers/wayback.mjs'
+import archiveToday from '../dist/providers/archive-today.mjs'
 
 // Wayback Machine
 const waybackArchive = createArchive(wayback())

@@ -12,7 +12,7 @@ import {
 
 export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
-    name: 'UK Web Archive',
+    name: 'uk-web-archive',
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options

@@ -1,12 +1,16 @@
 {
-  "name": "omnichron-playground",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node index.mjs"
+    "dev": "node index.mjs",
+    "cache": "node cache.mjs",
+    "wayback": "node wayback.mjs",
+    "archive": "node archive.mjs",
+    "permacc": "node permacc.mjs",
+    "commoncrawl": "node commoncrawl.mjs",
+    "uk-web-archive": "node uk-web-archive.mjs"
   },
   "dependencies": {
-    "omnichron": "link:..",
-    "omnichron-playground": "link:"
+    "omnichron": "latest"
   }
 }

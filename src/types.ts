@@ -1,6 +1,10 @@
 export interface ArchiveOptions {
   // Pagination option
   limit?: number  // Maximum number of results to return
+  
+  // Caching options
+  cache?: boolean // Enable/disable caching
+  ttl?: number    // Cache TTL in milliseconds
 }
 
 export interface ArchivedPage {
@@ -20,6 +24,9 @@ export interface ArchiveResponse {
   
   // Provider-specific metadata
   _meta?: Record<string, any>
+  
+  // Cache info
+  fromCache?: boolean
 }
 
 export interface ArchiveProvider {
