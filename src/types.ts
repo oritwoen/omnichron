@@ -31,6 +31,7 @@ export interface ArchiveResponse {
 
 export interface ArchiveProvider {
   name: string
+  slug?: string
   getSnapshots: (domain: string, options?: ArchiveOptions) => Promise<ArchiveResponse>
 }
 

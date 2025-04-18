@@ -12,7 +12,8 @@ import {
 
 export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
-    name: 'uk-web-archive',
+    name: 'UK Web Archive',
+    slug: 'uk-web-archive',
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options

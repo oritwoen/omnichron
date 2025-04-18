@@ -20,11 +20,13 @@ const storage = createStorage({
  * Generate a cache key for a domain request
  */
 export function generateCacheKey(
-  providerName: string, 
+  provider: { name: string, slug?: string }, 
   domain: string, 
   options?: Pick<ArchiveOptions, 'limit'>
 ): string {
-  const key = `${providerName}:${domain}`
+  // Use slug if available, otherwise use name
+  const providerKey = provider.slug || provider.name
+  const key = `${providerKey}:${domain}`
   return options?.limit ? `${key}:${options.limit}` : key
 }
 
@@ -32,7 +34,7 @@ export function generateCacheKey(
  * Get cached response if available
  */
 export async function getCachedResponse(
-  providerName: string,
+  provider: { name: string, slug?: string },
   domain: string,
   options?: ArchiveOptions
 ): Promise<ArchiveResponse | undefined> {
@@ -41,7 +43,7 @@ export async function getCachedResponse(
     return undefined
   }
 
-  const key = generateCacheKey(providerName, domain, options)
+  const key = generateCacheKey(provider, domain, options)
   
   try {
     const cachedData = await storage.getItem(key)
@@ -73,7 +75,7 @@ export async function getCachedResponse(
  * Store response in cache
  */
 export async function cacheResponse(
-  providerName: string,
+  provider: { name: string, slug?: string },
   domain: string,
   response: ArchiveResponse,
   options?: ArchiveOptions
@@ -83,7 +85,7 @@ export async function cacheResponse(
     return
   }
 
-  const key = generateCacheKey(providerName, domain, options)
+  const key = generateCacheKey(provider, domain, options)
   const ttl = options?.ttl ?? defaultCacheConfig.ttl
   
   try {
@@ -115,12 +117,18 @@ export async function clearCache(): Promise<void> {
 /**
  * Clear cached responses for a specific provider
  */
-export async function clearProviderCache(providerName: string): Promise<void> {
+export async function clearProviderCache(provider: string | { name: string, slug?: string }): Promise<void> {
   try {
+    // Convert provider to string key (either slug or name)
+    const providerKey = typeof provider === 'string' 
+      ? provider 
+      : (provider.slug || provider.name)
+    
     const keys = await storage.getKeys()
-    const providerKeys = keys.filter(key => key.startsWith(`${providerName}:`))
+    const providerKeys = keys.filter(key => key.startsWith(`${providerKey}:`))
     await Promise.all(providerKeys.map(key => storage.removeItem(key)))
   } catch (error) {
+    const providerName = typeof provider === 'string' ? provider : provider.name
     console.error(`Failed to clear cache for provider ${providerName}:`, error)
   }
 }

@@ -9,7 +9,7 @@ export function createArchive(provider: ArchiveProvider, options?: ArchiveOption
       
       // Check cache first if not explicitly disabled
       if (mergedOptions.cache !== false) {
-        const cachedResponse = await getCachedResponse(provider.name, domain, mergedOptions)
+        const cachedResponse = await getCachedResponse(provider, domain, mergedOptions)
         if (cachedResponse) {
           return cachedResponse
         }
@@ -20,7 +20,7 @@ export function createArchive(provider: ArchiveProvider, options?: ArchiveOption
       
       // Cache successful responses
       if (response.success && mergedOptions.cache !== false) {
-        await cacheResponse(provider.name, domain, response, mergedOptions)
+        await cacheResponse(provider, domain, response, mergedOptions)
       }
       
       return response

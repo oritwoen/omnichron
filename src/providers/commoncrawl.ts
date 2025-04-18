@@ -13,7 +13,8 @@ import {
 
 export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
   return {
-    name: 'commoncrawl',
+    name: 'Common Crawl',
+    slug: 'commoncrawl',
     
     async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options

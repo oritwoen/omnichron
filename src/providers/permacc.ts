@@ -6,7 +6,8 @@ import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOp
 
 export default function permacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
-    name: 'permacc',
+    name: 'Perma.cc',
+    slug: 'permacc',
     
     async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options

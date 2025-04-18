@@ -12,7 +12,8 @@ import {
 
 export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
-    name: 'wayback',
+    name: 'Internet Archive Wayback Machine',
+    slug: 'wayback',
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options

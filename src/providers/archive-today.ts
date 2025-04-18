@@ -5,7 +5,8 @@ import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOp
 
 export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
-    name: 'archive-today',
+    name: 'Archive.today',
+    slug: 'archive-today',
     
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
