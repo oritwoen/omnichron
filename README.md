@@ -46,7 +46,7 @@ pnpm add omnichron
 import { createArchive, providers } from 'omnichron'
 
 // Create an archive client for Wayback Machine
-const waybackArchive = createArchive(providers.wayback)
+const waybackArchive = createArchive(providers['wayback'])
 
 // Or with custom URLs
 const customWayback = createArchive(createWayback({
@@ -82,7 +82,7 @@ const response = await waybackArchive.getSnapshots('example.com', {
 })
 
 // Using archive.today
-const archiveTodayArchive = createArchive(providers.archive)
+const archiveTodayArchive = createArchive(providers['archive-today'])
 const response = await archiveTodayArchive.getSnapshots('example.com')
 ```
 
@@ -159,7 +159,7 @@ configureCache({
   cache: true
 })
 
-const archive = createArchive(providers.wayback)
+const archive = createArchive(providers['wayback'])
 
 // Use cache (default behavior)
 const response1 = await archive.getSnapshots('example.com')
@@ -278,11 +278,11 @@ Configures the caching system.
 
 Clears all cached responses.
 
-### clearProviderCache(providerName)
+### clearProviderCache(provider)
 
 Clears cached responses for a specific provider.
 
-- `providerName`: Name of the provider to clear cache for
+- `provider`: The provider object or slug name to clear cache for
 
 ## Roadmap
 
