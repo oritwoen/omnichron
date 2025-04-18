@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.2.1
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.0...v0.2.1)
+
+### 🚀 Enhancements
+
+- Add cache layer ([af5ba10](https://github.com/oritwoen/omnichron/commit/af5ba10))
+
+### 🩹 Fixes
+
+- Update import path for utility functions in wayback provider ([19a15a6](https://github.com/oritwoen/omnichron/commit/19a15a6))
+
+### 💅 Refactors
+
+- Update provider name handling ([9ddcbea](https://github.com/oritwoen/omnichron/commit/9ddcbea))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.0
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.1.2...v0.2.0)
