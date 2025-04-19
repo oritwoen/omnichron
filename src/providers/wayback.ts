@@ -61,7 +61,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         const dataRows = response.slice(1)
 
         // Map CDX rows to ArchivedPage objects with typed metadata
-        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl)
+        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl, 'wayback')
         
         return createSuccessResponse(pages, 'wayback', { queryParams: fetchOptions.params })
       } catch (error: any) {
@@ -70,4 +70,3 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
     }
   }
 }
-

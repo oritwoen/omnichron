@@ -18,6 +18,7 @@ export interface ArchiveMetadata {
 export interface WaybackMetadata extends ArchiveMetadata {
   timestamp: string;
   status: number;
+  provider: string;
 }
 
 export interface CommonCrawlMetadata extends ArchiveMetadata {
@@ -27,6 +28,7 @@ export interface CommonCrawlMetadata extends ArchiveMetadata {
   mime?: string;
   length?: string;
   collection: string;
+  provider: string;
 }
 
 export interface PermaccMetadata extends Omit<ArchiveMetadata, 'status'> {
@@ -64,6 +66,7 @@ export interface ArchivedPage {
 // Type for response metadata
 export interface ResponseMetadata {
   source: string;
+  provider: string;
   errorDetails?: unknown;
   errorName?: string;
   queryParams?: Record<string, string>;

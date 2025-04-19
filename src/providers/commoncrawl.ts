@@ -105,7 +105,8 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
               digest: rowData.digest,
               mime: rowData.mime,
               length: rowData.length,
-              collection
+              collection,
+              provider: 'commoncrawl'
             } as CommonCrawlMetadata
           }
         })

@@ -60,7 +60,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
         const dataRows = response.slice(1)
 
         // Map CDX rows to ArchivedPage objects with typed metadata
-        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl)
+        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl, 'uk-web-archive')
         
         return createSuccessResponse(pages, 'uk-web-archive', { queryParams: fetchOptions.params })
       } catch (error: any) {
@@ -69,4 +69,3 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
     }
   }
 }
-

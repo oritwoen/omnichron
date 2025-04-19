@@ -52,6 +52,7 @@ export function createSuccessResponse(
     pages,
     _meta: {
       source,
+      provider: source,
       ...metadata
     } as ResponseMetadata
   }
@@ -75,6 +76,7 @@ export function createErrorResponse(
     error: typeof error === 'string' ? error : error.message ?? String(error),
     _meta: {
       source,
+      provider: source,
       errorDetails: error,
       errorName: error instanceof Error ? error.name : 'UnknownError',
       ...metadata
@@ -120,9 +122,14 @@ export function mergeOptions<T extends ArchiveOptions>(
  * Maps CDX server API response rows to ArchivedPage objects.
  * @param dataRows Array of rows from CDX API, excluding header.
  * @param snapshotBaseUrl Base URL for snapshot (including path segment).
+ * @param providerSlug Provider identifier used for metadata typing.
  * @returns Array of ArchivedPage objects.
  */
-export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): ArchivedPage[] {
+export function mapCdxRows(
+  dataRows: string[][], 
+  snapshotBaseUrl: string, 
+  providerSlug = 'wayback'
+): ArchivedPage[] {
   return dataRows.map(
     // Destructure raw fields: original URL, timestamp, status code
     ([rawUrl, rawTimestamp, rawStatus]) => {
@@ -136,7 +143,8 @@ export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): Archi
         snapshot: snapUrl,
         _meta: {
           timestamp: timestampRaw,
-          status: Number.parseInt(rawStatus ?? '0', 10)
+          status: Number.parseInt(rawStatus ?? '0', 10),
+          provider: providerSlug
         } as WaybackMetadata
       }
     }
