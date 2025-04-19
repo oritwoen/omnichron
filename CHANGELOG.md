@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.2.3
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.2...v0.2.3)
+
+### 🩹 Fixes
+
+- Update package versions to remove caret and link specifications for consistency ([bedb94c](https://github.com/oritwoen/omnichron/commit/bedb94c))
+
+### 🏡 Chore
+
+- Rename `cache` to `storage` ([1f1e860](https://github.com/oritwoen/omnichron/commit/1f1e860))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.2
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.1...v0.2.2)
