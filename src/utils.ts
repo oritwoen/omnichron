@@ -1,5 +1,6 @@
 import { FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
+import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveResponse, ArchivedPage, WaybackMetadata, ResponseMetadata } from './types'
 
 // Default performance configuration
@@ -57,7 +58,7 @@ export async function processInParallel<T, R>(
       const item = queue.shift()!;
       const promise = processFunction(item)
         .then(result => { batchResults.push(result); })
-        .catch(error => { console.error('Parallel processing error:', error); });
+        .catch(error => { consola.error('Parallel processing error:', error); });
       
       pendingPromises.push(promise);
     }
@@ -73,7 +74,7 @@ export async function processInParallel<T, R>(
       const item = queue.shift()!;
       const promise = processFunction(item)
         .then(result => { batchResults.push(result); })
-        .catch(error => { console.error('Parallel processing error:', error); });
+        .catch(error => { consola.error('Parallel processing error:', error); });
       
       stillPending.push(promise);
       
@@ -193,7 +194,7 @@ export function createFetchOptions(
     retryDelay: 300, // Add delay between retries
     retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504], // Standard retry status codes
     onResponseError: ({ request, response, options }) => {
-      console.error(`[fetch error] ${options.method} ${request} failed with status ${response.status}`);
+      consola.error(`[fetch error] ${options.method} ${request} failed with status ${response.status}`);
     },
     ...options
   }

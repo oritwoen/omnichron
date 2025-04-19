@@ -381,6 +381,7 @@ Clears cached responses for a specific provider.
   - Parallel processing with concurrency control
   - Batch processing for large datasets
   - Configurable timeouts and retries
+- ✅ Structured logging with consola
 
 ## License
 

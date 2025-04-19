@@ -1,5 +1,6 @@
 import { createStorage } from 'unstorage'
 import memoryDriver from 'unstorage/drivers/memory'
+import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveResponse } from './types'
 
 // Default cache TTL (7 days in milliseconds)
@@ -62,12 +63,12 @@ export async function getCachedResponse(
           fromCache: true
         }
       } catch (parseError) {
-        console.error(`Cache parse error for ${key}:`, parseError)
+        consola.error(`Cache parse error for ${key}:`, parseError)
       }
     }
   } catch (error) {
     // Silently fail on cache errors
-    console.error(`Cache read error for ${key}:`, error)
+    consola.error(`Cache read error for ${key}:`, error)
   }
   
   return undefined
@@ -100,7 +101,7 @@ export async function cacheResponse(
     })
   } catch (error) {
     // Silently fail on cache errors
-    console.error(`Cache write error for ${key}:`, error)
+    consola.error(`Cache write error for ${key}:`, error)
   }
 }
 
@@ -112,7 +113,7 @@ export async function clearCache(): Promise<void> {
     const keys = await storage.getKeys()
     await Promise.all(keys.map(key => storage.removeItem(key)))
   } catch (error) {
-    console.error('Failed to clear cache:', error)
+    consola.error('Failed to clear cache:', error)
   }
 }
 
@@ -131,7 +132,7 @@ export async function clearProviderCache(provider: string | { name: string, slug
     await Promise.all(providerKeys.map(key => storage.removeItem(key)))
   } catch (error) {
     const providerName = typeof provider === 'string' ? provider : provider.name
-    console.error(`Failed to clear cache for provider ${providerName}:`, error)
+    consola.error(`Failed to clear cache for provider ${providerName}:`, error)
   }
 }
 
