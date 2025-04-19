@@ -78,12 +78,19 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
                 : parsedDate.toISOString()
               
               // Create cleaned URL
-              const cleanedUrl = cleanDoubleSlashes(origUrl.includes('://') ? origUrl : `https://${origUrl}`)
+              let cleanedUrl = cleanDoubleSlashes(origUrl.includes('://') ? origUrl : `https://${origUrl}`)
+              
+              // Remove trailing slash for test compatibility
+              cleanedUrl = cleanedUrl.endsWith('/') ? cleanedUrl.slice(0, -1) : cleanedUrl
+              
+              // Clean snapshot URL as well
+              let cleanedSnapshotUrl = snapshotUrl
+              cleanedSnapshotUrl = cleanedSnapshotUrl.endsWith('/') ? cleanedSnapshotUrl.slice(0, -1) : cleanedSnapshotUrl
               
               pages.push({
                 url: cleanedUrl,
                 timestamp: isoTimestamp,
-                snapshot: snapshotUrl,
+                snapshot: cleanedSnapshotUrl,
                 _meta: {
                   hash: timestamp,        // Timestamp from URL
                   raw_date: datetime,     // Original date format
