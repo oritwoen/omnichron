@@ -1,47 +1,21 @@
 import { createArchive } from 'omnichron'
 import permacc from 'omnichron/providers/permacc'
 
-// Replace with your own Perma.cc API key
 const API_KEY = 'YOUR_API_KEY'
 
-// Create Perma.cc instance
-const permaccInstance = permacc({ 
-  apiKey: API_KEY,
-  // Optional configuration
-  limit: 50
-})
-
-// Create archive using Perma.cc
-const archive = createArchive(permaccInstance)
-
-// Example usage
-const domain = 'example.com'
-
-// Call function when API_KEY is updated
-if (API_KEY === 'YOUR_API_KEY') {
-  console.log('⚠️ To use this example, update the API_KEY in permacc.mjs')
-} else {
-  console.log(`Looking for archives for domain: ${domain}`)
-  
-  try {
-    const result = await archive.getSnapshots(domain)
-    
-    if (result.success) {
-      console.log(`Found ${result.pages.length} archived pages:`)
-      
-      for (const [index, page] of result.pages.entries()) {
-        console.log(`\n[${index + 1}] ${page.url}`)
-        console.log(`   📅 Date: ${page.timestamp}`)
-        console.log(`   🔗 Link: ${page.snapshot}`)
-        console.log(`   🆔 GUID: ${page._meta.guid}`)
-        if (page._meta.title) {
-          console.log(`   📝 Title: ${page._meta.title}`)
-        }
-      }
-    } else {
-      console.error(`Error: ${result.error}`)
+try {
+  if (API_KEY === 'YOUR_API_KEY') {
+    console.warn('Please set your Perma.cc API key')
+  } else {
+    const archive = createArchive(
+      permacc({ apiKey: API_KEY, limit: 5 })
+    )
+    const result = await archive.getSnapshots('example.com')
+    console.log('Perma.cc found', result.pages.length, 'pages')
+    for (const page of result.pages.slice(0, 5)) {
+      console.log(page.url, page.timestamp, page.snapshot)
     }
-  } catch (error) {
-    console.error('Unexpected error occurred:', error)
   }
+} catch (error_) {
+  console.error(error_)
 }

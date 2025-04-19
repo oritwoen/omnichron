@@ -5,7 +5,6 @@
     "dev": "node index.mjs",
     "cache": "node cache.mjs",
     "wayback": "node wayback.mjs",
-    "archive": "node archive.mjs",
     "permacc": "node permacc.mjs",
     "commoncrawl": "node commoncrawl.mjs",
     "uk-web-archive": "node uk-web-archive.mjs"
