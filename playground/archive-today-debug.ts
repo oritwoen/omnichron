@@ -49,7 +49,7 @@ async function testArchiveToday(domain: string) {
     // Extract all links
     const links: { hash: string, url: string, text: string }[] = []
     let linkMatch
-    let index = 0
+    let _index = 0
     
     while ((linkMatch = linkRegex.exec(searchHtml)) !== null) {
       if (linkMatch[2].includes(domain)) {
@@ -58,7 +58,7 @@ async function testArchiveToday(domain: string) {
           url: linkMatch[2],
           text: linkMatch[3].trim()
         })
-        index++
+        _index++
       }
     }
     
@@ -69,7 +69,7 @@ async function testArchiveToday(domain: string) {
     
     // Try alternative link patterns
     console.log('\nTrying alternative link patterns...')
-    const altLinkRegex = /<a href="\/([^\/]+)\/([^"]+)"[^>]*>([^<]+)<\/a>/g
+    const altLinkRegex = /<a href="\/([^/]+)\/([^"]+)"[^>]*>([^<]+)<\/a>/g
     const altLinks: { hash: string, url: string, text: string }[] = []
     
     let altMatch
@@ -119,7 +119,7 @@ async function testArchiveToday(domain: string) {
       if (
         (allMatch[1].startsWith('/') && allMatch[1].includes('/http')) || 
         (allMatch[1].startsWith('/20') || allMatch[1].startsWith('/19')) || // Year-based links
-        (allMatch[1].match(/\/[a-zA-Z0-9]{5,}\//)) // Hash-based links
+        new RegExp(/\/[a-zA-Z0-9]{5,}\//).test(allMatch[1]) // Hash-based links
       ) {
         allLinks.push(allMatch[1])
       }

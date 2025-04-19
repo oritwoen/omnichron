@@ -23,11 +23,11 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
      */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = mergeOptions(initOptions, reqOptions)
+      const _options = mergeOptions(initOptions, reqOptions)
       
       // Use default values
       const baseUrl = 'https://archive.is'
-      const snapshotUrl = 'https://archive.is'
+      const _snapshotUrl = 'https://archive.is'
       
       // Clean domain by removing protocol
       const cleanDomain = normalizeDomain(domain, false)
@@ -73,9 +73,9 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
             try {
               // Parse the ISO timestamp
               const parsedDate = new Date(datetime)
-              const isoTimestamp = !Number.isNaN(parsedDate.getTime()) 
-                ? parsedDate.toISOString() 
-                : new Date().toISOString()
+              const isoTimestamp = Number.isNaN(parsedDate.getTime())
+                ? new Date().toISOString()
+                : parsedDate.toISOString()
               
               // Create cleaned URL
               const cleanedUrl = cleanDoubleSlashes(origUrl.includes('://') ? origUrl : `https://${origUrl}`)
