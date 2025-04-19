@@ -1,8 +1,8 @@
 import { FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
 import { consola } from 'consola'
-import type { ArchiveOptions, ArchiveResponse, ArchivedPage, WaybackMetadata, ResponseMetadata } from './types'
-import { getConfig } from './config'
+import type { ArchiveOptions, ArchiveResponse, ArchivedPage, WaybackMetadata, ResponseMetadata } from '../types'
+import { getConfig } from '../config'
 
 // Utility for parallel processing with concurrency control
 export async function processInParallel<T, R>(

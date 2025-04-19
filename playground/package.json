@@ -13,7 +13,7 @@
     "concurrency": "node concurrency.mjs"
   },
   "dependencies": {
-    "omnichron": "latest",
-    "unstorage": "^1.8.0"
+    "omnichron": "link:",
+    "unstorage": "1.8.0"
   }
 }

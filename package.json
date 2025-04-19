@@ -28,8 +28,8 @@
       "default": "./dist/index.mjs"
     },
     "./utils": {
-      "types": "./dist/utils.d.mts",
-      "default": "./dist/utils.mjs"
+      "types": "./dist/utils/index.d.mts",
+      "import": "./dist/utils/index.mjs"
     },
     "./providers/*": {
       "types": "./dist/providers/*.d.ts",
