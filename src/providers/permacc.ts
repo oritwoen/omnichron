@@ -42,7 +42,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
       // Prepare fetch options using common utility with specific headers for Perma.cc
       const fetchOptions = createFetchOptions(baseUrl, {
         // Perma.cc pagination and filtering
-        limit: options?.limit || 100,
+        limit: options?.limit ?? 100,
         url: cleanDomain // Search by URL
       }, {
         headers: {
@@ -95,7 +95,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
             const snapUrl = `${snapshotUrl}/${item.guid}`
             
             // Parse timestamp to ISO format
-            const timestamp = item.creation_timestamp || new Date().toISOString()
+            const timestamp = item.creation_timestamp ?? new Date().toISOString()
             
             return {
               url: cleanedUrl,
@@ -112,7 +112,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
         
         return createSuccessResponse(pages, 'permacc', {
           queryParams: fetchOptions.params,
-          meta: response.meta || {}
+          meta: response.meta ?? {}
         })
       } catch (error: any) {
         return createErrorResponse(error, 'permacc')

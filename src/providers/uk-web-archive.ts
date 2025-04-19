@@ -43,7 +43,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
         url: urlPattern,
         output: 'json',
         fl: 'original,timestamp,statuscode',
-        limit: options?.limit ? String(options.limit) : '1000', // Configurable limit
+        limit: String(options?.limit ?? 1000), // Configurable limit with nullish coalescing
       })
       
       try {

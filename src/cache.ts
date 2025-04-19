@@ -25,7 +25,7 @@ export function generateCacheKey(
   options?: Pick<ArchiveOptions, 'limit'>
 ): string {
   // Use slug if available, otherwise use name
-  const providerKey = provider.slug || provider.name
+  const providerKey = provider.slug ?? provider.name
   const key = `${providerKey}:${domain}`
   return options?.limit ? `${key}:${options.limit}` : key
 }
@@ -122,7 +122,7 @@ export async function clearProviderCache(provider: string | { name: string, slug
     // Convert provider to string key (either slug or name)
     const providerKey = typeof provider === 'string' 
       ? provider 
-      : (provider.slug || provider.name)
+      : (provider.slug ?? provider.name)
     
     const keys = await storage.getKeys()
     const providerKeys = keys.filter(key => key.startsWith(`${providerKey}:`))

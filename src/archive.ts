@@ -48,7 +48,7 @@ export function createArchive(provider: ArchiveProvider, options?: ArchiveOption
     async getPages(domain: string, listOptions?: ArchiveOptions): Promise<ArchivedPage[]> {
       const res = await this.getSnapshots(domain, listOptions)
       if (!res.success) {
-        throw new Error(res.error || 'Failed to fetch archive snapshots')
+        throw new Error(res.error ?? 'Failed to fetch archive snapshots')
       }
       return res.pages
     }

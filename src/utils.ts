@@ -73,7 +73,7 @@ export function createErrorResponse(
   return {
     success: false,
     pages: [],
-    error: typeof error === 'string' ? error : error.message || String(error),
+    error: typeof error === 'string' ? error : error.message ?? String(error),
     _meta: {
       source,
       errorDetails: error,
@@ -125,9 +125,9 @@ export function mergeOptions<T extends ArchiveOptions>(
 export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): ArchivedPage[] {
   return dataRows.map(
     // Destructure raw fields: original URL, timestamp, status code
-    ([rawUrl = '', rawTimestamp = '', rawStatus = '0']) => {
-      const originalUrl = cleanDoubleSlashes(rawUrl)
-      const timestampRaw = rawTimestamp
+    ([rawUrl, rawTimestamp, rawStatus]) => {
+      const originalUrl = cleanDoubleSlashes(rawUrl ?? '')
+      const timestampRaw = rawTimestamp ?? ''
       const isoTimestamp = waybackTimestampToISO(timestampRaw)
       const snapUrl = `${snapshotBaseUrl}/${timestampRaw}/${originalUrl}`
       return {
@@ -136,7 +136,7 @@ export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): Archi
         snapshot: snapUrl,
         _meta: {
           timestamp: timestampRaw,
-          status: Number.parseInt(rawStatus, 10)
+          status: Number.parseInt(rawStatus ?? '0', 10)
         }
       }
     }

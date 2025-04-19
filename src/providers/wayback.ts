@@ -44,7 +44,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         output: 'json',
         fl: 'original,timestamp,statuscode',
         collapse: 'timestamp:4', // Collapse by year to reduce results
-        limit: options?.limit ? String(options.limit) : '1000', // Configurable limit
+        limit: String(options?.limit ?? 1000), // Configurable limit with nullish coalescing
       })
       
       try {

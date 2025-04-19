@@ -36,7 +36,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
       // Use default values
       const baseUrl = 'https://index.commoncrawl.org'
       const snapshotUrl = 'https://data.commoncrawl.org'
-      const collection = options.collection || 'CC-MAIN-latest'
+      const collection = options.collection ?? 'CC-MAIN-latest'
       
       // Normalize domain and create URL pattern for search
       const urlPattern = normalizeDomain(domain)
@@ -47,7 +47,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
         output: 'json',
         fl: 'url,timestamp,status,digest',
         collapse: 'digest',
-        limit: options?.limit ? String(options.limit) : '1000'
+        limit: String(options?.limit ?? 1000)
       }, {
         timeout: 60_000 // CommonCrawl may need a longer timeout
       })
@@ -86,10 +86,10 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
           }
           
           // Convert timestamp to ISO format
-          const isoTimestamp = waybackTimestampToISO(rowData.timestamp || '')
+          const isoTimestamp = waybackTimestampToISO(rowData.timestamp ?? '')
           
           // Clean the URL
-          const cleanedUrl = cleanDoubleSlashes(rowData.url || '')
+          const cleanedUrl = cleanDoubleSlashes(rowData.url ?? '')
           
           // Create direct link to the snapshot
           // CommonCrawl uses WARC format, build a link based on available data
@@ -101,7 +101,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
             snapshot: snapUrl,
             _meta: {
               timestamp: rowData.timestamp,
-              status: Number.parseInt(rowData.status || '0', 10),
+              status: Number.parseInt(rowData.status ?? '0', 10),
               digest: rowData.digest,
               mime: rowData.mime,
               length: rowData.length,
