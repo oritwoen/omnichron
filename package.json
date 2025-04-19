@@ -54,12 +54,11 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "consola": "^3.4.2",
-    "defu": "^6.1.4",
+    "consola": "3.4.2",
+    "defu": "6.1.4",
     "ofetch": "1.4.1",
-    "omnichron": "link:",
     "ufo": "1.6.1",
-    "unstorage": "^1.15.0"
+    "unstorage": "1.15.0"
   },
   "devDependencies": {
     "@types/node": "22.14.1",
@@ -71,10 +70,5 @@
     "unbuild": "3.5.0",
     "vitest": "3.1.1"
   },
-  "packageManager": "pnpm@10.7.0",
-  "pnpm": {
-    "overrides": {
-      "omnichron": "link:"
-    }
-  }
+  "packageManager": "pnpm@10.7.0"
 }

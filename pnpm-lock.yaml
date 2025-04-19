@@ -4,30 +4,24 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  omnichron: 'link:'
-
 importers:
 
   .:
     dependencies:
       consola:
-        specifier: ^3.4.2
+        specifier: 3.4.2
         version: 3.4.2
       defu:
-        specifier: ^6.1.4
+        specifier: 6.1.4
         version: 6.1.4
       ofetch:
         specifier: 1.4.1
         version: 1.4.1
-      omnichron:
-        specifier: 'link:'
-        version: 'link:'
       ufo:
         specifier: 1.6.1
         version: 1.6.1
       unstorage:
-        specifier: ^1.15.0
+        specifier: 1.15.0
         version: 1.15.0
     devDependencies:
       '@types/node':
@@ -57,12 +51,9 @@ importers:
 
   playground:
     dependencies:
-      consola:
-        specifier: ^3.4.2
-        version: 3.4.2
       omnichron:
-        specifier: link:..
-        version: link:..
+        specifier: latest
+        version: 0.2.2
       unstorage:
         specifier: ^1.8.0
         version: 1.15.0
@@ -1566,6 +1557,9 @@ packages:
 
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
+
+  omnichron@0.2.2:
+    resolution: {integrity: sha512-Aa0NzLxX13BR2VLk6dPIt8xoxCMfmVZsi3bEBmOkI0tGtyvOj1vBx0W/e7fWJ4IyiHTreCmtLE1y5DHU6zF/hA==}
 
   open@10.1.0:
     resolution: {integrity: sha512-mnkeQ1qP5Ue2wd+aivTD3NHd/lZ96Lu0jgf0pwktLPtx6cTZiH7tyeGRRHs0zX0rbrahXPnXlUnbeXyaBBuIaw==}
@@ -3684,6 +3678,34 @@ snapshots:
       ufo: 1.6.1
 
   ohash@2.0.11: {}
+
+  omnichron@0.2.2:
+    dependencies:
+      consola: 3.4.2
+      defu: 6.1.4
+      ofetch: 1.4.1
+      omnichron: 'link:'
+      ufo: 1.6.1
+      unstorage: 1.15.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/kv'
+      - aws4fetch
+      - db0
+      - idb-keyval
+      - ioredis
+      - uploadthing
 
   open@10.1.0:
     dependencies:
