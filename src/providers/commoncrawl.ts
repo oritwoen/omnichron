@@ -58,7 +58,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
         type CCResponse = {
           lines?: string[][],
           blocks?: any[],
-          pageCount?: number,
+          count?: number,
           blocks_with_urls?: number
         }
         const response = await ofetch(`/${collection}/cdx`, fetchOptions) as CCResponse
@@ -113,7 +113,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
         
         return createSuccessResponse(pages, 'commoncrawl', {
           collection,
-          pageCount: response.pageCount,
+          count: response.count,
           blocks_with_urls: response.blocks_with_urls,
           queryParams: fetchOptions.params
         })

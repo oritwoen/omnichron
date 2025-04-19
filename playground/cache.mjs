@@ -3,26 +3,64 @@ import wayback from 'omnichron/providers/wayback'
 import memoryDriver from 'unstorage/drivers/memory'
 
 try {
-  // In-memory cache setup
-  configureCache({ driver: memoryDriver(), cache: true })
-  const archive = createArchive(wayback())
+  // In-memory cache setup with TTL and prefix
+  configureCache({ 
+    driver: memoryDriver(), 
+    cache: true,
+    ttl: 3600000, // 1 hour cache TTL
+    prefix: 'omni-playground' // Custom prefix for cache keys
+  })
+  
+  const archive = createArchive(wayback(), {
+    // Combined performance and caching options
+    concurrency: 3,
+    batchSize: 20,
+    timeout: 15000,
+    retries: 2,
+    limit: 5,
+    cache: true,
+    ttl: 1800000 // Override TTL for this specific archive (30 min)
+  })
+  
   const domain = 'example.com'
-  const opts = { limit: 3 }
 
   console.log('First fetch (API)')
-  const first = await archive.getSnapshots(domain, opts)
+  console.time('First fetch')
+  const first = await archive.getSnapshots(domain)
+  console.timeEnd('First fetch')
   console.log('fromCache:', first.fromCache, 'pages:', first.pages.length)
 
-  console.log('Second fetch (cache)')
-  const second = await archive.getSnapshots(domain, opts)
+  console.log('\nSecond fetch (cache)')
+  console.time('Second fetch')
+  const second = await archive.getSnapshots(domain)
+  console.timeEnd('Second fetch')
   console.log('fromCache:', second.fromCache, 'pages:', second.pages.length)
+  console.log('Cache hit performance improvement demonstrated')
 
-  console.log('Clearing cache')
+  console.log('\nClearing cache')
   await clearCache()
 
-  console.log('Third fetch (after clear)')
-  const third = await archive.getSnapshots(domain, opts)
+  console.log('\nThird fetch (after clear)')
+  console.time('Third fetch')
+  const third = await archive.getSnapshots(domain)
+  console.timeEnd('Third fetch')
   console.log('fromCache:', third.fromCache, 'pages:', third.pages.length)
+  
+  // Demonstrate multiple provider caching
+  console.log('\nMultiple providers with cache')
+  const multiArchive = createArchive([
+    wayback(),
+    wayback({ prefix: 'mobile', userAgent: 'Mozilla/5.0 Mobile' }) // Same provider with different config
+  ], { 
+    cache: true,
+    concurrency: 2
+  })
+  
+  console.time('Multi-provider fetch')
+  const multiResult = await multiArchive.getSnapshots(domain, { limit: 3 })
+  console.timeEnd('Multi-provider fetch')
+  console.log('Total cached pages:', multiResult.pages.length)
+  
 } catch (error_) {
   console.error(error_)
 }

@@ -8,7 +8,8 @@ const DEFAULT_TTL = 7 * 24 * 60 * 60 * 1000
 // Default cache configuration
 const defaultCacheConfig = {
   cache: true,
-  ttl: DEFAULT_TTL
+  ttl: DEFAULT_TTL,
+  prefix: 'omnichron'
 }
 
 // Create a memory storage driver as default
@@ -26,8 +27,9 @@ export function generateCacheKey(
 ): string {
   // Use slug if available, otherwise use name
   const providerKey = provider.slug ?? provider.name
-  const key = `${providerKey}:${domain}`
-  return options?.limit ? `${key}:${options.limit}` : key
+  const prefix = defaultCacheConfig.prefix
+  const baseKey = `${prefix}:${providerKey}:${domain}`
+  return options?.limit ? `${baseKey}:${options.limit}` : baseKey
 }
 
 /**
@@ -140,6 +142,7 @@ export function configureCache(options: {
   driver?: any
   ttl?: number
   cache?: boolean
+  prefix?: string
 } = {}): void {
   // Update default options
   if (options.ttl !== undefined) {
@@ -148,6 +151,10 @@ export function configureCache(options: {
   
   if (options.cache !== undefined) {
     defaultCacheConfig.cache = options.cache
+  }
+  
+  if (options.prefix !== undefined) {
+    defaultCacheConfig.prefix = options.prefix
   }
   
   // Set custom storage driver if provided

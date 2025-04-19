@@ -14,7 +14,7 @@ describe('Common Crawl', () => {
         ['org,example)/', '20220101000000', 'https://example.com', 'text/html', '200', 'AAAABBBCCCDD', '12345'],
         ['org,example)/page1', '20220202000000', 'https://example.com/page1', 'text/html', '200', 'EEEFFGGHHII', '23456']
       ],
-      pageCount: 1,
+      count: 1,
       blocks_with_urls: 2
     }
     
@@ -56,7 +56,7 @@ describe('Common Crawl', () => {
     // CommonCrawl returns an object with an empty lines array
     const mockResponse = {
       lines: [],
-      pageCount: 0,
+      count: 0,
       blocks_with_urls: 0
     }
     

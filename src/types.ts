@@ -5,6 +5,12 @@ export interface ArchiveOptions {
   // Caching options
   cache?: boolean // Enable/disable caching
   ttl?: number    // Cache TTL in milliseconds
+  
+  // Performance options
+  concurrency?: number // Maximum number of concurrent requests (default: 5)
+  batchSize?: number   // Number of items to process in a single batch (default: 50)
+  timeout?: number     // Request timeout in milliseconds (default: 30000)
+  retries?: number     // Number of retry attempts for failed requests (default: 2)
 }
 
 // Base metadata interface with common properties

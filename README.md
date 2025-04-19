@@ -147,7 +147,9 @@ configureCache({
   // Set cache TTL (time-to-live) in milliseconds (default: 7 days)
   ttl: 24 * 60 * 60 * 1000, // 1 day
   // Enable/disable cache globally (default: true)
-  cache: true
+  cache: true,
+  // Set a custom cache key prefix (default: 'omnichron')
+  prefix: 'my-app-cache'
 })
 
 import createWayback from 'omnichron/providers/wayback'
@@ -228,11 +230,75 @@ interface ArchivedPage {
 
 ## API
 
-### createArchive(provider, options?)
+### Performance Optimizations
 
-Creates an archive client for the specified provider.
+omnichron includes several performance optimizations for handling large volumes of requests:
 
-- `provider`: An archive provider instance
+```ts
+import { createArchive } from 'omnichron'
+import createWayback from 'omnichron/providers/wayback'
+
+// Create archive with performance options
+const archive = createArchive(createWayback(), {
+  // Control parallel requests (default: 5)
+  concurrency: 10,
+  // Control batch processing size (default: 50)
+  batchSize: 100,
+  // Set request timeout in milliseconds (default: 30000)
+  timeout: 60000,
+  // Configure retry attempts for failed requests (default: 2)
+  retries: 3
+})
+
+// These options can also be set per request
+const response = await archive.getSnapshots('example.com', {
+  concurrency: 5,
+  timeout: 45000
+})
+```
+
+Key performance features:
+
+- **Concurrency control**: Limits the number of simultaneous requests to prevent overwhelming the remote server
+- **Batch processing**: Processes large datasets in manageable chunks to optimize memory usage
+- **Configurable timeouts**: Allows setting custom timeouts for all or specific requests
+- **Automatic retries**: Includes intelligent retry strategy with configurable delay and status codes
+- **Error handling**: Provides detailed error information with context for easier debugging
+
+### Multiple Providers
+
+You can now use multiple archive providers simultaneously:
+
+```ts
+import { createArchive } from 'omnichron'
+import createWayback from 'omnichron/providers/wayback'
+import createArchiveToday from 'omnichron/providers/archive-today'
+import createPermacc from 'omnichron/providers/permacc'
+
+// Create archive with multiple providers
+const multiArchive = createArchive([
+  createWayback(),
+  createArchiveToday(),
+  createPermacc({ apiKey: 'YOUR_API_KEY' })
+])
+
+// This will query all providers in parallel and combine results
+const response = await multiArchive.getSnapshots('example.com', { 
+  limit: 100,
+  concurrency: 3  // Maximum number of providers to query simultaneously
+})
+
+// Results are automatically merged and sorted by date (newest first)
+console.log(response.pages)
+// Response includes metadata about the multi-provider query
+console.log(response._meta.providerCount) // 3
+```
+
+### createArchive(providers, options?)
+
+Creates an archive client for one or multiple providers.
+
+- `providers`: A single archive provider instance or an array of providers
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
@@ -257,6 +323,10 @@ Gets archived snapshots for a domain from the archive provider.
   - `limit`: Maximum number of results to return
   - `cache`: Enable/disable caching for this request
   - `ttl`: Cache TTL in milliseconds for this request
+  - `concurrency`: Maximum number of concurrent requests
+  - `batchSize`: Number of items to process in a single batch
+  - `timeout`: Request timeout in milliseconds
+  - `retries`: Number of retry attempts for failed requests
 
 ### getPages(domain, options?)
 
@@ -267,6 +337,10 @@ Fetches archived snapshots for a domain, returning only the pages array or throw
   - `limit`: Maximum number of results to return
   - `cache`: Enable/disable caching for this request
   - `ttl`: Cache TTL in milliseconds for this request
+  - `concurrency`: Maximum number of concurrent requests
+  - `batchSize`: Number of items to process in a single batch
+  - `timeout`: Request timeout in milliseconds
+  - `retries`: Number of retry attempts for failed requests
 
 ### configureCache(options?)
 
@@ -303,7 +377,10 @@ Clears cached responses for a specific provider.
 ### Future Features
 - 🔜 Page Archiving API - create archives in addition to retrieving them
 - ✅ Local and persistent caching layer using unstorage
-- 🔜 Performance optimizations for high-volume requests
+- ✅ Performance optimizations for high-volume requests
+  - Parallel processing with concurrency control
+  - Batch processing for large datasets
+  - Configurable timeouts and retries
 
 ## License
 

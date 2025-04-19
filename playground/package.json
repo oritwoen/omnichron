@@ -7,9 +7,13 @@
     "wayback": "node wayback.mjs",
     "permacc": "node permacc.mjs",
     "commoncrawl": "node commoncrawl.mjs",
-    "uk-web-archive": "node uk-web-archive.mjs"
+    "uk-web-archive": "node uk-web-archive.mjs",
+    "multi": "node multi-provider.mjs",
+    "batch": "node batch-processing.mjs",
+    "concurrency": "node concurrency.mjs"
   },
   "dependencies": {
-    "omnichron": "latest"
+    "omnichron": "latest",
+    "unstorage": "^1.8.0"
   }
 }
