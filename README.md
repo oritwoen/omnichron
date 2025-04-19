@@ -43,19 +43,15 @@ pnpm add omnichron
 ## Usage
 
 ```ts
-import { createArchive, providers } from 'omnichron'
+import { createArchive } from 'omnichron'
+import createWayback from 'omnichron/providers/wayback'
+import createArchiveToday from 'omnichron/providers/archive-today'
 
 // Create an archive client for Wayback Machine
-const waybackArchive = createArchive(providers['wayback'])
+const waybackArchive = createArchive(createWayback())
 
-// Or with custom URLs
-const customWayback = createArchive(createWayback({
-  baseUrl: 'https://web.archive.org',       // API base URL
-  snapshotUrl: 'https://web.archive.org/web' // URL for snapshot links
-}))
-
-// Get archived snapshots for a domain
-const response = await waybackArchive.getSnapshots('example.com')
+// Get archived snapshots for a domain (with optional limit)
+const response = await waybackArchive.getSnapshots('example.com', { limit: 100 })
 
 if (response.success) {
   console.log('Archived snapshots:', response.pages)
@@ -75,15 +71,10 @@ if (response.success) {
   console.error('Error:', response.error)
 }
 
-// With limit option
-const response = await waybackArchive.getSnapshots('example.com', {
-  // Pagination option
-  limit: 100
-})
 
-// Using archive.today
-const archiveTodayArchive = createArchive(providers['archive-today'])
-const response = await archiveTodayArchive.getSnapshots('example.com')
+// Using Archive.today
+const archiveTodayArchive = createArchive(createArchiveToday())
+const archiveTodayResponse = await archiveTodayArchive.getSnapshots('example.com')
 ```
 
 ### Tree-shaking support
@@ -146,7 +137,7 @@ const response = await archive.getSnapshots('example.com')
 omnichron provides an integrated caching system that helps reduce API calls and improve performance:
 
 ```ts
-import { createArchive, providers, configureCache } from 'omnichron'
+import { createArchive, configureCache } from 'omnichron'
 import fsDriver from 'unstorage/drivers/fs'
 
 // Configure the cache with custom settings
@@ -159,7 +150,8 @@ configureCache({
   cache: true
 })
 
-const archive = createArchive(providers['wayback'])
+import createWayback from 'omnichron/providers/wayback'
+const archive = createArchive(createWayback())
 
 // Use cache (default behavior)
 const response1 = await archive.getSnapshots('example.com')
@@ -246,14 +238,14 @@ Creates an archive client for the specified provider.
 Returns an object with:
 - `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain
 
-### providers
+### Providers
 
-Object containing provider mappings for dynamic imports:
-- `providers['wayback']`: Wayback Machine (web.archive.org)
-- `providers['archive-today']`: Archive.today (archive.ph)
-- `providers['permacc']`: Perma.cc (perma.cc)
-- `providers['commoncrawl']`: Common Crawl (commoncrawl.org)
-- `providers['uk-web-archive']`: UK Web Archive (webarchive.org.uk)
+The individual provider factory functions can be imported directly:
+- `import createWayback from 'omnichron/providers/wayback'` — Wayback Machine (web.archive.org)
+- `import createArchiveToday from 'omnichron/providers/archive-today'` — Archive.today (archive.ph)
+- `import createPermacc from 'omnichron/providers/permacc'` — Perma.cc (perma.cc)
+- `import createCommonCrawl from 'omnichron/providers/commoncrawl'` — Common Crawl (commoncrawl.org)
+- `import createUkWebArchive from 'omnichron/providers/uk-web-archive'` — UK Web Archive (webarchive.org.uk)
 
 ### getSnapshots(domain, options?)
 
