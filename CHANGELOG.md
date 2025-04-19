@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.2.7
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.6...v0.2.7)
+
+### 🩹 Fixes
+
+- Update archive.today provider to use Memento API ([0960ea4](https://github.com/oritwoen/omnichron/commit/0960ea4))
+- Update snapshot URL handling and improve test cases for archive.today provider ([e290273](https://github.com/oritwoen/omnichron/commit/e290273))
+
+### 💅 Refactors
+
+- Rename variables for clarity in archive provider and debug script ([ecf191b](https://github.com/oritwoen/omnichron/commit/ecf191b))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.6
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.5...v0.2.6)
