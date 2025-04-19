@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      c12:
+        specifier: ^3.0.3
+        version: 3.0.3(magicast@0.3.5)
       consola:
         specifier: 3.4.2
         version: 3.4.2
@@ -53,7 +56,7 @@ importers:
     dependencies:
       omnichron:
         specifier: latest
-        version: 0.2.2
+        version: 0.2.3
       unstorage:
         specifier: ^1.8.0
         version: 1.15.0
@@ -1558,8 +1561,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  omnichron@0.2.2:
-    resolution: {integrity: sha512-Aa0NzLxX13BR2VLk6dPIt8xoxCMfmVZsi3bEBmOkI0tGtyvOj1vBx0W/e7fWJ4IyiHTreCmtLE1y5DHU6zF/hA==}
+  omnichron@0.2.3:
+    resolution: {integrity: sha512-3IPZ8U24nlngBe+/gx6clxV2oH/4e2wvlXm0bbRm4KyfZ2BAO4aMklQtO2FKvsH9F2bkqZlP276DycfjYd1hSw==}
 
   open@10.1.0:
     resolution: {integrity: sha512-mnkeQ1qP5Ue2wd+aivTD3NHd/lZ96Lu0jgf0pwktLPtx6cTZiH7tyeGRRHs0zX0rbrahXPnXlUnbeXyaBBuIaw==}
@@ -3679,12 +3682,11 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnichron@0.2.2:
+  omnichron@0.2.3:
     dependencies:
       consola: 3.4.2
       defu: 6.1.4
       ofetch: 1.4.1
-      omnichron: 'link:'
       ufo: 1.6.1
       unstorage: 1.15.0
     transitivePeerDependencies:

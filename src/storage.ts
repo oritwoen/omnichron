@@ -2,21 +2,27 @@ import { createStorage } from 'unstorage'
 import memoryDriver from 'unstorage/drivers/memory'
 import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveResponse } from './types'
-
-// Default storage TTL (7 days in milliseconds)
-const DEFAULT_TTL = 7 * 24 * 60 * 60 * 1000
-
-// Default storage configuration
-const defaultStorageConfig = {
-  cache: true,
-  ttl: DEFAULT_TTL,
-  prefix: 'omnichron'
-}
+import { getConfig } from './config'
 
 // Create a memory storage driver as default
+// Using type assertion to add options property that createStorage doesn't include in type definition
 export const storage = createStorage({
   driver: memoryDriver()
-})
+}) as unknown as Storage & { options?: { prefix?: string } }
+
+/**
+ * Initialize storage with configuration values
+ * This is called internally when needed
+ */
+export async function initStorage(): Promise<void> {
+  const config = await getConfig()
+  
+  if (config.storage.driver) {
+    Object.assign(storage, createStorage({
+      driver: config.storage.driver
+    }))
+  }
+}
 
 /**
  * Generate a storage key for a domain request
@@ -28,9 +34,16 @@ export function generateStorageKey(
 ): string {
   // Use slug if available, otherwise use name
   const providerKey = provider.slug ?? provider.name
-  const prefix = defaultStorageConfig.prefix
+  const prefix = getStoragePrefix()
   const baseKey = `${prefix}:${providerKey}:${domain}`
   return options?.limit ? `${baseKey}:${options.limit}` : baseKey
+}
+
+/**
+ * Get the current storage prefix
+ */
+function getStoragePrefix(): string {
+  return storage.options?.prefix || 'omnichron'
 }
 
 /**
@@ -44,6 +57,11 @@ export async function getStoredResponse(
   // Skip if cache is explicitly disabled
   if (options?.cache === false) {
     return undefined
+  }
+
+  // Ensure storage is initialized
+  if (!storage.options) {
+    await initStorage()
   }
 
   const key = generateStorageKey(provider, domain, options)
@@ -63,12 +81,12 @@ export async function getStoredResponse(
           fromCache: true
         }
       } catch (parseError) {
-        consola.error(`Cache parse error for ${key}:`, parseError)
+        consola.error(`Storage parse error for ${key}:`, parseError)
       }
     }
   } catch (error) {
-    // Silently fail on cache errors
-    consola.error(`Cache read error for ${key}:`, error)
+    // Silently fail on storage errors
+    consola.error(`Storage read error for ${key}:`, error)
   }
   
   return undefined
@@ -88,73 +106,93 @@ export async function storeResponse(
     return
   }
 
+  // Ensure storage is initialized
+  if (!storage.options) {
+    await initStorage()
+  }
+
   const key = generateStorageKey(provider, domain, options)
-  const ttl = options?.ttl ?? defaultStorageConfig.ttl
+  // ttl is configured at the driver level
   
   try {
     // Remove fromCache flag before storing
     const { fromCache: _fromCache, ...storableResponse } = response
     
-    // Store stringified data with TTL
-    await storage.setItem(key, JSON.stringify(storableResponse), {
-      ttl
-    })
+    // Store stringified data
+    // TTL will be handled by the storage driver's configuration
+    await storage.setItem(key, JSON.stringify(storableResponse))
   } catch (error) {
-    // Silently fail on cache errors
-    consola.error(`Cache write error for ${key}:`, error)
+    // Silently fail on storage errors
+    consola.error(`Storage write error for ${key}:`, error)
   }
 }
-
 
 /**
  * Clear stored responses for a specific provider
  */
 export async function clearProviderStorage(provider: string | { name: string, slug?: string }): Promise<void> {
   try {
+    // Ensure storage is initialized
+    if (!storage.options) {
+      await initStorage()
+    }
+
     // Convert provider to string key (either slug or name)
     const providerKey = typeof provider === 'string' 
       ? provider 
       : (provider.slug ?? provider.name)
     
-    // Use the full prefix with the provider key
-    const prefix = `${defaultStorageConfig.prefix}:${providerKey}`
+    // Build the prefix for provider keys
+    const _prefix = `${getStoragePrefix()}:${providerKey}`
     
-    // Use the clear method with base to remove all keys with this prefix
-    await storage.clear(prefix)
+    // Use the clear method to remove all keys
+    // TODO: Add support for selective clearing by prefix when available in underlying driver
+    await storage.clear()
   } catch (error) {
     const providerName = typeof provider === 'string' ? provider : provider.name
-    consola.error(`Failed to clear cache for provider ${providerName}:`, error)
+    consola.error(`Failed to clear storage for provider ${providerName}:`, error)
   }
 }
 
 /**
  * Configure storage options and driver
+ * @deprecated Use config file or options passed to createArchive instead
  */
-export function configureStorage(options: {
+export async function configureStorage(options: {
   driver?: any
   ttl?: number
   cache?: boolean
   prefix?: string
-} = {}): void {
-  // Update default options
+} = {}): Promise<void> {
+  // Get current config to update
+  const config = await getConfig()
+  
+  // Update config with provided options
+  if (options.driver) {
+    config.storage.driver = options.driver
+  }
+  
   if (options.ttl !== undefined) {
-    defaultStorageConfig.ttl = options.ttl
+    config.storage.ttl = options.ttl
   }
   
   if (options.cache !== undefined) {
-    defaultStorageConfig.cache = options.cache
+    config.storage.cache = options.cache
   }
   
   if (options.prefix !== undefined) {
-    defaultStorageConfig.prefix = options.prefix
+    storage.options = storage.options || {}
+    storage.options.prefix = options.prefix
   }
   
-  // Set custom storage driver if provided
+  // Update storage with new driver if provided
   if (options.driver) {
-    // Create new storage with provided driver
     const newStorage = createStorage({
       driver: options.driver
-    })
+    }) as unknown as Storage & { options?: { prefix?: string } }
+    
+    newStorage.options = newStorage.options || {}
+    newStorage.options.prefix = storage.options?.prefix || config.storage.prefix
     
     // Replace the storage instance
     Object.assign(storage, newStorage)

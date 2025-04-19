@@ -31,7 +31,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
      */
     async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = mergeOptions(initOptions, reqOptions)
+      const options = await mergeOptions(initOptions, reqOptions)
       
       // Use default values
       const baseUrl = 'https://index.commoncrawl.org'
@@ -42,7 +42,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
       const urlPattern = normalizeDomain(domain)
       
       // Prepare fetch options using common utility
-      const fetchOptions = createFetchOptions(baseUrl, {
+      const fetchOptions = await createFetchOptions(baseUrl, {
         url: urlPattern,
         output: 'json',
         fl: 'url,timestamp,status,digest',

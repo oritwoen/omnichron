@@ -29,7 +29,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
      */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = mergeOptions(initOptions, reqOptions)
+      const options = await mergeOptions(initOptions, reqOptions)
       
       // Use default values for UK Web Archive
       const baseUrl = 'https://www.webarchive.org.uk/wayback/archive'
@@ -39,7 +39,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
       const urlPattern = normalizeDomain(domain)
       
       // Prepare fetch options using common utility
-      const fetchOptions = createFetchOptions(baseUrl, {
+      const fetchOptions = await createFetchOptions(baseUrl, {
         url: urlPattern,
         output: 'json',
         fl: 'original,timestamp,statuscode',
@@ -60,7 +60,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
         const dataRows = response.slice(1)
 
         // Map CDX rows to ArchivedPage objects with typed metadata
-        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl, 'uk-web-archive')
+        const pages: ArchivedPage[] = await mapCdxRows(dataRows, snapshotUrl, 'uk-web-archive')
         
         return createSuccessResponse(pages, 'uk-web-archive', { queryParams: fetchOptions.params })
       } catch (error: any) {

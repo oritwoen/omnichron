@@ -24,7 +24,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
      */
     async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const options = mergeOptions(initOptions, reqOptions)
+      const options = await mergeOptions(initOptions, reqOptions)
       
       // Ensure API key is provided
       if (!options.apiKey) {
@@ -40,7 +40,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
       const cleanDomain = normalizeDomain(domain, false)
       
       // Prepare fetch options using common utility with specific headers for Perma.cc
-      const fetchOptions = createFetchOptions(baseUrl, {
+      const fetchOptions = await createFetchOptions(baseUrl, {
         // Perma.cc pagination and filtering
         limit: options?.limit ?? 100,
         url: cleanDomain // Search by URL

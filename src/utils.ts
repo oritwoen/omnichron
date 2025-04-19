@@ -2,24 +2,7 @@ import { FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
 import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveResponse, ArchivedPage, WaybackMetadata, ResponseMetadata } from './types'
-
-// Default performance configuration
-export const defaultPerformanceConfig = {
-  concurrency: 5,
-  batchSize: 50,
-  timeout: 30_000,
-  retries: 2
-}
-
-// Enhanced fetch options that will be used in fetch options
-export const enhancedFetchOptions = {
-  retry: 2,
-  retryDelay: 300,
-  timeout: 30_000,
-  headers: {
-    'Accept': 'application/json'
-  }
-}
+import { getConfig } from './config'
 
 // Utility for parallel processing with concurrency control
 export async function processInParallel<T, R>(
@@ -27,8 +10,9 @@ export async function processInParallel<T, R>(
   processFunction: (item: T) => Promise<R>,
   options: { concurrency?: number, batchSize?: number } = {}
 ): Promise<R[]> {
-  const concurrency = options.concurrency ?? defaultPerformanceConfig.concurrency;
-  const batchSize = options.batchSize ?? defaultPerformanceConfig.batchSize;
+  const config = await getConfig()
+  const concurrency = options.concurrency ?? config.performance.concurrency;
+  const batchSize = options.batchSize ?? config.performance.batchSize;
   
   // Process small datasets directly
   if (items.length <= concurrency) {
@@ -89,7 +73,6 @@ export async function processInParallel<T, R>(
     return batchResults;
   }
 }
-
 
 /**
  * Converts a Wayback Machine timestamp to ISO8601 format
@@ -180,17 +163,19 @@ export function createErrorResponse(
  * @param options Additional options
  * @returns FetchOptions object
  */
-export function createFetchOptions(
+export async function createFetchOptions(
   baseURL: string, 
   params: Record<string, any> = {}, 
   options: Partial<FetchOptions & ArchiveOptions> = {}
-): FetchOptions {
+): Promise<FetchOptions> {
+  const config = await getConfig()
+  
   return {
     method: 'GET',
     baseURL,
     params,
-    retry: options.retries ?? defaultPerformanceConfig.retries,
-    timeout: options.timeout ?? defaultPerformanceConfig.timeout,
+    retry: options.retries ?? config.performance.retries,
+    timeout: options.timeout ?? config.performance.timeout,
     retryDelay: 300, // Add delay between retries
     retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504], // Standard retry status codes
     onResponseError: ({ request, response, options }) => {
@@ -206,16 +191,27 @@ export function createFetchOptions(
  * @param reqOptions Request-specific options
  * @returns Merged options object
  */
-export function mergeOptions<T extends ArchiveOptions>(
+export async function mergeOptions<T extends ArchiveOptions>(
   initOptions: Partial<T> = {},
   reqOptions: Partial<T> = {}
-): T {
+): Promise<T> {
+  const config = await getConfig()
+  const defaultOptions = {
+    concurrency: config.performance.concurrency,
+    batchSize: config.performance.batchSize,
+    timeout: config.performance.timeout,
+    retries: config.performance.retries,
+    cache: config.storage.cache,
+    ttl: config.storage.ttl
+  }
+  
   return { 
-    ...defaultPerformanceConfig,
+    ...defaultOptions,
     ...initOptions, 
     ...reqOptions 
   } as T
 }
+
 /**
  * Maps CDX server API response rows to ArchivedPage objects.
  * @param dataRows Array of rows from CDX API, excluding header.
@@ -224,14 +220,16 @@ export function mergeOptions<T extends ArchiveOptions>(
  * @param options Performance options for processing.
  * @returns Array of ArchivedPage objects.
  */
-export function mapCdxRows(
+export async function mapCdxRows(
   dataRows: string[][], 
   snapshotBaseUrl: string, 
   providerSlug = 'wayback',
   options: ArchiveOptions = {}
-): ArchivedPage[] {
+): Promise<ArchivedPage[]> {
+  const config = await getConfig()
+  
   // Get batch size from options or use default
-  const batchSize = options.batchSize ?? defaultPerformanceConfig.batchSize;
+  const batchSize = options.batchSize ?? config.performance.batchSize;
   
   // For small datasets, process directly without batching
   if (dataRows.length <= batchSize) {

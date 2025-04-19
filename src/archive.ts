@@ -1,7 +1,8 @@
-import { defu } from 'defu'
+// Import necessary dependencies
 import type { ArchiveOptions, ArchiveResponse, ArchiveProvider, ArchivedPage } from './types'
 import { getStoredResponse, storeResponse } from './storage'
-import { defaultPerformanceConfig, processInParallel } from './utils'
+import { mergeOptions, processInParallel } from './utils'
+// Additional imports may be added as needed
 
 /**
  * Create a unified archive client that wraps one or multiple providers.
@@ -13,7 +14,11 @@ import { defaultPerformanceConfig, processInParallel } from './utils'
 export function createArchive(providers: ArchiveProvider | ArchiveProvider[], options?: ArchiveOptions) {
   // Convert single provider to array for consistent handling
   const providerArray = Array.isArray(providers) ? providers : [providers];
+
   return {
+    // Make options available for external access
+    options,
+    
     /**
      * Fetch archived snapshots for a domain, returning a full response object.
      * @param domain The domain to query
@@ -21,11 +26,7 @@ export function createArchive(providers: ArchiveProvider | ArchiveProvider[], op
      * @returns ArchiveResponse including pages, metadata, and cache info
      */
     async getSnapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse> {
-      const mergedOptions = defu(
-        listOptions, 
-        options, 
-        { cache: true, ...defaultPerformanceConfig }
-      )
+      const mergedOptions = await mergeOptions(options, listOptions)
       
       // When only one provider is used, handle as before
       if (providerArray.length === 1) {
@@ -130,6 +131,7 @@ export function createArchive(providers: ArchiveProvider | ArchiveProvider[], op
         }
       }
     },
+    
     /**
      * Fetch archived snapshots for a domain, returning only the pages array or throwing on error.
      * @param domain The domain to query

@@ -39,12 +39,12 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
       const urlPattern = normalizeDomain(domain)
       
       // Prepare fetch options using common utility
-      const fetchOptions = createFetchOptions(baseUrl, {
+      const fetchOptions = await createFetchOptions(baseUrl, {
         url: urlPattern,
         output: 'json',
         fl: 'original,timestamp,statuscode',
         collapse: 'timestamp:4', // Collapse by year to reduce results
-        limit: String(options?.limit ?? 1000), // Configurable limit with nullish coalescing
+        limit: String((await options)?.limit ?? 1000), // Configurable limit with nullish coalescing
       })
       
       try {
@@ -55,15 +55,15 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         
         // The response is an array where the first element is the header and the rest are data rows
         if (!Array.isArray(response) || response.length <= 1) {
-          return createSuccessResponse([], 'wayback', { queryParams: fetchOptions.params })
+          return createSuccessResponse([], 'wayback', { queryParams: fetchOptions.params || {} })
         }
 
         const dataRows = response.slice(1)
 
         // Map CDX rows to ArchivedPage objects with typed metadata
-        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl, 'wayback')
+        const pages: ArchivedPage[] = await mapCdxRows(dataRows, snapshotUrl, 'wayback', await options)
         
-        return createSuccessResponse(pages, 'wayback', { queryParams: fetchOptions.params })
+        return createSuccessResponse(pages, 'wayback', { queryParams: fetchOptions.params || {} })
       } catch (error: any) {
         return createErrorResponse(error, 'wayback')
       }

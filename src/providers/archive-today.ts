@@ -34,7 +34,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
       const cleanDomain = normalizeDomain(domain, false)
       
       // Prepare fetch options using common utility
-      const fetchOptions = createFetchOptions(baseUrl, {
+      const fetchOptions = await createFetchOptions(baseUrl, {
         // Add cache buster to avoid cached results
         t: Date.now(),
       }, {
