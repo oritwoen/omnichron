@@ -1,6 +1,6 @@
 import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, ArchiveTodayMetadata } from '../types'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
 /**
@@ -98,7 +98,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
                 hash: linkMatch[1],    // Hash from URL
                 raw_date: rawDate,     // Original date format
                 position: index        // Position in results list
-              }
+              } as ArchiveTodayMetadata
             })
             index++
           }

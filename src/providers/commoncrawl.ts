@@ -1,6 +1,6 @@
 import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from '../types'
 import type { CommonCrawlOptions } from '../_providers'
 import { 
   waybackTimestampToISO, 
@@ -106,7 +106,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
               mime: rowData.mime,
               length: rowData.length,
               collection
-            }
+            } as CommonCrawlMetadata
           }
         })
         

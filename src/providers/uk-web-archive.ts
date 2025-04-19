@@ -1,5 +1,5 @@
 import { ofetch } from 'ofetch'
-import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, UkWebArchiveMetadata } from '../types'
 import {
   normalizeDomain,
   createSuccessResponse,
@@ -59,7 +59,7 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
 
         const dataRows = response.slice(1)
 
-        // Map CDX rows to ArchivedPage objects
+        // Map CDX rows to ArchivedPage objects with typed metadata
         const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl)
         
         return createSuccessResponse(pages, 'uk-web-archive', { queryParams: fetchOptions.params })

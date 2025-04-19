@@ -1,5 +1,5 @@
 import { ofetch } from 'ofetch'
-import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, WaybackMetadata } from '../types'
 import {
   normalizeDomain,
   createSuccessResponse,
@@ -60,7 +60,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
 
         const dataRows = response.slice(1)
 
-        // Map CDX rows to ArchivedPage objects
+        // Map CDX rows to ArchivedPage objects with typed metadata
         const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl)
         
         return createSuccessResponse(pages, 'wayback', { queryParams: fetchOptions.params })

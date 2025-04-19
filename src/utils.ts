@@ -1,7 +1,6 @@
 import { FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
-import type { ArchiveOptions, ArchiveResponse } from './types'
-import type { ArchivedPage } from './types'
+import type { ArchiveOptions, ArchiveResponse, ArchivedPage, ArchiveMetadata, WaybackMetadata, ResponseMetadata } from './types'
 
 /**
  * Converts a Wayback Machine timestamp to ISO8601 format
@@ -44,9 +43,9 @@ export function normalizeDomain(domain: string, appendWildcard = true): string {
  * @returns Standardized ArchiveResponse object
  */
 export function createSuccessResponse(
-  pages: any[], 
+  pages: ArchivedPage[], 
   source: string, 
-  metadata: Record<string, any> = {}
+  metadata: Record<string, unknown> = {}
 ): ArchiveResponse {
   return {
     success: true,
@@ -54,7 +53,7 @@ export function createSuccessResponse(
     _meta: {
       source,
       ...metadata
-    }
+    } as ResponseMetadata
   }
 }
 
@@ -68,7 +67,7 @@ export function createSuccessResponse(
 export function createErrorResponse(
   error: Error | string, 
   source: string, 
-  metadata: Record<string, any> = {}
+  metadata: Record<string, unknown> = {}
 ): ArchiveResponse {
   return {
     success: false,
@@ -77,8 +76,9 @@ export function createErrorResponse(
     _meta: {
       source,
       errorDetails: error,
+      errorName: error instanceof Error ? error.name : 'UnknownError',
       ...metadata
-    }
+    } as ResponseMetadata
   }
 }
 
@@ -137,7 +137,7 @@ export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): Archi
         _meta: {
           timestamp: timestampRaw,
           status: Number.parseInt(rawStatus ?? '0', 10)
-        }
+        } as WaybackMetadata
       }
     }
   )

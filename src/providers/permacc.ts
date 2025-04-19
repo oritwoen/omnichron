@@ -1,6 +1,6 @@
 import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
+import type { ArchiveProvider, ArchiveResponse, ArchivedPage, PermaccMetadata } from '../types'
 import type { PermaccOptions } from '../_providers'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
@@ -106,7 +106,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
                 title: item.title,
                 status: item.status,
                 created_by: item.created_by?.id
-              }
+              } as PermaccMetadata
             }
           })
         
