@@ -3,7 +3,11 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "omnichron/utils": ["./src/utils/index.ts"],
+      "omnichron/providers/*": ["./src/providers/*"]
+    }
   },
   "include": [
     "src"

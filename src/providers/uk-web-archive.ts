@@ -7,7 +7,7 @@ import {
   createFetchOptions,
   mergeOptions,
   mapCdxRows
-} from '../utils'
+} from 'omnichron/utils'
 
 /**
  * Create a UK Web Archive provider.

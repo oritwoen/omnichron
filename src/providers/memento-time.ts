@@ -6,7 +6,7 @@ import {
   normalizeDomain,
   createFetchOptions, 
   mergeOptions 
-} from '../utils'
+} from 'omnichron/utils'
 
 /**
  * Interface for Memento Time Travel API response

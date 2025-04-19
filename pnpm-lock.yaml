@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  omnichron: link:.
+
 importers:
 
   .:
@@ -55,8 +58,8 @@ importers:
   playground:
     dependencies:
       omnichron:
-        specifier: 'link:'
-        version: 'link:'
+        specifier: link:..
+        version: link:..
       unstorage:
         specifier: 1.8.0
         version: 1.8.0

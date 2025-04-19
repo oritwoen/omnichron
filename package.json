@@ -71,5 +71,8 @@
     "unbuild": "3.5.0",
     "vitest": "3.1.1"
   },
+  "resolutions": {
+    "omnichron": "link:."
+  },
   "packageManager": "pnpm@10.7.0"
 }

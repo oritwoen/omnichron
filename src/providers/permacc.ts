@@ -2,7 +2,7 @@ import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
-import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
+import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from 'omnichron/utils'
 
 /**
  * Create a Perma.cc archive provider.
