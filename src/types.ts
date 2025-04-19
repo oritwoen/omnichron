@@ -29,10 +29,10 @@ export interface CommonCrawlMetadata extends ArchiveMetadata {
   collection: string;
 }
 
-export interface PermaccMetadata extends ArchiveMetadata {
+export interface PermaccMetadata extends Omit<ArchiveMetadata, 'status'> {
   guid: string;
   title?: string;
-  status?: string;
+  status?: string; // Status for Permacc is string
   created_by?: string;
 }
 
@@ -54,7 +54,11 @@ export interface ArchivedPage {
   snapshot: string    // Direct URL to the archived version
   
   // Provider-specific metadata with improved typing
-  _meta: ArchiveMetadata
+  _meta: {
+    [key: string]: unknown;
+    timestamp?: string;
+    status?: number | string;
+  }
 }
 
 // Type for response metadata

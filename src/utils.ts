@@ -1,6 +1,6 @@
 import { FetchOptions } from 'ofetch'
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
-import type { ArchiveOptions, ArchiveResponse, ArchivedPage, ArchiveMetadata, WaybackMetadata, ResponseMetadata } from './types'
+import type { ArchiveOptions, ArchiveResponse, ArchivedPage, WaybackMetadata, ResponseMetadata } from './types'
 
 /**
  * Converts a Wayback Machine timestamp to ISO8601 format

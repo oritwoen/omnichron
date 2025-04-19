@@ -1,5 +1,5 @@
 import { ofetch } from 'ofetch'
-import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, WaybackMetadata } from '../types'
+import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import {
   normalizeDomain,
   createSuccessResponse,
