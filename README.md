@@ -236,7 +236,8 @@ Creates an archive client for the specified provider.
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
-- `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain
+- `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain, returning a full response object
+- `getPages(domain, options?)`: Function to get archived snapshots for a domain, returning only the pages array or throwing on error
 
 ### Providers
 
@@ -250,6 +251,16 @@ The individual provider factory functions can be imported directly:
 ### getSnapshots(domain, options?)
 
 Gets archived snapshots for a domain from the archive provider.
+
+- `domain`: The domain to get archived snapshots for
+- `options`: Request-specific options (optional)
+  - `limit`: Maximum number of results to return
+  - `cache`: Enable/disable caching for this request
+  - `ttl`: Cache TTL in milliseconds for this request
+
+### getPages(domain, options?)
+
+Fetches archived snapshots for a domain, returning only the pages array or throwing an error if the request fails.
 
 - `domain`: The domain to get archived snapshots for
 - `options`: Request-specific options (optional)
