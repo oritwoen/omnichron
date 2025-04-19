@@ -1,4 +1,4 @@
-import { createArchive, configureCache, clearCache } from 'omnichron'
+import { createArchive, configureCache, storage } from 'omnichron'
 import wayback from 'omnichron/providers/wayback'
 import memoryDriver from 'unstorage/drivers/memory'
 
@@ -38,7 +38,7 @@ try {
   console.log('Cache hit performance improvement demonstrated')
 
   console.log('\nClearing cache')
-  await clearCache()
+  await storage.clear()
 
   console.log('\nThird fetch (after clear)')
   console.time('Third fetch')

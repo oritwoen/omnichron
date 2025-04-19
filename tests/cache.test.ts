@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { createArchive, configureCache, clearCache } from '../src'
+import { createArchive, configureCache, storage } from '../src'
 import memoryDriver from 'unstorage/drivers/memory'
 
 // Create a mock provider for testing
@@ -24,7 +24,7 @@ const mockProvider = {
 
 describe('Cache', () => {
   beforeEach(async () => {
-    await clearCache()
+    await storage.clear()
   })
 
   afterEach(() => {

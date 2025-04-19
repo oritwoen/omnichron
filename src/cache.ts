@@ -14,7 +14,7 @@ const defaultCacheConfig = {
 }
 
 // Create a memory storage driver as default
-const storage = createStorage({
+export const storage = createStorage({
   driver: memoryDriver()
 })
 
@@ -105,17 +105,6 @@ export async function cacheResponse(
   }
 }
 
-/**
- * Clear all cached responses
- */
-export async function clearCache(): Promise<void> {
-  try {
-    const keys = await storage.getKeys()
-    await Promise.all(keys.map(key => storage.removeItem(key)))
-  } catch (error) {
-    consola.error('Failed to clear cache:', error)
-  }
-}
 
 /**
  * Clear cached responses for a specific provider
@@ -127,9 +116,11 @@ export async function clearProviderCache(provider: string | { name: string, slug
       ? provider 
       : (provider.slug ?? provider.name)
     
-    const keys = await storage.getKeys()
-    const providerKeys = keys.filter(key => key.startsWith(`${providerKey}:`))
-    await Promise.all(providerKeys.map(key => storage.removeItem(key)))
+    // Use the full prefix with the provider key
+    const prefix = `${defaultCacheConfig.prefix}:${providerKey}`
+    
+    // Use the clear method with base to remove all keys with this prefix
+    await storage.clear(prefix)
   } catch (error) {
     const providerName = typeof provider === 'string' ? provider : provider.name
     consola.error(`Failed to clear cache for provider ${providerName}:`, error)
