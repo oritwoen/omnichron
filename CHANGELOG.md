@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.6
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.5...v0.2.6)
+
+### 🩹 Fixes
+
+- Update package paths and import statements for better module resolution ([dfc4120](https://github.com/oritwoen/omnichron/commit/dfc4120))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.5
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.4...v0.2.5)
