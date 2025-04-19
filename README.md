@@ -224,6 +224,11 @@ interface ArchivedPage {
     // For UK Web Archive:
     timestamp?: string;  // Original timestamp format
     status?: number;  // HTTP status code
+    
+    // For Memento Time Travel:
+    originalTimestamp?: string;  // Original RFC 1123 timestamp format
+    source?: string;  // Source archive (e.g., 'Internet Archive', 'Archive.today')
+    position?: number;  // Position in the results list
   };
 }
 ```
@@ -313,6 +318,7 @@ The individual provider factory functions can be imported directly:
 - `import createPermacc from 'omnichron/providers/permacc'` — Perma.cc (perma.cc)
 - `import createCommonCrawl from 'omnichron/providers/commoncrawl'` — Common Crawl (commoncrawl.org)
 - `import createUkWebArchive from 'omnichron/providers/uk-web-archive'` — UK Web Archive (webarchive.org.uk)
+- `import createMementoTime from 'omnichron/providers/memento-time'` — Memento Time Travel (timetravel.mementoweb.org)
 
 ### getSnapshots(domain, options?)
 
@@ -369,8 +375,8 @@ Clears cached responses for a specific provider.
 - ✅ Perma.cc
 - ✅ Common Crawl
 - ✅ UK Web Archive
+- ✅ Memento Time Travel
 - 🔜 Archive-It
-- 🔜 Memento Time Travel
 - 🔜 WebCite
 - 🔜 Conifer (formerly Webrecorder)
 

@@ -55,6 +55,13 @@ export interface UkWebArchiveMetadata extends ArchiveMetadata {
   status: number;
 }
 
+export interface MementoTimeMetadata extends ArchiveMetadata {
+  originalTimestamp: string;
+  source: string;
+  position?: number;
+  provider: string;
+}
+
 export interface ArchivedPage {
   // Common fields for all providers
   url: string         // Original URL of the page
