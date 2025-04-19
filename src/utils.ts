@@ -1,6 +1,7 @@
 import { FetchOptions } from 'ofetch'
-import { hasProtocol, withTrailingSlash, withoutProtocol } from 'ufo'
+import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveResponse } from './types'
+import type { ArchivedPage } from './types'
 
 /**
  * Converts a Wayback Machine timestamp to ISO8601 format
@@ -114,4 +115,27 @@ export function mergeOptions<T extends ArchiveOptions>(
   reqOptions: Partial<T> = {}
 ): T {
   return { ...initOptions, ...reqOptions } as T
+}
+/**
+ * Maps CDX server API response rows to ArchivedPage objects.
+ * @param dataRows Array of rows from CDX API, excluding header.
+ * @param snapshotBaseUrl Base URL for snapshot (including path segment).
+ * @returns Array of ArchivedPage objects.
+ */
+export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): ArchivedPage[] {
+  return dataRows.map(row => {
+    const originalUrl = cleanDoubleSlashes(row[0] || '')
+    const timestampRaw = row[1] || ''
+    const isoTimestamp = waybackTimestampToISO(timestampRaw)
+    const snapUrl = `${snapshotBaseUrl}/${timestampRaw}/${originalUrl}`
+    return {
+      url: originalUrl,
+      timestamp: isoTimestamp,
+      snapshot: snapUrl,
+      _meta: {
+        timestamp: timestampRaw,
+        status: Number.parseInt(row[2] || '0', 10)
+      }
+    }
+  })
 }

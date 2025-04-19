@@ -2,7 +2,7 @@ import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
-import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
+import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
 export default function permacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
@@ -24,7 +24,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
       const { apiKey } = options
       
       // Clean domain for search
-      const cleanDomain = domain.replace(/^https?:\/\//, '')
+      const cleanDomain = normalizeDomain(domain, false)
       
       // Prepare fetch options using common utility with specific headers for Perma.cc
       const fetchOptions = createFetchOptions(baseUrl, {

@@ -1,13 +1,12 @@
 import { ofetch } from 'ofetch'
-import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
-import { 
-  waybackTimestampToISO, 
-  normalizeDomain, 
+import {
+  normalizeDomain,
   createSuccessResponse,
   createErrorResponse,
   createFetchOptions,
-  mergeOptions 
+  mergeOptions,
+  mapCdxRows
 } from '../utils'
 
 export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
@@ -40,36 +39,15 @@ export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveP
         type UkWebArchiveResponse = [string[], ...string[][]]
         const response = await ofetch('/cdx/search/cdx', fetchOptions) as UkWebArchiveResponse
         
-        // The response is an array where the first element is the header
-        // and the rest are the actual data rows
+        // The response is an array where the first element is the header and the rest are data rows
         if (!Array.isArray(response) || response.length <= 1) {
           return createSuccessResponse([], 'uk-web-archive', { queryParams: fetchOptions.params })
         }
-        
-        // Remove the header row
+
         const dataRows = response.slice(1)
-        
-        // Map the data to our ArchivedPage interface
-        const pages: ArchivedPage[] = dataRows.map(row => {
-          // Use helper function to convert timestamp
-          const isoTimestamp = waybackTimestampToISO(row[1])
-          
-          // Clean potential double slashes in URL
-          const cleanedUrl = cleanDoubleSlashes(row[0])
-          
-          // Create direct URL to the archived version
-          const snapUrl = `${snapshotUrl}/${row[1]}/${cleanedUrl}`
-            
-          return {
-            url: cleanedUrl, // cleaned URL
-            timestamp: isoTimestamp,
-            snapshot: snapUrl,
-            _meta: {
-              timestamp: row[1], // original timestamp
-              status: Number.parseInt(row[2], 10) // HTTP status code
-            }
-          }
-        })
+
+        // Map CDX rows to ArchivedPage objects
+        const pages: ArchivedPage[] = mapCdxRows(dataRows, snapshotUrl)
         
         return createSuccessResponse(pages, 'uk-web-archive', { queryParams: fetchOptions.params })
       } catch (error: any) {

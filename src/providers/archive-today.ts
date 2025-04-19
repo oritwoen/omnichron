@@ -1,7 +1,7 @@
 import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
-import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions } from '../utils'
+import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
 export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
@@ -18,7 +18,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
       const snapshotUrl = 'https://archive.ph'
       
       // Clean domain by removing protocol
-      const cleanDomain = domain.replace(/^https?:\/\//, '')
+      const cleanDomain = normalizeDomain(domain, false)
       
       // Prepare fetch options using common utility
       const fetchOptions = createFetchOptions(baseUrl, {
