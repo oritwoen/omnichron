@@ -30,11 +30,11 @@ const processData = (data, batchSize) => {
     const batch = data.slice(i, i + batchSize)
     
     // Simulate processing
-    batch.forEach(item => {
+    for (const item of batch) {
       processed++
       const result = item.toString().repeat(10).length
       if (result === Infinity) console.log('Impossible!')
-    })
+    }
     
     // Log progress every 5 batches
     if (i % (batchSize * 5) === 0 && i > 0) {

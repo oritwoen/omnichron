@@ -1,7 +1,8 @@
 import { createArchive, configureCache } from 'omnichron'
 import wayback from 'omnichron/providers/wayback'
 import archiveToday from 'omnichron/providers/archive-today'
-import permacc from 'omnichron/providers/permacc'
+// Uncommment if you need more providers
+// import _permacc from 'omnichron/providers/permacc'
 import ukWebArchive from 'omnichron/providers/uk-web-archive'
 import commonCrawl from 'omnichron/providers/commoncrawl'
 import memoryDriver from 'unstorage/drivers/memory'
@@ -54,58 +55,56 @@ try {
   console.log(`Found ${result.pages.length} total snapshots across all providers\n`)
   
   // Count pages by provider
-  const providerCounts = result.pages.reduce((acc, page) => {
+  const providerCounts = {}
+  for (const page of result.pages) {
     const provider = page.metadata?.provider || 'unknown'
-    acc[provider] = (acc[provider] || 0) + 1
-    return acc
-  }, {})
+    providerCounts[provider] = (providerCounts[provider] || 0) + 1
+  }
   
   console.log('Snapshots by provider:')
-  Object.entries(providerCounts).forEach(([provider, count]) => {
+  for (const [provider, count] of Object.entries(providerCounts)) {
     console.log(`- ${provider}: ${count} snapshots`)
-  })
+  }
   
   // Group by year to see time distribution
-  const yearCounts = result.pages.reduce((acc, page) => {
-    if (!page.timestamp) return acc
+  const yearCounts = {}
+  for (const page of result.pages) {
+    if (!page.timestamp) continue
     
     try {
       const year = new Date(page.timestamp).getFullYear()
-      acc[year] = (acc[year] || 0) + 1
+      yearCounts[year] = (yearCounts[year] || 0) + 1
     } catch {
-      acc['unknown'] = (acc['unknown'] || 0) + 1
+      yearCounts['unknown'] = (yearCounts['unknown'] || 0) + 1
     }
-    
-    return acc
-  }, {})
+  }
   
   console.log('\nSnapshots by year:')
-  Object.entries(yearCounts)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .forEach(([year, count]) => {
+  for (const [year, count] of Object.entries(yearCounts)
+    .sort(([a], [b]) => a.localeCompare(b))) {
       console.log(`- ${year}: ${count} snapshots`)
-    })
+    }
   
   // Show sample results from each provider
   console.log('\nSample snapshots by provider:')
   const samplesByProvider = {}
   
-  result.pages.forEach(page => {
+  for (const page of result.pages) {
     const provider = page.metadata?.provider || 'unknown'
     if (!samplesByProvider[provider]) {
       samplesByProvider[provider] = page
     }
-  })
+  }
   
-  Object.entries(samplesByProvider).forEach(([provider, page]) => {
+  for (const [provider, page] of Object.entries(samplesByProvider)) {
     console.log(`\n${provider}:`)
     console.log({
       url: page.url,
       date: formatDate(page.timestamp),
-      snapshot: page.snapshot?.substring(0, 50) + (page.snapshot?.length > 50 ? '...' : ''),
+      snapshot: page.snapshot?.slice(0, 50) + (page.snapshot?.length > 50 ? '...' : ''),
       mimeType: page.metadata?.mimeType || 'unknown'
     })
-  })
+  }
   
   // Performance metrics
   console.log('\nPerformance metrics:')
@@ -121,7 +120,11 @@ try {
   for (const page of result.pages) {
     // Simulate processing work
     const data = page.url + (page.snapshot || '')
-    const hash = [...data].reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0)
+    // Compute hash using codePointAt instead of charCodeAt for better Unicode support
+    let hash = 0
+    for (const c of data) {
+      hash = (hash << 5) - hash + c.codePointAt(0)
+    }
     if (hash === Infinity) console.log('Impossible!')
   }
   console.timeEnd('Sequential processing')
@@ -134,7 +137,7 @@ try {
     
     for (const page of batch) {
       const data = page.url + (page.snapshot || '')
-      const hash = [...data].reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0)
+      const hash = [...data].reduce((h, c) => (h << 5) - h + c.codePointAt(0), 0)
       if (hash === Infinity) console.log('Impossible!')
     }
   }

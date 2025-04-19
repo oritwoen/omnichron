@@ -1,7 +1,8 @@
 import { createArchive } from 'omnichron'
 import wayback from 'omnichron/providers/wayback'
 import archiveToday from 'omnichron/providers/archive-today'
-import permacc from 'omnichron/providers/permacc'
+// Uncommment if you need more providers
+// import _permacc from 'omnichron/providers/permacc'
 
 try {
   console.log('Single provider example:')
@@ -22,7 +23,8 @@ try {
   const multiArchive = createArchive([
     wayback(),
     archiveToday(),
-    permacc()
+    // Include other providers as needed
+    // _permacc()
   ], {
     concurrency: 5,
     batchSize: 30,
@@ -36,11 +38,11 @@ try {
   console.log('Pages per provider:')
   
   // Group by provider
-  const byProvider = multiPages.pages.reduce((acc, page) => {
-    const provider = page.metadata.provider || 'unknown'
-    acc[provider] = (acc[provider] || 0) + 1
-    return acc
-  }, {})
+  const byProvider = {}
+  for (const page of multiPages.pages) {
+    const provider = page.metadata?.provider || 'unknown'
+    byProvider[provider] = (byProvider[provider] || 0) + 1
+  }
   
   console.log(byProvider)
   console.log('Sample page:', multiPages.pages[0])

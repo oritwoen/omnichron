@@ -58,9 +58,9 @@ try {
       const batch = result.pages.slice(i, i + 10)
       
       // Simulate processing
-      batch.forEach(page => {
+      for (const page of batch) {
         totalSize += page.url.length + (page.snapshot?.length || 0)
-      })
+      }
       
       batchedPages.push(...batch)
     }

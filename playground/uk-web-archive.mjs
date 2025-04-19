@@ -63,7 +63,11 @@ try {
       for (const page of result.pages) {
         // Simulate some processing work
         const data = page.url + (page.snapshot || '')
-        const hash = [...data].reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0)
+        // Compute hash using codePointAt instead of charCodeAt for better Unicode support
+        let hash = 0
+        for (const c of data) {
+          hash = (hash << 5) - hash + c.codePointAt(0)
+        }
         // Just to prevent optimization
         if (hash === Infinity) console.log('Impossible!')
       }
@@ -82,7 +86,11 @@ try {
       for (const batch of batches) {
         for (const page of batch) {
           const data = page.url + (page.snapshot || '')
-          const hash = [...data].reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0)
+          // Compute hash using codePointAt instead of charCodeAt for better Unicode support
+        let hash = 0
+        for (const c of data) {
+          hash = (hash << 5) - hash + c.codePointAt(0)
+        }
           if (hash === Infinity) console.log('Impossible!')
         }
       }

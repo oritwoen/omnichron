@@ -1,7 +1,8 @@
 import { createArchive } from 'omnichron'
 import wayback from 'omnichron/providers/wayback'
 import archiveToday from 'omnichron/providers/archive-today'
-import permacc from 'omnichron/providers/permacc'
+// Uncommment if you need more providers
+// import _permacc from 'omnichron/providers/permacc'
 
 /**
  * This example demonstrates the concurrency control features
@@ -64,9 +65,9 @@ try {
     
     // Print summary for this concurrency level
     console.log('\nResults:')
-    snapshots.forEach(snap => {
+    for (const snap of snapshots) {
       console.log(`- ${snap.domain}: ${snap.count} snapshots in ${snap.time} ms`)
-    })
+    }
     console.log(`Total time: ${totalTime} ms`)
   }
   
@@ -104,16 +105,16 @@ try {
   console.timeEnd('Multi-provider query')
   
   // Group by provider
-  const byProvider = multiResult.pages.reduce((acc, page) => {
+  const byProvider = {}
+  for (const page of multiResult.pages) {
     const provider = page.metadata?.provider || 'unknown'
-    acc[provider] = (acc[provider] || 0) + 1
-    return acc
-  }, {})
+    byProvider[provider] = (byProvider[provider] || 0) + 1
+  }
   
   console.log(`\nFound ${multiResult.pages.length} total snapshots:`)
-  Object.entries(byProvider).forEach(([provider, count]) => {
+  for (const [provider, count] of Object.entries(byProvider)) {
     console.log(`- ${provider}: ${count} snapshots`)
-  })
+  }
   
   console.log('\nConcurrency control allows you to:')
   console.log('1. Limit server load when making multiple requests')
