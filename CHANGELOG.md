@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.2.4
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.3...v0.2.4)
+
+### 🚀 Enhancements
+
+- Add configuration management ([0a3e802](https://github.com/oritwoen/omnichron/commit/0a3e802))
+- Add Memento Time Travel provider ([0bebe08](https://github.com/oritwoen/omnichron/commit/0bebe08))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.3
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.2...v0.2.3)
