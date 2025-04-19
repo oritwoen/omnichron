@@ -2,6 +2,13 @@ import { defu } from 'defu'
 import type { ArchiveOptions, ArchiveResponse, ArchiveProvider, ArchivedPage } from './types'
 import { getCachedResponse, cacheResponse } from './cache'
 
+/**
+ * Create a unified archive client that wraps a specific provider.
+ *
+ * @param provider - ArchiveProvider instance to use (e.g., Wayback, Archive.today).
+ * @param options - Default ArchiveOptions (limit, cache, ttl) applied to each request.
+ * @returns An object with methods `getSnapshots` and `getPages` for fetching archive data.
+ */
 export function createArchive(provider: ArchiveProvider, options?: ArchiveOptions) {
   return {
     /**

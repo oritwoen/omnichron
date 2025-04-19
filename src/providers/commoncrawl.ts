@@ -11,11 +11,24 @@ import {
   mergeOptions 
 } from '../utils'
 
+/**
+ * Create a Common Crawl archive provider.
+ *
+ * @param initOptions - Initial Common Crawl options (e.g., collection, limit, cache settings).
+ * @returns ArchiveProvider instance for fetching snapshots from Common Crawl.
+ */
 export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {}): ArchiveProvider {
   return {
     name: 'Common Crawl',
     slug: 'commoncrawl',
     
+    /**
+     * Fetch archived snapshots from Common Crawl.
+     *
+     * @param domain - The domain to fetch archives for.
+     * @param reqOptions - Request-specific Common Crawl options (e.g., collection, limit).
+     * @returns Promise resolving to ArchiveResponse containing pages and metadata.
+     */
     async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = mergeOptions(initOptions, reqOptions)

@@ -9,11 +9,24 @@ import {
   mapCdxRows
 } from '../utils'
 
+/**
+ * Create a Wayback Machine archive provider.
+ *
+ * @param initOptions - Initial archive options (limit, cache, ttl) for Wayback queries.
+ * @returns ArchiveProvider instance for fetching snapshots from the Wayback Machine.
+ */
 export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'Internet Archive Wayback Machine',
     slug: 'wayback',
     
+    /**
+     * Fetch archived snapshots from the Internet Archive Wayback Machine.
+     *
+     * @param domain - The domain to search for archived snapshots.
+     * @param reqOptions - Request-specific options overriding initial settings.
+     * @returns Promise resolving to ArchiveResponse containing pages and metadata.
+     */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = mergeOptions(initOptions, reqOptions)

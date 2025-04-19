@@ -4,11 +4,24 @@ import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
+/**
+ * Create a Perma.cc archive provider.
+ *
+ * @param initOptions - Initial Perma.cc options including required `apiKey` and cache settings.
+ * @returns ArchiveProvider instance for fetching snapshots from Perma.cc.
+ */
 export default function permacc(initOptions: Partial<PermaccOptions> = {}): ArchiveProvider {
   return {
     name: 'Perma.cc',
     slug: 'permacc',
     
+    /**
+     * Fetch archived snapshots from Perma.cc.
+     *
+     * @param domain - The domain to fetch archives for.
+     * @param reqOptions - Request-specific Perma.cc options (e.g., apiKey, limit).
+     * @returns Promise resolving to ArchiveResponse containing pages and metadata.
+     */
     async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = mergeOptions(initOptions, reqOptions)

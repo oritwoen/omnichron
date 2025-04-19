@@ -3,11 +3,24 @@ import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from '../utils'
 
+/**
+ * Create an Archive.today archive provider.
+ *
+ * @param initOptions - Initial options for Archive.today (e.g., maxRedirects, cache settings).
+ * @returns ArchiveProvider instance for fetching snapshots from Archive.today.
+ */
 export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'Archive.today',
     slug: 'archive-today',
     
+    /**
+     * Fetch archived snapshots from Archive.today.
+     *
+     * @param domain - The domain to fetch archives for.
+     * @param reqOptions - Request-specific options overriding initial settings.
+     * @returns Promise resolving to ArchiveResponse containing pages and metadata.
+     */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

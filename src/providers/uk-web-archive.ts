@@ -9,11 +9,24 @@ import {
   mapCdxRows
 } from '../utils'
 
+/**
+ * Create a UK Web Archive provider.
+ *
+ * @param initOptions - Initial UK Web Archive options (e.g., limit, cache settings).
+ * @returns ArchiveProvider instance for fetching snapshots from UK Web Archive.
+ */
 export default function ukWebArchive(initOptions: ArchiveOptions = {}): ArchiveProvider {
   return {
     name: 'UK Web Archive',
     slug: 'uk-web-archive',
     
+    /**
+     * Fetch archived snapshots from the UK Web Archive.
+     *
+     * @param domain - The domain to fetch archives for.
+     * @param reqOptions - Request-specific options overriding initial settings.
+     * @returns Promise resolving to ArchiveResponse containing pages and metadata.
+     */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = mergeOptions(initOptions, reqOptions)
