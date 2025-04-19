@@ -3,11 +3,11 @@ import memoryDriver from 'unstorage/drivers/memory'
 import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveResponse } from './types'
 
-// Default cache TTL (7 days in milliseconds)
+// Default storage TTL (7 days in milliseconds)
 const DEFAULT_TTL = 7 * 24 * 60 * 60 * 1000
 
-// Default cache configuration
-const defaultCacheConfig = {
+// Default storage configuration
+const defaultStorageConfig = {
   cache: true,
   ttl: DEFAULT_TTL,
   prefix: 'omnichron'
@@ -19,24 +19,24 @@ export const storage = createStorage({
 })
 
 /**
- * Generate a cache key for a domain request
+ * Generate a storage key for a domain request
  */
-export function generateCacheKey(
+export function generateStorageKey(
   provider: { name: string, slug?: string }, 
   domain: string, 
   options?: Pick<ArchiveOptions, 'limit'>
 ): string {
   // Use slug if available, otherwise use name
   const providerKey = provider.slug ?? provider.name
-  const prefix = defaultCacheConfig.prefix
+  const prefix = defaultStorageConfig.prefix
   const baseKey = `${prefix}:${providerKey}:${domain}`
   return options?.limit ? `${baseKey}:${options.limit}` : baseKey
 }
 
 /**
- * Get cached response if available
+ * Get stored response if available
  */
-export async function getCachedResponse(
+export async function getStoredResponse(
   provider: { name: string, slug?: string },
   domain: string,
   options?: ArchiveOptions
@@ -46,7 +46,7 @@ export async function getCachedResponse(
     return undefined
   }
 
-  const key = generateCacheKey(provider, domain, options)
+  const key = generateStorageKey(provider, domain, options)
   
   try {
     const cachedData = await storage.getItem(key)
@@ -75,9 +75,9 @@ export async function getCachedResponse(
 }
 
 /**
- * Store response in cache
+ * Store response in storage
  */
-export async function cacheResponse(
+export async function storeResponse(
   provider: { name: string, slug?: string },
   domain: string,
   response: ArchiveResponse,
@@ -88,8 +88,8 @@ export async function cacheResponse(
     return
   }
 
-  const key = generateCacheKey(provider, domain, options)
-  const ttl = options?.ttl ?? defaultCacheConfig.ttl
+  const key = generateStorageKey(provider, domain, options)
+  const ttl = options?.ttl ?? defaultStorageConfig.ttl
   
   try {
     // Remove fromCache flag before storing
@@ -107,9 +107,9 @@ export async function cacheResponse(
 
 
 /**
- * Clear cached responses for a specific provider
+ * Clear stored responses for a specific provider
  */
-export async function clearProviderCache(provider: string | { name: string, slug?: string }): Promise<void> {
+export async function clearProviderStorage(provider: string | { name: string, slug?: string }): Promise<void> {
   try {
     // Convert provider to string key (either slug or name)
     const providerKey = typeof provider === 'string' 
@@ -117,7 +117,7 @@ export async function clearProviderCache(provider: string | { name: string, slug
       : (provider.slug ?? provider.name)
     
     // Use the full prefix with the provider key
-    const prefix = `${defaultCacheConfig.prefix}:${providerKey}`
+    const prefix = `${defaultStorageConfig.prefix}:${providerKey}`
     
     // Use the clear method with base to remove all keys with this prefix
     await storage.clear(prefix)
@@ -128,9 +128,9 @@ export async function clearProviderCache(provider: string | { name: string, slug
 }
 
 /**
- * Configure cache options and storage
+ * Configure storage options and driver
  */
-export function configureCache(options: {
+export function configureStorage(options: {
   driver?: any
   ttl?: number
   cache?: boolean
@@ -138,15 +138,15 @@ export function configureCache(options: {
 } = {}): void {
   // Update default options
   if (options.ttl !== undefined) {
-    defaultCacheConfig.ttl = options.ttl
+    defaultStorageConfig.ttl = options.ttl
   }
   
   if (options.cache !== undefined) {
-    defaultCacheConfig.cache = options.cache
+    defaultStorageConfig.cache = options.cache
   }
   
   if (options.prefix !== undefined) {
-    defaultCacheConfig.prefix = options.prefix
+    defaultStorageConfig.prefix = options.prefix
   }
   
   // Set custom storage driver if provided

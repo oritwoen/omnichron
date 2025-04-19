@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { createArchive, configureCache, storage } from '../src'
+import { createArchive, configureStorage, storage } from '../src'
 import memoryDriver from 'unstorage/drivers/memory'
 
 // Create a mock provider for testing
@@ -32,8 +32,8 @@ describe('Cache', () => {
   })
 
   it('should cache and retrieve from cache', async () => {
-    // Configure cache with memory driver
-    configureCache({
+    // Configure storage with memory driver
+    configureStorage({
       driver: memoryDriver(),
       cache: true
     })
@@ -60,8 +60,8 @@ describe('Cache', () => {
   })
 
   it('should bypass cache when cache:false is specified', async () => {
-    // Configure cache with memory driver
-    configureCache({
+    // Configure storage with memory driver
+    configureStorage({
       cache: true
     })
     
@@ -81,8 +81,8 @@ describe('Cache', () => {
   })
 
   it.skip('should respect TTL setting', async () => {
-    // Configure cache with very short TTL (10ms)
-    configureCache({
+    // Configure storage with very short TTL (10ms)
+    configureStorage({
       driver: memoryDriver(),
       ttl: 10
     })
@@ -106,8 +106,8 @@ describe('Cache', () => {
   })
 
   it('should use different cache keys for different limits', async () => {
-    // Configure cache
-    configureCache({
+    // Configure storage
+    configureStorage({
       driver: memoryDriver()
     })
     

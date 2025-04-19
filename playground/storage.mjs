@@ -1,14 +1,14 @@
-import { createArchive, configureCache, storage } from 'omnichron'
+import { createArchive, configureStorage, storage } from 'omnichron'
 import wayback from 'omnichron/providers/wayback'
 import memoryDriver from 'unstorage/drivers/memory'
 
 try {
-  // In-memory cache setup with TTL and prefix
-  configureCache({ 
+  // In-memory storage setup with TTL and prefix
+  configureStorage({ 
     driver: memoryDriver(), 
     cache: true,
-    ttl: 3600000, // 1 hour cache TTL
-    prefix: 'omni-playground' // Custom prefix for cache keys
+    ttl: 3600000, // 1 hour storage TTL
+    prefix: 'omni-playground' // Custom prefix for storage keys
   })
   
   const archive = createArchive(wayback(), {

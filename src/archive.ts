@@ -1,6 +1,6 @@
 import { defu } from 'defu'
 import type { ArchiveOptions, ArchiveResponse, ArchiveProvider, ArchivedPage } from './types'
-import { getCachedResponse, cacheResponse } from './cache'
+import { getStoredResponse, storeResponse } from './storage'
 import { defaultPerformanceConfig, processInParallel } from './utils'
 
 /**
@@ -31,20 +31,20 @@ export function createArchive(providers: ArchiveProvider | ArchiveProvider[], op
       if (providerArray.length === 1) {
         const provider = providerArray[0];
         
-        // Check cache first if not explicitly disabled
+        // Check storage first if not explicitly disabled
         if (mergedOptions.cache !== false) {
-          const cachedResponse = await getCachedResponse(provider, domain, mergedOptions)
-          if (cachedResponse) {
-            return cachedResponse
+          const storedResponse = await getStoredResponse(provider, domain, mergedOptions)
+          if (storedResponse) {
+            return storedResponse
           }
         }
         
         // Fetch fresh data
         const response = await provider.getSnapshots(domain, mergedOptions)
         
-        // Cache successful responses
+        // Store successful responses
         if (response.success && mergedOptions.cache !== false) {
-          await cacheResponse(provider, domain, response, mergedOptions)
+          await storeResponse(provider, domain, response, mergedOptions)
         }
         
         return response
@@ -52,11 +52,11 @@ export function createArchive(providers: ArchiveProvider | ArchiveProvider[], op
       
       // For multiple providers, fetch in parallel with concurrency control
       const fetchProvider = async (provider: ArchiveProvider): Promise<ArchiveResponse> => {
-        // Try cache first
+        // Try storage first
         if (mergedOptions.cache !== false) {
-          const cachedResponse = await getCachedResponse(provider, domain, mergedOptions)
-          if (cachedResponse) {
-            return cachedResponse
+          const storedResponse = await getStoredResponse(provider, domain, mergedOptions)
+          if (storedResponse) {
+            return storedResponse
           }
         }
         
@@ -64,9 +64,9 @@ export function createArchive(providers: ArchiveProvider | ArchiveProvider[], op
         try {
           const response = await provider.getSnapshots(domain, mergedOptions)
           
-          // Cache successful responses
+          // Store successful responses
           if (response.success && mergedOptions.cache !== false) {
-            await cacheResponse(provider, domain, response, mergedOptions)
+            await storeResponse(provider, domain, response, mergedOptions)
           }
           
           return response
