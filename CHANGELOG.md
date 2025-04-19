@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.5
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.4...v0.2.5)
+
+### 🏡 Chore
+
+- Update build process ([7bc36e5](https://github.com/oritwoen/omnichron/commit/7bc36e5))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.4
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.3...v0.2.4)

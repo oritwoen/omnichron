@@ -1,6 +1,6 @@
 {
   "name": "omnichron",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Unified interface for web archive providers",
   "license": "MIT",
   "author": "oritwoen",
