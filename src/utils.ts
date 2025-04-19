@@ -123,19 +123,22 @@ export function mergeOptions<T extends ArchiveOptions>(
  * @returns Array of ArchivedPage objects.
  */
 export function mapCdxRows(dataRows: string[][], snapshotBaseUrl: string): ArchivedPage[] {
-  return dataRows.map(row => {
-    const originalUrl = cleanDoubleSlashes(row[0] || '')
-    const timestampRaw = row[1] || ''
-    const isoTimestamp = waybackTimestampToISO(timestampRaw)
-    const snapUrl = `${snapshotBaseUrl}/${timestampRaw}/${originalUrl}`
-    return {
-      url: originalUrl,
-      timestamp: isoTimestamp,
-      snapshot: snapUrl,
-      _meta: {
-        timestamp: timestampRaw,
-        status: Number.parseInt(row[2] || '0', 10)
+  return dataRows.map(
+    // Destructure raw fields: original URL, timestamp, status code
+    ([rawUrl = '', rawTimestamp = '', rawStatus = '0']) => {
+      const originalUrl = cleanDoubleSlashes(rawUrl)
+      const timestampRaw = rawTimestamp
+      const isoTimestamp = waybackTimestampToISO(timestampRaw)
+      const snapUrl = `${snapshotBaseUrl}/${timestampRaw}/${originalUrl}`
+      return {
+        url: originalUrl,
+        timestamp: isoTimestamp,
+        snapshot: snapUrl,
+        _meta: {
+          timestamp: timestampRaw,
+          status: Number.parseInt(rawStatus, 10)
+        }
       }
     }
-  })
+  )
 }
