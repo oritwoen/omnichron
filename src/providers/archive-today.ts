@@ -23,90 +23,86 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
      */
     async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const options = mergeOptions(initOptions, reqOptions)
       
       // Use default values
-      const baseUrl = 'https://archive.ph'
-      const snapshotUrl = 'https://archive.ph'
+      const baseUrl = 'https://archive.is'
+      const snapshotUrl = 'https://archive.is'
       
       // Clean domain by removing protocol
       const cleanDomain = normalizeDomain(domain, false)
       
-      // Prepare fetch options using common utility
-      const fetchOptions = await createFetchOptions(baseUrl, {
-        // Add cache buster to avoid cached results
-        t: Date.now(),
-      }, {
-        retry: 3 // More retries for archive.today
+      // Prepare fetch options using common utility but WITHOUT query parameters
+      // Archive.today timemap API doesn't support query parameters
+      const fetchOptions = await createFetchOptions(baseUrl, {}, {
+        retry: 5,           // More retries for archive.today
+        timeout: 60000,     // Extended timeout (60 seconds)
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Referer': baseUrl
+        }
       })
       
       try {
-        // Get HTML response, using path format
-        const html = await ofetch(`/${cleanDomain}`, fetchOptions) as string
+        // Using Memento API to get timemap directly with the domain
+        // Format: https://archive.is/timemap/http://example.com
+        const fullUrl = cleanDomain.includes('://') ? cleanDomain : `http://${cleanDomain}`
+        const timemapUrl = `/timemap/${fullUrl}`
         
-        if (typeof html !== 'string') {
-          throw new TypeError('Unexpected response format')
-        }
+        const timemapResponse = await ofetch(timemapUrl, {
+          ...fetchOptions,
+          responseType: 'text',  // Explicitly request text response
+          parseResponse: txt => txt  // Ensure we get raw text
+        })
         
-        // Simple regex extraction of archive links
-        // Archive.today links follow the pattern: /hash/url
-        const linkRegex = /<a[^>]*href="\/([a-zA-Z0-9]+)\/(https?:\/\/[^"]+)"[^>]*>(.*?)<\/a>/g
-        const dateRegex = /<td class="date">([^<]+)<\/td>/g
-        
+        // Parse the Memento API response
+        // Format: <http://archive.md/20140101030405/https://example.com/>; rel="memento"; datetime="Wed, 01 Jan 2014 03:04:05 GMT"
         const pages: ArchivedPage[] = []
-        let linkMatch
-        const dates: string[] = []
+        const mementoRegex = /<(https?:\/\/archive\.(?:is|today|md|ph)\/([0-9]{8,14})\/(?:https?:\/\/)?([^>]+))>;\s*rel="(?:first\s+)?memento";\s*datetime="([^"]+)"/g
         
-        // Extract all dates first
-        let dateMatch
-        while ((dateMatch = dateRegex.exec(html)) !== null) {
-          dates.push(dateMatch[1])
-        }
-        
-        // Extract all links
+        let mementoMatch
         let index = 0
-        while ((linkMatch = linkRegex.exec(html)) !== null) {
-          if (linkMatch[2].includes(cleanDomain)) {
-            const rawDate = index < dates.length ? dates[index] : ''
-            // Trying to parse archive.today's date format to ISO 8601
-            // Date format is typically like "01 Jan 2022"
-            let isoTimestamp = new Date().toISOString()  // Default to current date
-            
+        
+        while ((mementoMatch = mementoRegex.exec(timemapResponse)) !== null) {
+          const [, snapshotUrl, timestamp, origUrl, datetime] = mementoMatch
+          
+          // Check if the URL belongs to our domain
+          if (origUrl.includes(cleanDomain)) {
             try {
-              if (rawDate) {
-                const parsedDate = new Date(rawDate)
-                if (!Number.isNaN(parsedDate.getTime())) {
-                  isoTimestamp = parsedDate.toISOString()
-                }
-              }
-            } catch {
-              // Fall back to current date if parsing fails
+              // Parse the ISO timestamp
+              const parsedDate = new Date(datetime)
+              const isoTimestamp = !Number.isNaN(parsedDate.getTime()) 
+                ? parsedDate.toISOString() 
+                : new Date().toISOString()
+              
+              // Create cleaned URL
+              const cleanedUrl = cleanDoubleSlashes(origUrl.includes('://') ? origUrl : `https://${origUrl}`)
+              
+              pages.push({
+                url: cleanedUrl,
+                timestamp: isoTimestamp,
+                snapshot: snapshotUrl,
+                _meta: {
+                  hash: timestamp,        // Timestamp from URL
+                  raw_date: datetime,     // Original date format
+                  position: index         // Position in results list
+                } as ArchiveTodayMetadata
+              })
+              
+              index++
+            } catch (error) {
+              console.error('Error parsing archive.today snapshot:', error)
             }
-            
-            // Clean potential double slashes in URL
-            const cleanedUrl = cleanDoubleSlashes(linkMatch[2])
-            
-            // Create direct URL to the archived version
-            const snapUrl = `${snapshotUrl}/${linkMatch[1]}/${cleanedUrl}`
-            
-            pages.push({
-              url: cleanedUrl,
-              timestamp: isoTimestamp,
-              snapshot: snapUrl,
-              _meta: {
-                hash: linkMatch[1],    // Hash from URL
-                raw_date: rawDate,     // Original date format
-                position: index        // Position in results list
-              } as ArchiveTodayMetadata
-            })
-            index++
           }
         }
         
+        // Return response
         return createSuccessResponse(pages, 'archive-today', {
           domain: cleanDomain,
-          page: 1
+          page: 1,
+          empty: pages.length === 0
         })
       } catch (error: any) {
         return createErrorResponse(error, 'archive-today', {
@@ -116,4 +112,3 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
     }
   }
 }
-

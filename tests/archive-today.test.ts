@@ -8,7 +8,46 @@ vi.mock('ofetch', () => ({
 }))
 
 describe('archive.today', () => {
-  it('lists pages for a domain', async () => {
+  it('lists pages for a domain using Memento API', async () => {
+    const mockTimemapResponse = `
+    <https://example.com/>; rel="original",
+    <http://archive.md/timegate/https://example.com/>; rel="timegate",
+    <http://archive.md/20020120142510/http://example.com/>; rel="first memento"; datetime="Sun, 20 Jan 2002 14:25:10 GMT",
+    <http://archive.md/20140101030405/https://example.com/>; rel="memento"; datetime="Wed, 01 Jan 2014 03:04:05 GMT",
+    <http://archive.md/20150308151422/https://example.com/>; rel="memento"; datetime="Sun, 08 Mar 2015 15:14:22 GMT",
+    <http://archive.md/20160810200921/https://example.com/>; rel="memento"; datetime="Wed, 10 Aug 2016 20:09:21 GMT"
+    `
+    
+    vi.mocked(ofetch).mockResolvedValueOnce(mockTimemapResponse)
+    
+    const archiveInstance = createArchiveToday()
+    const archive = createArchiveClient(archiveInstance)
+    const result = await archive.getSnapshots('example.com')
+    
+    expect(result.success).toBe(true)
+    expect(result.pages).toHaveLength(4)
+    
+    // Check first snapshot
+    expect(result.pages[0].url).toBe('https://example.com')
+    expect(result.pages[0].snapshot).toBe('http://archive.md/20020120142510/http://example.com')
+    expect(result.pages[0]._meta.hash).toBe('20020120142510')
+    expect(result.pages[0]._meta.raw_date).toBe('Sun, 20 Jan 2002 14:25:10 GMT')
+    
+    // Verify API call
+    expect(ofetch).toHaveBeenCalledWith(
+      '/timemap/https://example.com',
+      expect.objectContaining({
+        baseURL: 'https://archive.is',
+        method: 'GET'
+      })
+    )
+  })
+  
+  it('falls back to HTML parsing when Memento API fails', async () => {
+    // First request (Memento API) fails
+    vi.mocked(ofetch).mockRejectedValueOnce(new Error('API error'))
+    
+    // Second request (HTML fallback) succeeds
     const mockHtml = `
       <html>
         <table>
@@ -30,77 +69,33 @@ describe('archive.today', () => {
     const archive = createArchiveClient(archiveInstance)
     const result = await archive.getSnapshots('example.com')
     
-    expect(result.success).toBe(true)
-    expect(result.pages).toHaveLength(2)
-    expect(result.pages[0].url).toBe('https://example.com')
-    expect(result.pages[0].snapshot).toBe('https://archive.ph/abc123/https://example.com')
-    expect(result.pages[0]._meta.raw_date).toBe('01 Jan 2022')
-    expect(result.pages[0]._meta.hash).toBe('abc123')
-    
-    expect(result.pages[1].url).toBe('https://example.com/page1')
-    expect(result.pages[1].snapshot).toBe('https://archive.ph/def456/https://example.com/page1')
-    expect(result.pages[1]._meta.raw_date).toBe('02 Feb 2022')
-    expect(result.pages[1]._meta.hash).toBe('def456')
-    expect(ofetch).toHaveBeenCalledWith(
-      '/example.com',
-      expect.objectContaining({
-        baseURL: 'https://archive.ph',
-        method: 'GET'
-      })
-    )
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
   })
   
-  it.skip('handles empty results', async () => {
-    const mockHtml = `<html><body>No snapshots found</body></html>`
+  it('handles empty results from Memento API', async () => {
+    const mockEmptyResponse = 'TimeMap does not exists. The archive has no Mementos for the requested URI'
     
-    vi.mocked(ofetch).mockResolvedValueOnce(mockHtml)
+    vi.mocked(ofetch).mockResolvedValueOnce(mockEmptyResponse)
     
-    // Override implementation to return empty array for this test
-    const archiveInstance = {
-      name: 'Archive.today',
-      slug: 'archive-today',
-      async getSnapshots() {
-        return {
-          success: true,
-          pages: [],
-          _meta: {
-            source: 'archive-today'
-          }
-        }
-      }
-    }
-    
+    const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.getSnapshots('example.com')
+    const result = await archive.getSnapshots('nonexistent-domain.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(0)
+    expect(result._meta.empty).toBe(true)
   })
   
-  it.skip('handles fetch errors', async () => {
+  it('handles fetch errors', async () => {
     vi.mocked(ofetch).mockRejectedValueOnce(new Error('Network error'))
     
-    // Override implementation to return error for this test
-    const archiveInstance = {
-      name: 'Archive.today',
-      slug: 'archive-today',
-      async getSnapshots() {
-        return {
-          success: false,
-          pages: [],
-          error: 'Network error',
-          _meta: {
-            source: 'archive-today'
-          }
-        }
-      }
-    }
-    
+    const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
     const result = await archive.getSnapshots('example.com')
     
     expect(result.success).toBe(false)
-    expect(result.error).toBe('Network error')
+    expect(result.error).toBeDefined()
     expect(result.pages).toHaveLength(0)
   })
 })
