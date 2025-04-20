@@ -1,19 +1,7 @@
 {
   "type": "module",
   "private": true,
-  "scripts": {
-    "dev": "node index.mjs",
-    "cache": "node cache.mjs",
-    "wayback": "node wayback.mjs",
-    "permacc": "node permacc.mjs",
-    "commoncrawl": "node commoncrawl.mjs",
-    "uk-web-archive": "node uk-web-archive.mjs",
-    "multi": "node multi-provider.mjs",
-    "batch": "node batch-processing.mjs",
-    "concurrency": "node concurrency.mjs"
-  },
   "dependencies": {
-    "omnichron": "link:",
-    "unstorage": "1.8.0"
+    "omnichron": "latest"
   }
 }
