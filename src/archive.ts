@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import type { ArchiveOptions, ArchiveResponse, ArchiveProvider, ArchivedPage, ArchiveInterface } from './types'
+import type { ArchiveOptions, ArchiveResponse, ArchiveProvider, ArchivedPage } from './types'
 import { getStoredResponse, storeResponse } from './storage'
 import { mergeOptions, processInParallel } from './utils'
 
