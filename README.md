@@ -42,12 +42,10 @@ pnpm add omnichron
 ## Usage
 
 ```ts
-import { createArchive } from 'omnichron'
-import createWayback from 'omnichron/providers/wayback'
-import createArchiveToday from 'omnichron/providers/archive-today'
+import { createArchive, providers } from 'omnichron'
 
 // Create an archive client for Wayback Machine
-const waybackArchive = createArchive(createWayback())
+const waybackArchive = createArchive(await providers.wayback())
 
 // Get archived snapshots for a domain (with optional limit)
 const response = await waybackArchive.getSnapshots('example.com', { limit: 100 })
@@ -70,23 +68,21 @@ if (response.success) {
   console.error('Error:', response.error)
 }
 
-
 // Using Archive.today
-const archiveTodayArchive = createArchive(createArchiveToday())
+const archiveTodayArchive = createArchive(await providers.archiveToday())
 const archiveTodayResponse = await archiveTodayArchive.getSnapshots('example.com')
 ```
 
-### Tree-shaking support
+### Lazy-loading and Tree-shaking support
 
-For better performance and smaller bundle size, you can import only the providers you need:
+For better performance and smaller bundle size, the providers are lazy-loaded:
 
 ```ts
 // Only import Wayback Machine
-import { createArchive } from 'omnichron'
-import createWayback from 'omnichron/providers/wayback'
+import { createArchive, providers } from 'omnichron'
 
-const waybackProvider = createWayback()
-const archive = createArchive(waybackProvider)
+// The provider is loaded on-demand
+const archive = createArchive(await providers.wayback())
 ```
 
 ### TypeScript support
@@ -119,15 +115,13 @@ console.log(response.meta.total_count)
 Perma.cc requires an API key for authentication:
 
 ```ts
-import { createArchive } from 'omnichron'
-import createPermacc from 'omnichron/providers/permacc'
+import { createArchive, providers } from 'omnichron'
 
 // Create with required API key
-const permaccProvider = createPermacc({
+const archive = createArchive(await providers.permacc({
   apiKey: 'YOUR_API_KEY'
-})
+}))
 
-const archive = createArchive(permaccProvider)
 const response = await archive.getSnapshots('example.com')
 ```
 
@@ -136,11 +130,11 @@ const response = await archive.getSnapshots('example.com')
 omnichron provides an integrated caching system that helps reduce API calls and improve performance:
 
 ```ts
-import { createArchive, configureCache } from 'omnichron'
+import { createArchive, providers, configureStorage } from 'omnichron'
 import fsDriver from 'unstorage/drivers/fs'
 
 // Configure the cache with custom settings
-configureCache({
+configureStorage({
   // Use filesystem driver for persistent cache
   driver: fsDriver({ base: './cache' }),
   // Set cache TTL (time-to-live) in milliseconds (default: 7 days)
@@ -151,8 +145,7 @@ configureCache({
   prefix: 'my-app-cache'
 })
 
-import createWayback from 'omnichron/providers/wayback'
-const archive = createArchive(createWayback())
+const archive = createArchive(await providers.wayback())
 
 // Use cache (default behavior)
 const response1 = await archive.getSnapshots('example.com')
@@ -169,16 +162,14 @@ const freshResponse = await archive.getSnapshots('example.com', { cache: false }
 CommonCrawl provides access to massive web archives through different crawl collections:
 
 ```ts
-import { createArchive } from 'omnichron'
-import createCommonCrawl from 'omnichron/providers/commoncrawl'
+import { createArchive, providers } from 'omnichron'
 
 // Create with a specific collection or use latest (default)
-const commonCrawlProvider = createCommonCrawl({
+const archive = createArchive(await providers.commoncrawl({
   collection: 'CC-MAIN-2023-50',
   limit: 50  // Maximum number of results
-})
+}))
 
-const archive = createArchive(commonCrawlProvider)
 const response = await archive.getSnapshots('example.com')
 ```
 
@@ -233,11 +224,10 @@ interface ArchivedPage {
 omnichron includes several performance optimizations for handling large volumes of requests:
 
 ```ts
-import { createArchive } from 'omnichron'
-import createWayback from 'omnichron/providers/wayback'
+import { createArchive, providers } from 'omnichron'
 
 // Create archive with performance options
-const archive = createArchive(createWayback(), {
+const archive = createArchive(await providers.wayback(), {
   // Control parallel requests (default: 5)
   concurrency: 10,
   // Control batch processing size (default: 50)
@@ -268,16 +258,17 @@ Key performance features:
 You can now use multiple archive providers simultaneously:
 
 ```ts
-import { createArchive } from 'omnichron'
-import createWayback from 'omnichron/providers/wayback'
-import createArchiveToday from 'omnichron/providers/archive-today'
-import createPermacc from 'omnichron/providers/permacc'
+import { createArchive, providers } from 'omnichron'
 
-// Create archive with multiple providers
+// Option 1: Use the all() helper
+const allProviders = await providers.all()
+const multiArchive = createArchive(allProviders)
+
+// Option 2: Create archive with specific providers
 const multiArchive = createArchive([
-  createWayback(),
-  createArchiveToday(),
-  createPermacc({ apiKey: 'YOUR_API_KEY' })
+  await providers.wayback(),
+  await providers.archiveToday(),
+  await providers.permacc({ apiKey: 'YOUR_API_KEY' })
 ])
 
 // This will query all providers in parallel and combine results
@@ -296,20 +287,24 @@ console.log(response._meta.providerCount) // 3
 
 Creates an archive client for one or multiple providers.
 
-- `providers`: A single archive provider instance or an array of providers
+- `providers`: A single archive provider instance (or Promise resolving to provider) or an array of providers (or Promises resolving to providers)
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
 - `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain, returning a full response object
 - `getPages(domain, options?)`: Function to get archived snapshots for a domain, returning only the pages array or throwing on error
+- `use(provider)`: Function to add a new provider to this archive instance
+- `useAll(providers)`: Function to add multiple providers to this archive instance at once
 
 ### Providers
 
-The individual provider factory functions can be imported directly:
-- `import createWayback from 'omnichron/providers/wayback'` — Wayback Machine (web.archive.org)
-- `import createArchiveToday from 'omnichron/providers/archive-today'` — Archive.today (archive.ph)
-- `import createPermacc from 'omnichron/providers/permacc'` — Perma.cc (perma.cc)
-- `import createCommonCrawl from 'omnichron/providers/commoncrawl'` — Common Crawl (commoncrawl.org)
+The individual provider factory functions are accessible through the providers object for lazy-loading:
+- `providers.wayback(options?)` — Wayback Machine (web.archive.org)
+- `providers.archiveToday(options?)` — Archive.today (archive.ph)
+- `providers.permacc(options?)` — Perma.cc (perma.cc)
+- `providers.commoncrawl(options?)` — Common Crawl (commoncrawl.org)
+- `providers.webcite(options?)` — WebCite
+- `providers.all(options?)` — Helper that initializes all common providers at once
 
 ### getSnapshots(domain, options?)
 
@@ -339,20 +334,20 @@ Fetches archived snapshots for a domain, returning only the pages array or throw
   - `timeout`: Request timeout in milliseconds
   - `retries`: Number of retry attempts for failed requests
 
-### configureCache(options?)
+### configureStorage(options?)
 
-Configures the caching system.
+Configures the storage system.
 
 - `options`: Configuration options (optional)
   - `driver`: Custom storage driver from unstorage
   - `ttl`: Default TTL in milliseconds
   - `cache`: Enable/disable cache globally
 
-### clearCache()
+### storage
 
-Clears all cached responses.
+Access to the underlying storage instance.
 
-### clearProviderCache(provider)
+### clearProviderStorage(provider)
 
 Clears cached responses for a specific provider.
 
@@ -360,23 +355,24 @@ Clears cached responses for a specific provider.
 
 ## Roadmap
 
-### Future Providers
+### Providers
 - ✅ Internet Archive's Wayback Machine
 - ✅ Archive.today
 - ✅ Perma.cc
 - ✅ Common Crawl
+- ✅ WebCite
 - 🔜 Archive-It
-- 🔜 WebCite
 - 🔜 Conifer (formerly Webrecorder)
 
-### Future Features
-- 🔜 Page Archiving API - create archives in addition to retrieving them
+### Features
+- ✅ Lazy-loading providers with automatic tree-shaking
 - ✅ Local and persistent caching layer using unstorage
 - ✅ Performance optimizations for high-volume requests
   - Parallel processing with concurrency control
   - Batch processing for large datasets
   - Configurable timeouts and retries
 - ✅ Structured logging with consola
+- 🔜 Page Archiving API - create archives in addition to retrieving them
 
 ## License
 
