@@ -30,95 +30,113 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
     async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
-      // Merge options, preferring request options over init options
       const options = await mergeOptions(initOptions, reqOptions)
-      
-      // Use default values
-      const baseUrl = 'https://index.commoncrawl.org'
-      const snapshotUrl = 'https://data.commoncrawl.org'
-      const collection = options.collection ?? 'CC-MAIN-latest'
-      
-      // Normalize domain and create URL pattern for search
+
+      const baseURL = 'https://index.commoncrawl.org'
+      const dataBaseURL = 'https://data.commoncrawl.org'
+      // Determine collection and CDX index path: use explicit or fetch latest via collinfo.json
+      let collectionName = options.collection as string | undefined
+      let indexName: string
+      if (!collectionName || collectionName === 'CC-MAIN-latest') {
+        let apiPath: string | undefined
+        try {
+          const collinfoOpts = await createFetchOptions(baseURL, {}, { timeout: options.timeout ?? 60_000 })
+          const collinfo = await ofetch('/collinfo.json', collinfoOpts) as Array<any>
+          if (Array.isArray(collinfo) && collinfo.length > 0) {
+            const first = collinfo[0]
+            const cdxApiProp = first['cdx-api'] || first.cdxApi
+            if (typeof cdxApiProp === 'string') {
+              // Extract path from URL or use as-is
+              let raw = cdxApiProp.startsWith('http')
+                ? new URL(cdxApiProp).pathname
+                : cdxApiProp
+              raw = raw.startsWith('/') ? raw.slice(1) : raw
+              apiPath = raw
+              // Derive collection name without '-index'
+              collectionName = raw.endsWith('-index')
+                ? raw.slice(0, -'-index'.length)
+                : raw
+            } else if (typeof first.name === 'string') {
+              collectionName = first.name
+              apiPath = collectionName.endsWith('-index')
+                ? collectionName
+                : `${collectionName}-index`
+            }
+          }
+        } catch {
+          // ignore and fallback
+        }
+        // Fallback defaults if collinfo failed or missing
+        if (!collectionName) collectionName = 'CC-MAIN-latest'
+        if (!apiPath) {
+          apiPath = collectionName.endsWith('-index')
+            ? collectionName
+            : `${collectionName}-index`
+        }
+        indexName = apiPath
+      } else {
+        // Explicit collection provided by user
+        indexName = collectionName.endsWith('-index')
+          ? collectionName
+          : `${collectionName}-index`
+      }
+
       const urlPattern = normalizeDomain(domain)
-      
-      // Prepare fetch options using common utility
-      const fetchOptions = await createFetchOptions(baseUrl, {
+      const params: Record<string, string> = {
         url: urlPattern,
         output: 'json',
-        fl: 'url,timestamp,status,digest',
+        fl: 'url,timestamp,status,mime,length,offset,filename,digest',
         collapse: 'digest',
-        limit: String(options?.limit ?? 1000)
-      }, {
-        timeout: 60_000 // CommonCrawl may need a longer timeout
+        limit: String(options.limit ?? 1000)
+      }
+
+      const fetchOptions = await createFetchOptions(baseURL, params, {
+        timeout: options.timeout ?? 60_000,
+        responseType: 'text'
       })
-      
+
       try {
-        // Use ofetch with CDX Server API path
-        // TypeScript type assertion for the response
-        type CCResponse = {
-          lines?: string[][],
-          blocks?: any[],
-          count?: number,
-          blocks_with_urls?: number
-        }
-        const response = await ofetch(`/${collection}/cdx`, fetchOptions) as CCResponse
-        
-        // No results or invalid response
-        if (!response.lines || !Array.isArray(response.lines) || response.lines.length === 0) {
+        const raw = await ofetch(`/${indexName}`, fetchOptions)
+        const text = typeof raw === 'string' ? raw : String(raw)
+        const lines = text.split('\n').filter(line => line.trim())
+
+        if (lines.length === 0) {
           return createSuccessResponse([], 'commoncrawl', {
-            collection,
+            collection: collectionName,
             queryParams: fetchOptions.params
           })
         }
-        
-        // Extract fields and data rows
-        const fields = ['urlkey', 'timestamp', 'url', 'mime', 'status', 'digest', 'length']
-        const dataRows = response.lines
-        
-        // Map the data to our ArchivedPage interface
-        const pages: ArchivedPage[] = dataRows.map(row => {
-          // Create an object mapping fields to values
-          const rowData: Record<string, string> = {}
-          
-          // Use entries() to get index and value in for-of loop
-          for (const [index, field] of fields.entries()) {
-            rowData[field] = row[index] || ''
-          }
-          
-          // Convert timestamp to ISO format
-          const isoTimestamp = waybackTimestampToISO(rowData.timestamp ?? '')
-          
-          // Clean the URL
-          const cleanedUrl = cleanDoubleSlashes(rowData.url ?? '')
-          
-          // Create direct link to the snapshot
-          // CommonCrawl uses WARC format, build a link based on available data
-          const snapUrl = `${snapshotUrl}/warc/${collection}/${rowData.digest}`
-          
+
+        const records = lines.map(line => JSON.parse(line) as Record<string, string>)
+        const pages: ArchivedPage[] = records.map(record => {
+          const isoTimestamp = waybackTimestampToISO(record.timestamp || '')
+          const cleanedUrl = cleanDoubleSlashes(record.url || '')
+          const snapUrl = `${dataBaseURL}/${record.filename}`
           return {
             url: cleanedUrl,
             timestamp: isoTimestamp,
             snapshot: snapUrl,
             _meta: {
-              timestamp: rowData.timestamp,
-              status: Number.parseInt(rowData.status ?? '0', 10),
-              digest: rowData.digest,
-              mime: rowData.mime,
-              length: rowData.length,
-              collection,
+              timestamp: record.timestamp,
+              status: Number.parseInt(record.status || '0', 10),
+              digest: record.digest,
+              mime: record.mime,
+              length: record.length,
+              offset: record.offset,
+              filename: record.filename,
+              collection: collectionName,
               provider: 'commoncrawl'
             } as CommonCrawlMetadata
           }
         })
-        
+
         return createSuccessResponse(pages, 'commoncrawl', {
-          collection,
-          count: response.count,
-          blocks_with_urls: response.blocks_with_urls,
+          collection: collectionName,
+          count: pages.length,
           queryParams: fetchOptions.params
         })
       } catch (error: any) {
-        return createErrorResponse(error, 'commoncrawl', { collection })
+        return createErrorResponse(error, 'commoncrawl', { collection: collectionName })
       }
     }
   }

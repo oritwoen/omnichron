@@ -9,16 +9,34 @@ vi.mock('ofetch', () => ({
 
 describe('Common Crawl', () => {
   it('lists pages for a domain', async () => {
-    const mockResponse = {
-      lines: [
-        ['org,example)/', '20220101000000', 'https://example.com', 'text/html', '200', 'AAAABBBCCCDD', '12345'],
-        ['org,example)/page1', '20220202000000', 'https://example.com/page1', 'text/html', '200', 'EEEFFGGHHII', '23456']
-      ],
-      count: 1,
-      blocks_with_urls: 2
-    }
-    
-    vi.mocked(ofetch).mockResolvedValueOnce(mockResponse)
+    const records = [
+      {
+        url: 'https://example.com',
+        timestamp: '20220101000000',
+        mime: 'text/html',
+        status: '200',
+        digest: 'AAAABBBCCCDD',
+        length: '12345',
+        offset: '123',
+        filename: 'warc/CC-MAIN-latest/AAAABBBCCCDD'
+      },
+      {
+        url: 'https://example.com/page1',
+        timestamp: '20220202000000',
+        mime: 'text/html',
+        status: '200',
+        digest: 'EEEFFGGHHII',
+        length: '23456',
+        offset: '456',
+        filename: 'warc/CC-MAIN-latest/EEEFFGGHHII'
+      }
+    ]
+    const ndjson = records.map(r => JSON.stringify(r)).join('\n') + '\n'
+    // Mock collection info first, then NDJSON lines
+    const collInfo = [{ name: 'CC-MAIN-2023-50' }]
+    vi.mocked(ofetch)
+      .mockResolvedValueOnce(collInfo)
+      .mockResolvedValueOnce(ndjson)
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
@@ -32,15 +50,21 @@ describe('Common Crawl', () => {
     expect(result.pages[0].timestamp).toBe('2022-01-01T00:00:00Z')
     expect(result.pages[0].snapshot).toMatch(/https:\/\/data\.commoncrawl\.org\/warc\/CC-MAIN-latest\/AAAABBBCCCDD/)
     expect(result.pages[0]._meta.status).toBe(200)
-    expect(result.pages[0]._meta.collection).toBe('CC-MAIN-latest')
+    expect(result.pages[0]._meta.collection).toBe('CC-MAIN-2023-50')
     
     // Check second result
     expect(result.pages[1].url).toBe('https://example.com/page1')
     expect(result.pages[1].snapshot).toMatch(/https:\/\/data\.commoncrawl\.org\/warc\/CC-MAIN-latest\/EEEFFGGHHII/)
     
-    // Check if the query was made with correct parameters
-    expect(ofetch).toHaveBeenCalledWith(
-      '/CC-MAIN-latest/cdx',
+    // Check calls: first to fetch collections, then to fetch index
+    expect(ofetch).toHaveBeenNthCalledWith(
+      1,
+      '/collinfo.json',
+      expect.objectContaining({ baseURL: 'https://index.commoncrawl.org' })
+    )
+    expect(ofetch).toHaveBeenNthCalledWith(
+      2,
+      '/CC-MAIN-2023-50-index',
       expect.objectContaining({
         baseURL: 'https://index.commoncrawl.org',
         method: 'GET',
@@ -53,14 +77,12 @@ describe('Common Crawl', () => {
   })
   
   it('handles empty results', async () => {
-    // CommonCrawl returns an object with an empty lines array
-    const mockResponse = {
-      lines: [],
-      count: 0,
-      blocks_with_urls: 0
-    }
-    
-    vi.mocked(ofetch).mockResolvedValueOnce(mockResponse)
+    // CommonCrawl returns no data for empty results
+    // Mock collection info then empty NDJSON
+    const collInfo = [{ name: 'CC-MAIN-2023-50' }]
+    vi.mocked(ofetch)
+      .mockResolvedValueOnce(collInfo)
+      .mockResolvedValueOnce('')
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
