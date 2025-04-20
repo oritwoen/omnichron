@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.2.10
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.9...v0.2.10)
+
+### 💅 Refactors
+
+- Replace ofetch with $fetch in archive providers ([47075a0](https://github.com/oritwoen/omnichron/commit/47075a0))
+- Improve test suite ([af7c9db](https://github.com/oritwoen/omnichron/commit/af7c9db))
+
+### 🏡 Chore
+
+- Update packageManager to pnpm@10.8.1 ([1643f47](https://github.com/oritwoen/omnichron/commit/1643f47))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.9
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.8...v0.2.9)

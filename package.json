@@ -1,6 +1,6 @@
 {
   "name": "omnichron",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Unified interface for web archive providers",
   "license": "MIT",
   "author": "oritwoen",
@@ -45,13 +45,10 @@
   ],
   "scripts": {
     "dev": "vitest dev",
-
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck",
-
     "build": "unbuild",
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release --push && pnpm publish"
@@ -71,7 +68,6 @@
     "typescript": "5.8.3",
     "changelogen": "0.6.1",
     "eslint-config-unjs": "0.4.2",
-
     "@types/node": "22.14.1",
     "@vitest/coverage-v8": "3.1.1"
   },
