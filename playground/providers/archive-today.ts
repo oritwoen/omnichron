@@ -1,8 +1,7 @@
-import { createArchive } from 'omnichron'
-import archiveToday from 'omnichron/providers/archive-today'
+import { createArchive, providers } from 'omnichron'
 
 const archive = createArchive(
-  archiveToday()
+  await providers.archiveToday()
 )
 
 const snapshots = await archive.getSnapshots('example.com')

@@ -1,8 +1,7 @@
-import { createArchive } from 'omnichron'
-import webcite from 'omnichron/providers/webcite'
+import { createArchive, providers } from 'omnichron'
 
 const archive = createArchive(
-  webcite({
+  await providers.webcite({
     timeout: 30000
   })
 )

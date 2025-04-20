@@ -1,20 +1,7 @@
-import { createArchive } from 'omnichron'
-import archiveToday from 'omnichron/providers/archive-today'
-import commoncrawl from 'omnichron/providers/commoncrawl'
-import mementoTime from 'omnichron/providers/memento-time'
-import permacc from 'omnichron/providers/permacc'
-import ukWebArchive from 'omnichron/providers/uk-web-archive'
-import wayback from 'omnichron/providers/wayback'
+import { createArchive, providers } from 'omnichron'
 
 // Create archive with all providers
-const archive = createArchive([
-  archiveToday({ timeout: 5000 }),
-  commoncrawl({ timeout: 5000 }),
-  mementoTime({ timeout: 5000 }),
-  permacc({ timeout: 5000 }),
-  ukWebArchive({ timeout: 5000 }),
-  wayback({ limit: 10 })
-])
+const archive = createArchive(await providers.all({ timeout: 5000 }))
 
 const domain = 'example.com'
 console.log(`Searching snapshots for domain: ${domain}`)

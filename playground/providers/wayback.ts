@@ -1,8 +1,7 @@
-import { createArchive } from 'omnichron'
-import wayback from 'omnichron/providers/wayback'
+import { createArchive, providers } from 'omnichron'
 
 const archive = createArchive(
-  wayback({
+  await providers.wayback({
     limit: 10,
     timeout: 10
   })

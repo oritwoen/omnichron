@@ -1,8 +1,7 @@
-import { createArchive } from 'omnichron'
-import permacc from 'omnichron/providers/permacc'
+import { createArchive, providers } from 'omnichron'
 
 const archive = createArchive(
-  permacc({
+  await providers.permacc({
     apiKey: 'your-api-key-here',
   })
 )
