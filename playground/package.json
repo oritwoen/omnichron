@@ -1,7 +1,14 @@
 {
   "type": "module",
   "private": true,
+
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build"
+  },
+
   "dependencies": {
+    "nuxt": "latest",
     "omnichron": "latest"
   }
 }

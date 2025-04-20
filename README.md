@@ -45,7 +45,7 @@ pnpm add omnichron
 import { createArchive, providers } from 'omnichron'
 
 // Create an archive client for Wayback Machine
-const waybackArchive = createArchive(await providers.wayback())
+const waybackArchive = createArchive(providers.wayback())
 
 // Get archived snapshots for a domain (with optional limit)
 const response = await waybackArchive.getSnapshots('example.com', { limit: 100 })
@@ -69,8 +69,26 @@ if (response.success) {
 }
 
 // Using Archive.today
-const archiveTodayArchive = createArchive(await providers.archiveToday())
+const archiveTodayArchive = createArchive(providers.archiveToday())
 const archiveTodayResponse = await archiveTodayArchive.getSnapshots('example.com')
+```
+
+### API Server Example
+
+```ts
+// Nuxt.js API endpoint (server/api/snapshots.ts)
+import { createArchive, providers } from 'omnichron'
+
+const archive = createArchive(
+  providers.all({
+    timeout: 60 * 10
+  })
+)
+
+export default defineEventHandler(async () => {
+  const snapshots = await archive.getSnapshots('example.com')
+  return snapshots
+})
 ```
 
 ### Lazy-loading and Tree-shaking support
@@ -82,7 +100,7 @@ For better performance and smaller bundle size, the providers are lazy-loaded:
 import { createArchive, providers } from 'omnichron'
 
 // The provider is loaded on-demand
-const archive = createArchive(await providers.wayback())
+const archive = createArchive(providers.wayback())
 ```
 
 ### TypeScript support
@@ -118,7 +136,7 @@ Perma.cc requires an API key for authentication:
 import { createArchive, providers } from 'omnichron'
 
 // Create with required API key
-const archive = createArchive(await providers.permacc({
+const archive = createArchive(providers.permacc({
   apiKey: 'YOUR_API_KEY'
 }))
 
@@ -145,7 +163,7 @@ configureStorage({
   prefix: 'my-app-cache'
 })
 
-const archive = createArchive(await providers.wayback())
+const archive = createArchive(providers.wayback())
 
 // Use cache (default behavior)
 const response1 = await archive.getSnapshots('example.com')
@@ -165,7 +183,7 @@ CommonCrawl provides access to massive web archives through different crawl coll
 import { createArchive, providers } from 'omnichron'
 
 // Create with a specific collection or use latest (default)
-const archive = createArchive(await providers.commoncrawl({
+const archive = createArchive(providers.commoncrawl({
   collection: 'CC-MAIN-2023-50',
   limit: 50  // Maximum number of results
 }))
@@ -227,7 +245,7 @@ omnichron includes several performance optimizations for handling large volumes 
 import { createArchive, providers } from 'omnichron'
 
 // Create archive with performance options
-const archive = createArchive(await providers.wayback(), {
+const archive = createArchive(providers.wayback(), {
   // Control parallel requests (default: 5)
   concurrency: 10,
   // Control batch processing size (default: 50)
@@ -261,14 +279,14 @@ You can now use multiple archive providers simultaneously:
 import { createArchive, providers } from 'omnichron'
 
 // Option 1: Use the all() helper
-const allProviders = await providers.all()
+const allProviders = providers.all()
 const multiArchive = createArchive(allProviders)
 
 // Option 2: Create archive with specific providers
 const multiArchive = createArchive([
-  await providers.wayback(),
-  await providers.archiveToday(),
-  await providers.permacc({ apiKey: 'YOUR_API_KEY' })
+  providers.wayback(),
+  providers.archiveToday(),
+  providers.permacc({ apiKey: 'YOUR_API_KEY' })
 ])
 
 // This will query all providers in parallel and combine results
@@ -287,7 +305,7 @@ console.log(response._meta.providerCount) // 3
 
 Creates an archive client for one or multiple providers.
 
-- `providers`: A single archive provider instance (or Promise resolving to provider) or an array of providers (or Promises resolving to providers)
+- `providers`: A single archive provider instance or an array of providers
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
@@ -365,7 +383,8 @@ Clears cached responses for a specific provider.
 - 🔜 Conifer (formerly Webrecorder)
 
 ### Features
-- ✅ Lazy-loading providers with automatic tree-shaking
+- ✅ Proxy-based lazy-loading providers with automatic tree-shaking
+- ✅ Framework-agnostic design (works with Node.js, Nuxt, Edge functions, etc.)
 - ✅ Local and persistent caching layer using unstorage
 - ✅ Performance optimizations for high-volume requests
   - Parallel processing with concurrency control
