@@ -77,11 +77,18 @@ export interface ArchivedPage {
   snapshot: string    // Direct URL to the archived version
   
   // Provider-specific metadata with improved typing
-  _meta: {
-    [key: string]: unknown;
-    timestamp?: string;
-    status?: number | string;
-  }
+  _meta: ArchivedPageMetadata
+}
+
+export interface ArchivedPageMetadata {
+  // Common metadata fields
+  timestamp?: string;
+  status?: number | string;
+  provider?: string;
+  source?: string;
+  
+  // Allow additional provider-specific metadata
+  [key: string]: unknown;
 }
 
 // Type for response metadata
@@ -120,3 +127,24 @@ export interface ArchiveProvider {
 // Read-only types for immutable data
 export type ReadonlyArchivedPage = Readonly<ArchivedPage>;
 export type ReadonlyArchiveResponse = Readonly<ArchiveResponse>;
+
+/**
+ * Interface for Archive instances
+ * Defines the public API that all archive implementations must provide
+ */
+export interface ArchiveInterface {
+  // Configuration options
+  readonly options?: ArchiveOptions;
+  
+  // Core methods
+  getSnapshots(domain: string, options?: ArchiveOptions): Promise<ArchiveResponse>;
+  getPages(domain: string, options?: ArchiveOptions): Promise<ArchivedPage[]>;
+  
+  // Provider management
+  use(provider: ArchiveProvider | Promise<ArchiveProvider>): Promise<ArchiveInterface>;
+  useAll(providers: (ArchiveProvider | Promise<ArchiveProvider>)[]): Promise<ArchiveInterface>;
+  
+  // Event hooks (for plugins)
+  onBeforeRequest?(domain: string, options: ArchiveOptions): Promise<void>;
+  onAfterResponse?(response: ArchiveResponse): Promise<void>;
+}
