@@ -1,4 +1,4 @@
-import { ofetch } from 'ofetch'
+import { $fetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from '../types'
 import type { CommonCrawlOptions } from '../_providers'
@@ -41,7 +41,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
         let apiPath: string | undefined
         try {
           const collinfoOpts = await createFetchOptions(baseURL, {}, { timeout: options.timeout ?? 60_000 })
-          const collinfo = await ofetch('/collinfo.json', collinfoOpts) as Array<any>
+          const collinfo = await $fetch('/collinfo.json', collinfoOpts) as Array<any>
           if (Array.isArray(collinfo) && collinfo.length > 0) {
             const first = collinfo[0]
             const cdxApiProp = first['cdx-api'] || first.cdxApi
@@ -96,7 +96,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
       })
 
       try {
-        const raw = await ofetch(`/${indexName}`, fetchOptions)
+        const raw = await $fetch(`/${indexName}`, fetchOptions)
         const text = typeof raw === 'string' ? raw : String(raw)
         const lines = text.split('\n').filter(line => line.trim())
 

@@ -1,7 +1,7 @@
-import { ofetch } from 'ofetch'
+import { $fetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, ArchiveTodayMetadata } from '../types'
-import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from 'omnichron/utils'
+import { createSuccessResponse, createErrorResponse, mergeOptions, normalizeDomain } from 'omnichron/utils'
 
 /**
  * Create an Archive.today archive provider.
@@ -26,24 +26,11 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
       const _options = mergeOptions(initOptions, reqOptions)
       
       // Use default values
-      const baseUrl = 'https://archive.is'
+      const baseURL = 'https://archive.is'
       const _snapshotUrl = 'https://archive.is'
       
       // Clean domain by removing protocol
       const cleanDomain = normalizeDomain(domain, false)
-      
-      // Prepare fetch options using common utility but WITHOUT query parameters
-      // Archive.today timemap API doesn't support query parameters
-      const fetchOptions = await createFetchOptions(baseUrl, {}, {
-        retry: 5,           // More retries for archive.today
-        timeout: 60000,     // Extended timeout (60 seconds)
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Referer': baseUrl
-        }
-      })
       
       try {
         // Using Memento API to get timemap directly with the domain
@@ -51,10 +38,11 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
         const fullUrl = cleanDomain.includes('://') ? cleanDomain : `http://${cleanDomain}`
         const timemapUrl = `/timemap/${fullUrl}`
         
-        const timemapResponse = await ofetch(timemapUrl, {
-          ...fetchOptions,
-          responseType: 'text',  // Explicitly request text response
-          parseResponse: txt => txt  // Ensure we get raw text
+        const timemapResponse = await $fetch(timemapUrl, {
+          baseURL,
+          retry: 5,
+          timeout: 60000,
+          responseType: 'text',
         })
         
         // Parse the Memento API response

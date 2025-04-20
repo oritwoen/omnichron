@@ -1,6 +1,5 @@
-import { ofetch } from 'ofetch'
+import { $fetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
-import { consola } from 'consola'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from 'omnichron/utils'
@@ -79,7 +78,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
         }
         
         // Type assertion instead of generic to avoid type conflicts
-        const response = await ofetch('/v1/public/archives/', fetchOptions) as PermaccResponse
+        const response = await $fetch('/v1/public/archives/', fetchOptions) as PermaccResponse
         
         if (!response.objects || response.objects.length === 0) {
           return createSuccessResponse([], 'permacc', { queryParams: fetchOptions.params })

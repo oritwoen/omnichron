@@ -1,4 +1,4 @@
-import { ofetch } from 'ofetch'
+import { $fetch } from 'ofetch'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { WebCiteOptions } from '../_providers'
 import { 
@@ -45,11 +45,6 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
         url: encodeURIComponent(cleanDomain) // Query parameter for retrieval - must be properly encoded
       }, {
         timeout: options.timeout ?? 30000,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5'
-        }
       })
       
       try {
@@ -59,7 +54,7 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
         
         try {
           // Try to access the specific archived URL directly
-          const response = await ofetch(queryPath, fetchOptions)
+          const response = await $fetch(queryPath, fetchOptions)
           
           // WebCite is read-only now, only return what we can find for the specific URL
           // Format of snapshot URLs: https://www.webcitation.org/[ID]

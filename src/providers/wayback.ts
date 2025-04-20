@@ -1,4 +1,4 @@
-import { ofetch } from 'ofetch'
+import { $fetch } from 'ofetch'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import {
   normalizeDomain,
@@ -51,7 +51,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         // Use ofetch with CDX Server API path
         // TypeScript type assertion for the response
         type WaybackResponse = [string[], ...string[][]]
-        const response = await ofetch('/cdx/search/cdx', fetchOptions) as WaybackResponse
+        const response = await $fetch('/cdx/search/cdx', fetchOptions) as WaybackResponse
         
         // The response is an array where the first element is the header and the rest are data rows
         if (!Array.isArray(response) || response.length <= 1) {
