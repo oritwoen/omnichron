@@ -1,6 +1,32 @@
 # Changelog
 
 
+## v0.3.0
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.10...v0.3.0)
+
+### 🚀 Enhancements
+
+- ⚠️  Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
+
+### 💅 Refactors
+
+- Streamline provider imports and usage in archive creation ([bfb7154](https://github.com/oritwoen/omnichron/commit/bfb7154))
+- Remove unused ArchiveInterface import from archive.ts ([30bd845](https://github.com/oritwoen/omnichron/commit/30bd845))
+- Update usage examples to utilize lazy-loading for archive providers ([13bef50](https://github.com/oritwoen/omnichron/commit/13bef50))
+
+### 🏡 Chore
+
+- Remove old playgrounds ([50de406](https://github.com/oritwoen/omnichron/commit/50de406))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.10
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.9...v0.2.10)
