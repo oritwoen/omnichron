@@ -3,7 +3,7 @@ import permacc from 'omnichron/providers/permacc'
 
 const archive = createArchive(
   permacc({
-    timeout: 5000 // 5 seconds timeout
+    apiKey: 'your-api-key-here',
   })
 )
 

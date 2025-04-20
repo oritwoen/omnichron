@@ -11,6 +11,9 @@ export interface ArchiveOptions {
   batchSize?: number   // Number of items to process in a single batch (default: 50)
   timeout?: number     // Request timeout in milliseconds (default: 30000)
   retries?: number     // Number of retry attempts for failed requests (default: 2)
+  
+  // Provider-specific authentication (can be overridden in provider-specific options)
+  apiKey?: string      // Optional API key for providers that require authentication
 }
 
 // Base metadata interface with common properties

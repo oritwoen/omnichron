@@ -1,5 +1,6 @@
 import { ofetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
+import { consola } from 'consola'
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage } from '../types'
 import type { PermaccOptions } from '../_providers'
 import { createSuccessResponse, createErrorResponse, createFetchOptions, mergeOptions, normalizeDomain } from 'omnichron/utils'
@@ -23,12 +24,16 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
     async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
-      // Merge options, preferring request options over init options
-      const options = await mergeOptions(initOptions, reqOptions)
+
+      // Merge options, preserving apiKey from initOptions if not provided in reqOptions
+      const options = await mergeOptions<PermaccOptions>(
+        initOptions,
+        reqOptions
+      )
       
       // Ensure API key is provided
       if (!options.apiKey) {
-        return createErrorResponse('API key is required for Perma.cc', 'permacc')
+        throw new Error('API key is required for Perma.cc')
       }
       
       // Use default values and required apiKey
@@ -46,8 +51,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
         url: cleanDomain // Search by URL
       }, {
         headers: {
-          'Authorization': `ApiKey ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Authorization': `ApiKey ${apiKey}`
         }
       })
       

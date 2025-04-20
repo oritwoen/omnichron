@@ -205,6 +205,7 @@ export async function mergeOptions<T extends ArchiveOptions>(
     ttl: config.storage.ttl
   }
   
+  // Create merged options with all properties preserved
   return { 
     ...defaultOptions,
     ...initOptions, 
