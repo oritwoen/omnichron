@@ -34,10 +34,14 @@ describe('Perma.cc Platform', () => {
 
   it('should require an API key', async () => {
     const permacc = createPermacc({} as PermaccOptions)
-    const result = await permacc.getSnapshots('example.com')
     
-    expect(result.success).toBe(false)
-    expect(result.error).toBe('API key is required for Perma.cc')
+    try {
+      await permacc.getSnapshots('example.com')
+      // Should not reach this point
+      expect(true).toBe(false)
+    } catch (error: any) {
+      expect(error.message).toBe('API key is required for Perma.cc')
+    }
   })
 
   it('should fetch and format archived pages', async () => {

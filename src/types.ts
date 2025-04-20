@@ -53,6 +53,11 @@ export interface ArchiveTodayMetadata extends ArchiveMetadata {
   position?: number;
 }
 
+export interface WebCiteMetadata extends ArchiveMetadata {
+  requestId: string;
+  position?: number;
+}
+
 export interface UkWebArchiveMetadata extends ArchiveMetadata {
   timestamp: string;
   status: number;
