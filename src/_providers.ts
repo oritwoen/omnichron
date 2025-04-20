@@ -19,17 +19,11 @@ export interface CommonCrawlOptions extends ArchiveOptions {
   collection?: string // Identifier of the crawl collection (e.g. 'CC-MAIN-2023-50' or 'CC-MAIN-latest')
 }
 
-export interface MementoTimeOptions extends ArchiveOptions {
-  // Can add specific options for Memento Time Travel API if needed
-  timeGate?: boolean // Example option to use TimeGate instead of TimeMap
-}
-
 export type ProviderOptions = {
   'wayback': WaybackOptions
   'archive-today': ArchiveTodayOptions
   'permacc': PermaccOptions
   'commoncrawl': CommonCrawlOptions
-  'memento-time': MementoTimeOptions
 }
 
 // Provider map and modules - using paths from tsconfig.json
@@ -37,6 +31,5 @@ export const providers = Object.freeze({
   'wayback': 'archivepkg/providers/wayback',
   'archive-today': 'archivepkg/providers/archive-today',
   'permacc': 'archivepkg/providers/permacc',
-  'commoncrawl': 'archivepkg/providers/commoncrawl',
-  'memento-time': 'archivepkg/providers/memento-time'
+  'commoncrawl': 'archivepkg/providers/commoncrawl'
 })
