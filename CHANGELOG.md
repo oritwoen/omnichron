@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.8
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.7...v0.2.8)
+
+### 🩹 Fixes
+
+- Enhance Common Crawl provider to handle collection fetching ([2ebe1ef](https://github.com/oritwoen/omnichron/commit/2ebe1ef))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.7
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.6...v0.2.7)
