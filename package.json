@@ -45,31 +45,35 @@
   ],
   "scripts": {
     "dev": "vitest dev",
+
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+
+    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
+    "test:types": "tsc --noEmit --skipLibCheck",
+
     "build": "unbuild",
     "prepack": "pnpm build",
-    "release": "pnpm test && changelogen --release --push && pnpm publish",
-    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
-    "test:types": "tsc --noEmit --skipLibCheck"
+    "release": "pnpm test && changelogen --release --push && pnpm publish"
   },
   "dependencies": {
-    "c12": "^3.0.3",
-    "consola": "3.4.2",
+    "ufo": "1.6.1",
+    "c12": "3.0.3",
     "defu": "6.1.4",
     "ofetch": "1.4.1",
-    "ufo": "1.6.1",
+    "consola": "3.4.2",
     "unstorage": "1.15.0"
   },
   "devDependencies": {
-    "@types/node": "22.14.1",
-    "@vitest/coverage-v8": "3.1.1",
-    "changelogen": "0.6.1",
-    "eslint": "9.24.0",
-    "eslint-config-unjs": "0.4.2",
-    "typescript": "5.8.3",
+    "vitest": "3.1.1",
+    "eslint": "9.25.0",
     "unbuild": "3.5.0",
-    "vitest": "3.1.1"
+    "typescript": "5.8.3",
+    "changelogen": "0.6.1",
+    "eslint-config-unjs": "0.4.2",
+
+    "@types/node": "22.14.1",
+    "@vitest/coverage-v8": "3.1.1"
   },
   "resolutions": {
     "omnichron": "link:."

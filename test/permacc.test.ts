@@ -5,7 +5,7 @@ import { PermaccOptions } from '../src/_providers'
 // Mock fetch
 vi.mock('ofetch', () => {
   return {
-    ofetch: vi.fn().mockImplementation(() => {
+    $fetch: vi.fn().mockImplementation(() => {
       return {
         objects: [
           {
