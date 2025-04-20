@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v0.2.9
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.8...v0.2.9)
+
+### 🚀 Enhancements
+
+- Add webcite provider ([1ee9024](https://github.com/oritwoen/omnichron/commit/1ee9024))
+
+### 💅 Refactors
+
+- Remove unused permacc.mjs file and update permacc provider to require apiKey ([7c48b48](https://github.com/oritwoen/omnichron/commit/7c48b48))
+- Remove UK Web Archive provider and related tests ([19279bd](https://github.com/oritwoen/omnichron/commit/19279bd))
+- Remove Memento Time Travel provider and related tests ([11c6c0f](https://github.com/oritwoen/omnichron/commit/11c6c0f))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.2.8
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.7...v0.2.8)
