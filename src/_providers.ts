@@ -28,12 +28,3 @@ export type ProviderOptions = {
   'commoncrawl': CommonCrawlOptions
   'webcite': WebCiteOptions
 }
-
-// Provider map and modules - using paths from tsconfig.json
-export const providers = Object.freeze({
-  'wayback': 'archivepkg/providers/wayback',
-  'archive-today': 'archivepkg/providers/archive-today',
-  'permacc': 'archivepkg/providers/permacc',
-  'commoncrawl': 'archivepkg/providers/commoncrawl',
-  'webcite': 'archivepkg/providers/webcite'
-})

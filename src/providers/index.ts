@@ -15,10 +15,10 @@ export const providers = {
   /**
    * Creates a Wayback Machine provider.
    * @param options - Configuration options for the Wayback Machine provider
-   * @returns Promise resolving to the Wayback Machine provider
+   * @returns The Wayback Machine provider
    * @example
    * ```js
-   * const waybackProvider = await providers.wayback({ limit: 100 })
+   * const waybackProvider = providers.wayback({ limit: 100 })
    * ```
    */
   async wayback(options?: WaybackOptions): Promise<ArchiveProvider> {
@@ -29,10 +29,10 @@ export const providers = {
   /**
    * Creates an Archive.today provider.
    * @param options - Configuration options for the Archive.today provider
-   * @returns Promise resolving to the Archive.today provider
+   * @returns The Archive.today provider
    * @example
    * ```js
-   * const archiveTodayProvider = await providers.archiveToday({ maxRedirects: 5 })
+   * const archiveTodayProvider = providers.archiveToday({ maxRedirects: 5 })
    * ```
    */
   async archiveToday(options?: ArchiveTodayOptions): Promise<ArchiveProvider> {
@@ -43,10 +43,10 @@ export const providers = {
   /**
    * Creates a Perma.cc provider.
    * @param options - Configuration options for the Perma.cc provider (requires apiKey)
-   * @returns Promise resolving to the Perma.cc provider
+   * @returns The Perma.cc provider
    * @example
    * ```js
-   * const permaccProvider = await providers.permacc({ apiKey: 'your-api-key' })
+   * const permaccProvider = providers.permacc({ apiKey: 'your-api-key' })
    * ```
    */
   async permacc(options?: PermaccOptions): Promise<ArchiveProvider> {
@@ -57,10 +57,10 @@ export const providers = {
   /**
    * Creates a Common Crawl provider.
    * @param options - Configuration options for the Common Crawl provider
-   * @returns Promise resolving to the Common Crawl provider
+   * @returns The Common Crawl provider
    * @example
    * ```js
-   * const commoncrawlProvider = await providers.commoncrawl({ collection: 'CC-MAIN-2023-50' })
+   * const commoncrawlProvider = providers.commoncrawl({ collection: 'CC-MAIN-2023-50' })
    * ```
    */
   async commoncrawl(options?: CommonCrawlOptions): Promise<ArchiveProvider> {
@@ -71,10 +71,10 @@ export const providers = {
   /**
    * Creates a WebCite provider.
    * @param options - Configuration options for the WebCite provider
-   * @returns Promise resolving to the WebCite provider
+   * @returns The WebCite provider
    * @example
    * ```js
-   * const webciteProvider = await providers.webcite({ timeout: 10000 })
+   * const webciteProvider = providers.webcite({ timeout: 10000 })
    * ```
    */
   async webcite(options?: WebCiteOptions): Promise<ArchiveProvider> {
@@ -86,10 +86,10 @@ export const providers = {
    * Helper to initialize all commonly used providers at once.
    * Note: Perma.cc is excluded as it requires an API key.
    * @param options - Common configuration options for all providers
-   * @returns Promise resolving to an array of all common providers
+   * @returns An array of all common providers
    * @example
    * ```js
-   * const allProviders = await providers.all({ timeout: 15000 })
+   * const allProviders = providers.all({ timeout: 15000 })
    * const archive = createArchive(allProviders)
    * ```
    */
