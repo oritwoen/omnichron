@@ -9,7 +9,7 @@ import {
   createErrorResponse, 
   createFetchOptions, 
   mergeOptions 
-} from 'omnichron/utils'
+} from '../utils'
 
 /**
  * Create a Common Crawl archive provider.

@@ -23,18 +23,7 @@
   ],
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.mts",
-      "import": "./dist/utils/index.mjs"
-    },
-    "./providers/*": {
-      "types": "./dist/providers/*.d.ts",
-      "default": "./dist/providers/*.mjs"
-    }
+    ".": "./dist/index.mjs"
   },
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -49,7 +38,7 @@
     "lint:fix": "eslint . --fix",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck",
-    "build": "unbuild",
+    "build": "obuild src/index.ts",
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release --push && pnpm publish"
   },
@@ -64,7 +53,7 @@
   "devDependencies": {
     "vitest": "3.1.1",
     "eslint": "9.25.0",
-    "unbuild": "3.5.0",
+    "obuild": "0.0.4",
     "typescript": "5.8.3",
     "changelogen": "0.6.1",
     "eslint-config-unjs": "0.4.2",

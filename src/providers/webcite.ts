@@ -7,7 +7,7 @@ import {
   createErrorResponse, 
   createFetchOptions, 
   mergeOptions 
-} from 'omnichron/utils'
+} from '../utils'
 
 /**
  * Create a WebCite archive provider.

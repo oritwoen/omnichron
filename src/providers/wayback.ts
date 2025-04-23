@@ -7,7 +7,7 @@ import {
   createFetchOptions,
   mergeOptions,
   mapCdxRows
-} from 'omnichron/utils'
+} from '../utils'
 
 /**
  * Create a Wayback Machine archive provider.

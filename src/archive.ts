@@ -34,7 +34,13 @@ import { mergeOptions, processInParallel } from './utils'
 export function createArchive(
   providers: ArchiveProvider | ArchiveProvider[] | Promise<ArchiveProvider> | Promise<ArchiveProvider[]>, 
   options?: ArchiveOptions
-) {
+): {
+  options?: ArchiveOptions;
+  getSnapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse>;
+  getPages(domain: string, listOptions?: ArchiveOptions): Promise<ArchivedPage[]>;
+  use(provider: ArchiveProvider | Promise<ArchiveProvider>): Promise<any>;
+  useAll(newProviders: (ArchiveProvider | Promise<ArchiveProvider>)[]): Promise<any>;
+} {
   // Storage for resolved providers
   let resolvedProviders: ArchiveProvider[] | undefined = undefined;
   

@@ -1,7 +1,7 @@
 import { $fetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, ArchiveTodayMetadata } from '../types'
-import { createSuccessResponse, createErrorResponse, mergeOptions, normalizeDomain } from 'omnichron/utils'
+import { createSuccessResponse, createErrorResponse, mergeOptions, normalizeDomain } from '../utils'
 
 /**
  * Create an Archive.today archive provider.
