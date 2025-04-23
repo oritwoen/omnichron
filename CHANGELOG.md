@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.3.1
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.3.0...v0.3.1)
+
+### 🚀 Enhancements
+
+- **build:** Use `obuild` instead `unbuild` ([4ea7fc4](https://github.com/oritwoen/omnichron/commit/4ea7fc4))
+
+### 💅 Refactors
+
+- **playground:** Use nuxt/cloudflare examples ([1adeb61](https://github.com/oritwoen/omnichron/commit/1adeb61))
+
+### 🏡 Chore
+
+- **playground:** Add initial setup script for building and installing dependencies ([b27a76a](https://github.com/oritwoen/omnichron/commit/b27a76a))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.3.0
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.2.10...v0.3.0)
