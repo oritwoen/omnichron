@@ -393,6 +393,35 @@ Clears cached responses for a specific provider.
 - ✅ Structured logging with consola
 - 🔜 Page Archiving API - create archives in addition to retrieving them
 
+## Comparison: omnichron vs urlfinder
+
+While both omnichron and [urlfinder](https://github.com/projectdiscovery/urlfinder) serve similar purposes in discovering URLs, they have distinct approaches and strengths:
+
+| Feature | omnichron | urlfinder |
+| ------- | --------- | --------- |
+| **Primary Focus** | Complete web archive access with historical snapshots | URL discovery only |
+| **Key Advantage** | Full access to archived page content via `snapshot` URLs | Faster pure URL discovery |
+| **Use Case** | Research, content recovery, historical analysis | Attack surface mapping, reconnaissance |
+| **Providers** | Archive.org, Archive.today, Perma.cc, CommonCrawl, WebCite | Multiple passive sources optimized for URL discovery |
+| **Output** | Rich data objects with full metadata and snapshot links | Simple URL listings |
+| **Language** | TypeScript/JavaScript (Node.js, browser compatible) | Go |
+| **Unique Feature** | Historical page content access & analysis | High-speed URL enumeration |
+
+### When to use omnichron
+
+- When you need to access and analyze historical content of websites
+- For content recovery from defunct websites
+- For comprehensive web research requiring historical context
+- When you need structured data with full metadata about archives
+- For projects requiring TypeScript/JavaScript integration
+
+### When to use urlfinder
+
+- For pure reconnaissance and URL discovery
+- When maximum speed is required
+- When working with Go-based toolchains
+- For simple URL enumeration without needing historical content
+
 ## License
 
 MIT
