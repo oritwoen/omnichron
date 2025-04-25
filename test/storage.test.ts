@@ -6,7 +6,7 @@ import memoryDriver from 'unstorage/drivers/memory'
 const mockProvider = {
   name: 'TestProvider',
   slug: 'test-provider',
-  getSnapshots: vi.fn().mockImplementation(async () => {
+  snapshots: vi.fn().mockImplementation(async () => {
     return {
       success: true,
       pages: [{
@@ -42,13 +42,13 @@ describe('Cache', () => {
     const archive = createArchive(mockProvider)
     
     // First call should hit the API
-    const firstResponse = await archive.getSnapshots('example.com')
+    const firstResponse = await archive.snapshots('example.com')
     
     expect(firstResponse.success).toBe(true)
     expect(firstResponse.fromCache).toBeUndefined()
     
     // Second call should come from cache
-    const secondResponse = await archive.getSnapshots('example.com')
+    const secondResponse = await archive.snapshots('example.com')
     
     expect(secondResponse.success).toBe(true)
     expect(secondResponse.fromCache).toBe(true)
@@ -57,7 +57,7 @@ describe('Cache', () => {
     expect(secondResponse.pages).toEqual(firstResponse.pages)
     
     // Check API was called only once
-    expect(mockProvider.getSnapshots).toHaveBeenCalledTimes(1)
+    expect(mockProvider.snapshots).toHaveBeenCalledTimes(1)
   })
 
   it('should bypass cache when cache:false is specified', async () => {
@@ -69,16 +69,16 @@ describe('Cache', () => {
     const archive = createArchive(mockProvider)
     
     // First call should hit the API and cache the result
-    await archive.getSnapshots('example.com')
+    await archive.snapshots('example.com')
     
     // Second call with cache:false should bypass cache
-    const response = await archive.getSnapshots('example.com', { cache: false })
+    const response = await archive.snapshots('example.com', { cache: false })
     
     expect(response.success).toBe(true)
     expect(response.fromCache).toBeUndefined()
     
     // API should be called twice
-    expect(mockProvider.getSnapshots).toHaveBeenCalledTimes(2)
+    expect(mockProvider.snapshots).toHaveBeenCalledTimes(2)
   })
 
   it('should respect TTL setting', async () => {
@@ -95,7 +95,7 @@ describe('Cache', () => {
     const archive = createArchive(mockProvider)
     
     // First call should hit the API
-    await archive.getSnapshots('example.com')
+    await archive.snapshots('example.com')
     
     // Wait for TTL to expire
     await new Promise(resolve => setTimeout(resolve, 20))
@@ -104,13 +104,13 @@ describe('Cache', () => {
     await storage.clear()
     
     // After TTL expired, should hit API again
-    const secondResponse = await archive.getSnapshots('example.com')
+    const secondResponse = await archive.snapshots('example.com')
     
     expect(secondResponse.success).toBe(true)
     expect(secondResponse.fromCache).toBeUndefined()
     
     // Check that API was called twice due to TTL expiration
-    expect(mockProvider.getSnapshots).toHaveBeenCalledTimes(2)
+    expect(mockProvider.snapshots).toHaveBeenCalledTimes(2)
   })
 
   it('should use different cache keys for different limits', async () => {
@@ -123,22 +123,22 @@ describe('Cache', () => {
     const archive = createArchive(mockProvider)
     
     // Call with limit=10
-    await archive.getSnapshots('example.com', { limit: 10 })
+    await archive.snapshots('example.com', { limit: 10 })
     
     // Call with limit=20 should hit API again
-    const response = await archive.getSnapshots('example.com', { limit: 20 })
+    const response = await archive.snapshots('example.com', { limit: 20 })
     
     expect(response.fromCache).toBeUndefined()
     
     // API should be called twice due to different limits
-    expect(mockProvider.getSnapshots).toHaveBeenCalledTimes(2)
+    expect(mockProvider.snapshots).toHaveBeenCalledTimes(2)
     
     // Call with limit=10 again should use cache
-    const cachedResponse = await archive.getSnapshots('example.com', { limit: 10 })
+    const cachedResponse = await archive.snapshots('example.com', { limit: 10 })
     
     expect(cachedResponse.fromCache).toBe(true)
     
     // API should still have been called only twice
-    expect(mockProvider.getSnapshots).toHaveBeenCalledTimes(2)
+    expect(mockProvider.snapshots).toHaveBeenCalledTimes(2)
   })
 })

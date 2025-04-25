@@ -40,7 +40,7 @@ describe('Common Crawl', () => {
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
-    const result = await archive.getSnapshots('example.com')
+    const result = await archive.snapshots('example.com')
     
     // Adjust expectations to match actual implementation
     expect(result.success).toBe(true)
@@ -87,7 +87,7 @@ describe('Common Crawl', () => {
     
     const ccInstance = createCommonCrawl()
     const archive = createArchive(ccInstance)
-    const result = await archive.getSnapshots('nonexistentdomain.com')
+    const result = await archive.snapshots('nonexistentdomain.com')
     
     // Adjust expectations to match actual implementation
     expect(result.success).toBe(true)

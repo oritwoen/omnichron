@@ -27,7 +27,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
      * @param reqOptions - Request-specific options overriding initial settings.
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
-    async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
+    async snapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = mergeOptions(initOptions, reqOptions)
       

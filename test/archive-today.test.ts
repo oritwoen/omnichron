@@ -26,7 +26,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.getSnapshots('example.com')
+    const result = await archive.snapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(4)
@@ -58,7 +58,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.getSnapshots('example.com')
+    const result = await archive.snapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result._meta?.source).toBe('archive-today')
@@ -71,7 +71,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.getSnapshots('nonexistent-domain.com')
+    const result = await archive.snapshots('nonexistent-domain.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(0)
@@ -91,7 +91,7 @@ describe('archive.today', () => {
     
     const archiveInstance = createArchiveToday()
     const archive = createArchiveClient(archiveInstance)
-    const result = await archive.getSnapshots('empty-domain-test.com')
+    const result = await archive.snapshots('empty-domain-test.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toEqual([])

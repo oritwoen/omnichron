@@ -17,7 +17,7 @@ describe('WebCite Provider', () => {
     const provider = createWebCite()
     expect(provider.name).toBe('WebCite')
     expect(provider.slug).toBe('webcite')
-    expect(typeof provider.getSnapshots).toBe('function')
+    expect(typeof provider.snapshots).toBe('function')
   })
 
   it('identifies when WebCite is not accepting new archives', async () => {
@@ -27,7 +27,7 @@ describe('WebCite Provider', () => {
     )
     
     const archive = createArchive(createWebCite())
-    const response = await archive.getSnapshots('example.com')
+    const response = await archive.snapshots('example.com')
     
     // Adjust the expectations to match the actual implementation behavior
     expect(response.success).toBe(true)
@@ -53,7 +53,7 @@ describe('WebCite Provider', () => {
     vi.mocked($fetch).mockResolvedValueOnce(mockResponse)
     
     const archive = createArchive(createWebCite())
-    const response = await archive.getSnapshots('example.com')
+    const response = await archive.snapshots('example.com')
     
     // Adjust the expectations to match the actual implementation behavior
     expect(response.success).toBe(true)
@@ -65,7 +65,7 @@ describe('WebCite Provider', () => {
     vi.mocked($fetch).mockRejectedValueOnce(new Error('Network error'))
     
     const archive = createArchive(createWebCite())
-    const response = await archive.getSnapshots('example.com')
+    const response = await archive.snapshots('example.com')
     
     expect(response.success).toBe(true)
     expect(response._meta?.provider).toBe('webcite')
@@ -76,7 +76,7 @@ describe('WebCite Provider', () => {
     vi.mocked($fetch).mockResolvedValueOnce('<html><body>Unexpected content</body></html>')
     
     const archive = createArchive(createWebCite())
-    const response = await archive.getSnapshots('example.com')
+    const response = await archive.snapshots('example.com')
     
     // The provider should handle this gracefully
     expect(response.success).toBe(true)

@@ -36,7 +36,7 @@ export function createArchive(
   options?: ArchiveOptions
 ): {
   options?: ArchiveOptions;
-  getSnapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse>;
+  snapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse>;
   getPages(domain: string, listOptions?: ArchiveOptions): Promise<ArchivedPage[]>;
   use(provider: ArchiveProvider | Promise<ArchiveProvider>): Promise<any>;
   useAll(newProviders: (ArchiveProvider | Promise<ArchiveProvider>)[]): Promise<any>;
@@ -86,7 +86,7 @@ export function createArchive(
     
     try {
       // Fetch fresh data
-      const response = await provider.getSnapshots(domain, requestOptions);
+      const response = await provider.snapshots(domain, requestOptions);
       
       // Cache successful responses
       if (response.success && requestOptions.cache !== false) {
@@ -176,16 +176,16 @@ export function createArchive(
      * @example
      * ```js
      * // Basic usage
-     * const response = await archive.getSnapshots('example.com')
+     * const response = await archive.snapshots('example.com')
      * 
      * // With request-specific options
-     * const response = await archive.getSnapshots('example.com', { 
+     * const response = await archive.snapshots('example.com', { 
      *   limit: 5,
      *   cache: false // Skip cache for this request
      * })
      * ```
      */
-    async getSnapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse> {
+    async snapshots(domain: string, listOptions?: ArchiveOptions): Promise<ArchiveResponse> {
       const mergedOptions = await mergeOptions(options, listOptions);
       const providerArray = await getProviders();
       
@@ -230,7 +230,7 @@ export function createArchive(
      * ```
      */
     async getPages(domain: string, listOptions?: ArchiveOptions): Promise<ArchivedPage[]> {
-      const res = await this.getSnapshots(domain, listOptions);
+      const res = await this.snapshots(domain, listOptions);
       if (!res.success) {
         throw new Error(res.error ?? 'Failed to fetch archive snapshots');
       }

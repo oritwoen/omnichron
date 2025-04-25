@@ -22,7 +22,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
      * @param reqOptions - Request-specific Perma.cc options (e.g., apiKey, limit).
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
-    async getSnapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
+    async snapshots(domain: string, reqOptions: Partial<PermaccOptions> = {}): Promise<ArchiveResponse> {
 
       // Merge options, preserving apiKey from initOptions if not provided in reqOptions
       const options = await mergeOptions<PermaccOptions>(

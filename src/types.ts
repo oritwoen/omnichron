@@ -121,7 +121,7 @@ export type ArchiveResult =
 export interface ArchiveProvider {
   name: string;
   slug?: string;
-  getSnapshots: (domain: string, options?: ArchiveOptions) => Promise<ArchiveResponse>;
+  snapshots: (domain: string, options?: ArchiveOptions) => Promise<ArchiveResponse>;
 }
 
 // Read-only types for immutable data
@@ -137,7 +137,7 @@ export interface ArchiveInterface {
   readonly options?: ArchiveOptions;
   
   // Core methods
-  getSnapshots(domain: string, options?: ArchiveOptions): Promise<ArchiveResponse>;
+  snapshots(domain: string, options?: ArchiveOptions): Promise<ArchiveResponse>;
   getPages(domain: string, options?: ArchiveOptions): Promise<ArchivedPage[]>;
   
   // Provider management

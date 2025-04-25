@@ -36,7 +36,7 @@ describe('Perma.cc Platform', () => {
     const permacc = createPermacc({} as PermaccOptions)
     
     try {
-      await permacc.getSnapshots('example.com')
+      await permacc.snapshots('example.com')
       // Should not reach this point
       expect(true).toBe(false)
     } catch (error: any) {
@@ -46,7 +46,7 @@ describe('Perma.cc Platform', () => {
 
   it('should fetch and format archived pages', async () => {
     const permacc = createPermacc({ apiKey: 'test_key' })
-    const result = await permacc.getSnapshots('example.com')
+    const result = await permacc.snapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(1)
@@ -64,7 +64,7 @@ describe('Perma.cc Platform', () => {
       limit: 50
     })
     
-    const result = await permacc.getSnapshots('example.com')
+    const result = await permacc.snapshots('example.com')
     expect(result.success).toBe(true)
     expect(result.pages[0].snapshot).toBe('https://perma.cc/ABC123')
   })

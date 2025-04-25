@@ -7,7 +7,7 @@ const archive = createArchive(
 )
 
 export default defineEventHandler(async () => {
-  const snapshots = await archive.getSnapshots('example.com')
+  const snapshots = await archive.snapshots('example.com')
 
   return snapshots
 })

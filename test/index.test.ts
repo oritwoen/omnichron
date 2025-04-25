@@ -13,15 +13,15 @@ describe('createArchive', () => {
     const waybackInstance = createWayback()
     const archive = createArchive(waybackInstance)
     
-    expect(archive).toHaveProperty('getSnapshots')
-    expect(typeof archive.getSnapshots).toBe('function')
+    expect(archive).toHaveProperty('snapshots')
+    expect(typeof archive.snapshots).toBe('function')
   })
   
   it('merges global and request options', async () => {
     // Create a mock provider
     const mockProvider: ArchiveProvider = {
       name: 'Mock Provider',
-      getSnapshots: vi.fn().mockResolvedValue({ success: true, pages: [] })
+      snapshots: vi.fn().mockResolvedValue({ success: true, pages: [] })
     }
     
     const globalOptions = { 
@@ -34,9 +34,9 @@ describe('createArchive', () => {
     }
     
     const archive = createArchive(mockProvider, globalOptions)
-    await archive.getSnapshots('example.com', requestOptions)
+    await archive.snapshots('example.com', requestOptions)
     
-    expect(mockProvider.getSnapshots).toHaveBeenCalledWith(
+    expect(mockProvider.snapshots).toHaveBeenCalledWith(
       'example.com',
       expect.objectContaining({
         timeout: 10_000,

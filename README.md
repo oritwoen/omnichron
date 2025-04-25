@@ -48,7 +48,7 @@ import { createArchive, providers } from 'omnichron'
 const waybackArchive = createArchive(providers.wayback())
 
 // Get archived snapshots for a domain (with optional limit)
-const response = await waybackArchive.getSnapshots('example.com', { limit: 100 })
+const response = await waybackArchive.snapshots('example.com', { limit: 100 })
 
 if (response.success) {
   console.log('Archived snapshots:', response.pages)
@@ -70,7 +70,7 @@ if (response.success) {
 
 // Using Archive.today
 const archiveTodayArchive = createArchive(providers.archiveToday())
-const archiveTodayResponse = await archiveTodayArchive.getSnapshots('example.com')
+const archiveTodayResponse = await archiveTodayArchive.snapshots('example.com')
 ```
 
 ### API Server Example
@@ -86,7 +86,7 @@ const archive = createArchive(
 )
 
 export default defineEventHandler(async () => {
-  const snapshots = await archive.getSnapshots('example.com')
+  const snapshots = await archive.snapshots('example.com')
   return snapshots
 })
 ```
@@ -140,7 +140,7 @@ const archive = createArchive(providers.permacc({
   apiKey: 'YOUR_API_KEY'
 }))
 
-const response = await archive.getSnapshots('example.com')
+const response = await archive.snapshots('example.com')
 ```
 
 ### Using the Cache
@@ -166,13 +166,13 @@ configureStorage({
 const archive = createArchive(providers.wayback())
 
 // Use cache (default behavior)
-const response1 = await archive.getSnapshots('example.com')
+const response1 = await archive.snapshots('example.com')
 // First call hits API, subsequent calls use cache
-const response2 = await archive.getSnapshots('example.com')
+const response2 = await archive.snapshots('example.com')
 console.log('From cache:', response2.fromCache) // true
 
 // Bypass cache for specific requests
-const freshResponse = await archive.getSnapshots('example.com', { cache: false })
+const freshResponse = await archive.snapshots('example.com', { cache: false })
 ```
 
 ### Using Common Crawl
@@ -188,7 +188,7 @@ const archive = createArchive(providers.commoncrawl({
   limit: 50  // Maximum number of results
 }))
 
-const response = await archive.getSnapshots('example.com')
+const response = await archive.snapshots('example.com')
 ```
 
 ## Response format
@@ -257,7 +257,7 @@ const archive = createArchive(providers.wayback(), {
 })
 
 // These options can also be set per request
-const response = await archive.getSnapshots('example.com', {
+const response = await archive.snapshots('example.com', {
   concurrency: 5,
   timeout: 45000
 })
@@ -290,7 +290,7 @@ const multiArchive = createArchive([
 ])
 
 // This will query all providers in parallel and combine results
-const response = await multiArchive.getSnapshots('example.com', { 
+const response = await multiArchive.snapshots('example.com', { 
   limit: 100,
   concurrency: 3  // Maximum number of providers to query simultaneously
 })
@@ -309,7 +309,7 @@ Creates an archive client for one or multiple providers.
 - `options`: Global options for all requests (optional)
 
 Returns an object with:
-- `getSnapshots(domain, options?)`: Function to get archived snapshots for a domain, returning a full response object
+- `snapshots(domain, options?)`: Function to get archived snapshots for a domain, returning a full response object
 - `getPages(domain, options?)`: Function to get archived snapshots for a domain, returning only the pages array or throwing on error
 - `use(provider)`: Function to add a new provider to this archive instance
 - `useAll(providers)`: Function to add multiple providers to this archive instance at once
@@ -324,7 +324,7 @@ The individual provider factory functions are accessible through the providers o
 - `providers.webcite(options?)` — WebCite
 - `providers.all(options?)` — Helper that initializes all common providers at once
 
-### getSnapshots(domain, options?)
+### snapshots(domain, options?)
 
 Gets archived snapshots for a domain from the archive provider.
 

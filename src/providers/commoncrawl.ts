@@ -29,7 +29,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
      * @param reqOptions - Request-specific Common Crawl options (e.g., collection, limit).
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
-    async getSnapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
+    async snapshots(domain: string, reqOptions: Partial<CommonCrawlOptions> = {}): Promise<ArchiveResponse> {
       const options = await mergeOptions(initOptions, reqOptions)
 
       const baseURL = 'https://index.commoncrawl.org'

@@ -19,7 +19,7 @@ describe('wayback machine', () => {
     
     const waybackInstance = createWayback()
     const archive = createArchive(waybackInstance)
-    const result = await archive.getSnapshots('example.com')
+    const result = await archive.snapshots('example.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(2)
@@ -50,7 +50,7 @@ describe('wayback machine', () => {
     
     const waybackInstance = createWayback()
     const archive = createArchive(waybackInstance)
-    const result = await archive.getSnapshots('nonexistent-domain.com')
+    const result = await archive.snapshots('nonexistent-domain.com')
     
     expect(result.success).toBe(true)
     expect(result.pages).toHaveLength(0)

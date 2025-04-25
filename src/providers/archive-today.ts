@@ -21,7 +21,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
      * @param reqOptions - Request-specific options overriding initial settings.
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
-    async getSnapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
+    async snapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const _options = mergeOptions(initOptions, reqOptions)
       

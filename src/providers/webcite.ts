@@ -30,7 +30,7 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
      * @param reqOptions - Request-specific options overriding initial settings.
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
-    async getSnapshots(domain: string, reqOptions: Partial<WebCiteOptions> = {}): Promise<ArchiveResponse> {
+    async snapshots(domain: string, reqOptions: Partial<WebCiteOptions> = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
       const options = await mergeOptions(initOptions, reqOptions)
       
