@@ -34,42 +34,23 @@ export async function processInParallel<T, R>(
   // Helper function to process a batch with concurrency limit
   async function processBatch(batch: T[], limit: number): Promise<R[]> {
     const batchResults: R[] = [];
-    const pendingPromises: Promise<void>[] = [];
-    const queue = [...batch];
-    
-    // Initial filling of the queue
-    while (pendingPromises.length < limit && queue.length > 0) {
-      const item = queue.shift()!;
+    const executing: Set<Promise<void>> = new Set();
+
+    for (const item of batch) {
       const promise = processFunction(item)
         .then(result => { batchResults.push(result); })
-        .catch(error => { consola.error('Parallel processing error:', error); });
-      
-      pendingPromises.push(promise);
+        .catch(error => { consola.error('Parallel processing error:', error); })
+        .finally(() => { executing.delete(promise); });
+
+      executing.add(promise);
+
+      if (executing.size >= limit) {
+        await Promise.race(executing);
+      }
     }
-    
-    // Process remaining items as earlier ones complete
-    while (queue.length > 0) {
-      await Promise.race(pendingPromises);
-      
-      // Create a new array for still pending promises
-      const stillPending: Promise<void>[] = [];
-      
-      // Add a new item to process
-      const item = queue.shift()!;
-      const promise = processFunction(item)
-        .then(result => { batchResults.push(result); })
-        .catch(error => { consola.error('Parallel processing error:', error); });
-      
-      stillPending.push(promise);
-      
-      // Replace pendingPromises with the new array
-      pendingPromises.length = 0;
-      pendingPromises.push(...stillPending);
-    }
-    
-    // Wait for remaining promises
-    await Promise.all(pendingPromises);
-    
+
+    await Promise.all(executing);
+
     return batchResults;
   }
 }
