@@ -138,16 +138,20 @@ export async function clearProviderStorage(provider: string | { name: string, sl
     }
 
     // Convert provider to string key (either slug or name)
-    const providerKey = typeof provider === 'string' 
-      ? provider 
+    const providerKey = typeof provider === 'string'
+      ? provider
       : (provider.slug ?? provider.name)
-    
-    // Build the prefix for provider keys
-    const _prefix = `${getStoragePrefix()}:${providerKey}`
-    
-    // Use the clear method to remove all keys
-    // TODO: Add support for selective clearing by prefix when available in underlying driver
-    await storage.clear()
+
+    // Get all keys and filter by provider prefix
+    const storagePrefix = getStoragePrefix()
+    const providerPrefix = `${storagePrefix}:${providerKey}:`
+    const keys = await storage.getKeys()
+
+    for (const key of keys) {
+      if (key.startsWith(providerPrefix)) {
+        await storage.removeItem(key)
+      }
+    }
   } catch (error) {
     const providerName = typeof provider === 'string' ? provider : provider.name
     consola.error(`Failed to clear storage for provider ${providerName}:`, error)
