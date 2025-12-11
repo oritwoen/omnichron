@@ -1,5 +1,6 @@
 import { $fetch } from 'ofetch'
 import { cleanDoubleSlashes } from 'ufo'
+import { consola } from 'consola'
 import type { ArchiveOptions, ArchiveProvider, ArchiveResponse, ArchivedPage, ArchiveTodayMetadata } from '../types'
 import { createSuccessResponse, createErrorResponse, mergeOptions, normalizeDomain } from '../utils'
 
@@ -88,7 +89,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
               
               index++
             } catch (error) {
-              console.error('Error parsing archive.today snapshot:', error)
+              consola.error('Error parsing archive.today snapshot:', error)
             }
           }
         }
@@ -99,7 +100,7 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
           page: 1,
           empty: pages.length === 0
         })
-      } catch (error: any) {
+      } catch (error) {
         return createErrorResponse(error, 'archive-today', {
           domain: cleanDomain
         })

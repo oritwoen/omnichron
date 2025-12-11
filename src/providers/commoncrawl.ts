@@ -135,7 +135,7 @@ export default function commonCrawl(initOptions: Partial<CommonCrawlOptions> = {
           count: pages.length,
           queryParams: fetchOptions.params
         })
-      } catch (error: any) {
+      } catch (error) {
         return createErrorResponse(error, 'commoncrawl', { collection: collectionName })
       }
     }

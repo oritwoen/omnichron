@@ -113,20 +113,29 @@ export function createSuccessResponse(
 
 /**
  * Creates a standardized error response object
- * @param error Error object or message
+ * @param error Error object, message, or unknown value
  * @param source Source identifier for the provider
  * @param metadata Additional metadata to include
  * @returns Standardized ArchiveResponse error object
  */
 export function createErrorResponse(
-  error: Error | string, 
-  source: string, 
+  error: unknown,
+  source: string,
   metadata: Record<string, unknown> = {}
 ): ArchiveResponse {
+  let errorMessage: string
+  if (error instanceof Error) {
+    errorMessage = error.message
+  } else if (typeof error === 'string') {
+    errorMessage = error
+  } else {
+    errorMessage = String(error)
+  }
+
   return {
     success: false,
     pages: [],
-    error: typeof error === 'string' ? error : error.message ?? String(error),
+    error: errorMessage,
     _meta: {
       source,
       provider: source,

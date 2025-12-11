@@ -64,7 +64,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         const pages: ArchivedPage[] = await mapCdxRows(dataRows, snapshotUrl, 'wayback', await options)
         
         return createSuccessResponse(pages, 'wayback', { queryParams: fetchOptions.params || {} })
-      } catch (error: any) {
+      } catch (error) {
         return createErrorResponse(error, 'wayback')
       }
     }

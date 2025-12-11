@@ -90,15 +90,15 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
             queryParams: fetchOptions.params,
             isAvailable: !isNotFound
           })
-        } catch (fetchError: any) {
+        } catch (fetchError) {
           // Handle fetch error specially to ensure correct error response
-          return createErrorResponse(fetchError, 'webcite', { 
+          return createErrorResponse(fetchError, 'webcite', {
             domain: cleanDomain
           })
         }
-      } catch (error: any) {
+      } catch (error) {
         // Handle any other unexpected errors
-        return createErrorResponse(error, 'webcite', { 
+        return createErrorResponse(error, 'webcite', {
           domain: cleanDomain
         })
       }

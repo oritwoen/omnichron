@@ -120,7 +120,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
           queryParams: fetchOptions.params,
           meta: response.meta ?? {}
         })
-      } catch (error: any) {
+      } catch (error) {
         return createErrorResponse(error, 'permacc')
       }
     }
