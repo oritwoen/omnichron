@@ -209,7 +209,7 @@ export function createArchive(
     
     /**
      * Fetch archived pages for a domain, returning only the pages array.
-     * Throws an error if the request fails (unlike getSnapshots which returns a success flag).
+     * Throws an error if the request fails (unlike snapshots which returns a success flag).
      * 
      * @param domain - The domain to search for in archive services
      * @param listOptions - Request-specific options that override the defaults
