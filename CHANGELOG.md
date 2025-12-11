@@ -1,6 +1,33 @@
 # Changelog
 
 
+## v0.4.0
+
+[compare changes](https://github.com/oritwoen/omnichron/compare/v0.3.1...v0.4.0)
+
+### 🩹 Fixes
+
+- **utils:** Fix concurrency control losing pending promises ([09139be](https://github.com/oritwoen/omnichron/commit/09139be))
+- **storage:** Implement selective provider cache clearing ([df3b397](https://github.com/oritwoen/omnichron/commit/df3b397))
+
+### 💅 Refactors
+
+- ⚠️  Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
+- Improve type safety across codebase ([e5ff2b1](https://github.com/oritwoen/omnichron/commit/e5ff2b1))
+
+### 📖 Documentation
+
+- Add comparison section between omnichron and urlfinder with usage scenarios ([b32b163](https://github.com/oritwoen/omnichron/commit/b32b163))
+- **archive:** Fix outdated reference in JSDoc comment ([592b2a5](https://github.com/oritwoen/omnichron/commit/592b2a5))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
+
+### ❤️ Contributors
+
+- Dominik Opyd <dominik.opyd@gmail.com>
+
 ## v0.3.1
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.3.0...v0.3.1)
