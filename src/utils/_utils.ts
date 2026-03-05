@@ -33,12 +33,14 @@ export async function processInParallel<T, R>(
   
   // Helper function to process a batch with concurrency limit
   async function processBatch(batch: T[], limit: number): Promise<R[]> {
-    const batchResults: R[] = [];
+    const FAILED = Symbol('failed');
+    const batchResults: Array<R | typeof FAILED> = Array.from({ length: batch.length }, () => FAILED);
     const executing: Set<Promise<void>> = new Set();
 
-    for (const item of batch) {
-      const promise = processFunction(item)
-        .then(result => { batchResults.push(result); })
+    for (let idx = 0; idx < batch.length; idx++) {
+      const i = idx;
+      const promise = processFunction(batch[i])
+        .then(result => { batchResults[i] = result; })
         .catch(error => { consola.error('Parallel processing error:', error); })
         .finally(() => { executing.delete(promise); });
 
@@ -51,7 +53,7 @@ export async function processInParallel<T, R>(
 
     await Promise.all(executing);
 
-    return batchResults;
+    return batchResults.filter((r): r is R => r !== FAILED);
   }
 }
 
