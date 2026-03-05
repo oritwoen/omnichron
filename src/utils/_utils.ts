@@ -33,7 +33,7 @@ export async function processInParallel<T, R>(
   
   // Helper function to process a batch with concurrency limit
   async function processBatch(batch: T[], limit: number): Promise<R[]> {
-    const batchResults = new Array<R | undefined>(batch.length);
+    const batchResults = Array.from({length: batch.length});
     const executing: Set<Promise<void>> = new Set();
 
     for (let idx = 0; idx < batch.length; idx++) {
