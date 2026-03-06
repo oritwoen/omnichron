@@ -43,8 +43,8 @@ describe('archive.today', () => {
       expect.objectContaining({
         baseURL: 'https://archive.is', 
         responseType: 'text',
-        retry: 5, 
-        timeout: 60000
+        retry: 1, 
+        timeout: 10000
       })
     )
   })

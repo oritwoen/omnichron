@@ -24,12 +24,11 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
      */
     async snapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
       // Merge options, preferring request options over init options
-      const _options = mergeOptions(initOptions, reqOptions)
+      const options = await mergeOptions(initOptions, reqOptions)
       
       // Use default values
       const baseURL = 'https://archive.is'
-      const _snapshotUrl = 'https://archive.is'
-      
+
       // Clean domain by removing protocol
       const cleanDomain = normalizeDomain(domain, false)
       
@@ -41,8 +40,8 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
         
         const timemapResponse = await $fetch(timemapUrl, {
           baseURL,
-          retry: 5,
-          timeout: 60000,
+          retry: options.retries ?? 5,
+          timeout: options.timeout ?? 60000,
           responseType: 'text',
         })
         
@@ -94,11 +93,14 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
           }
         }
         
+        // Apply limit if specified
+        const limitedPages = typeof options.limit === 'number' ? pages.slice(0, Math.max(0, options.limit)) : pages
+        
         // Return response
-        return createSuccessResponse(pages, 'archive-today', {
+        return createSuccessResponse(limitedPages, 'archive-today', {
           domain: cleanDomain,
           page: 1,
-          empty: pages.length === 0
+          empty: limitedPages.length === 0
         })
       } catch (error) {
         return createErrorResponse(error, 'archive-today', {
