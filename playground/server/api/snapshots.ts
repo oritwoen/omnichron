@@ -2,7 +2,7 @@ import { createArchive, providers } from "omnichron";
 
 const archive = createArchive(
   providers.all({
-    timeout: 60 * 10,
+    timeout: 60_000,
   }),
 );
 

@@ -2,7 +2,7 @@ import { createArchive, providers } from "omnichron";
 
 const archive = createArchive(
   providers.webcite({
-    timeout: 60 * 10,
+    timeout: 60_000,
   }),
 );
 

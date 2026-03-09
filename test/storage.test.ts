@@ -42,7 +42,7 @@ describe("Cache", () => {
 
   it("should cache and retrieve from cache", async () => {
     // Configure storage with memory driver
-    configureStorage({
+    await configureStorage({
       driver: memoryDriver(),
       cache: true,
     });
@@ -70,7 +70,7 @@ describe("Cache", () => {
 
   it("should bypass cache when cache:false is specified", async () => {
     // Configure storage with memory driver
-    configureStorage({
+    await configureStorage({
       cache: true,
     });
 
@@ -94,7 +94,7 @@ describe("Cache", () => {
     const customDriver = memoryDriver();
 
     // Configure storage with very short TTL (10ms)
-    configureStorage({
+    await configureStorage({
       driver: customDriver,
       ttl: 10,
       cache: true,
@@ -123,7 +123,7 @@ describe("Cache", () => {
 
   it("should use different cache keys for different limits", async () => {
     // Configure storage
-    configureStorage({
+    await configureStorage({
       driver: memoryDriver(),
       cache: true,
     });
@@ -152,7 +152,7 @@ describe("Cache", () => {
 
   it("should clear only specific provider cache", async () => {
     // Configure storage
-    configureStorage({
+    await configureStorage({
       driver: memoryDriver(),
       cache: true,
     });

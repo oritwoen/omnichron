@@ -143,7 +143,7 @@ export function createArchive(
     });
 
     // Apply limit if specified
-    const limitedPages = limit ? allPages.slice(0, limit) : allPages;
+    const limitedPages = typeof limit === "number" ? allPages.slice(0, Math.max(0, limit)) : allPages;
 
     // Providers list for metadata
     const providersList = responses.map((r) => r._meta?.provider || "unknown").filter(Boolean);

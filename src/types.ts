@@ -7,10 +7,10 @@ export interface ArchiveOptions {
   ttl?: number; // Cache TTL in milliseconds
 
   // Performance options
-  concurrency?: number; // Maximum number of concurrent requests (default: 5)
-  batchSize?: number; // Number of items to process in a single batch (default: 50)
-  timeout?: number; // Request timeout in milliseconds (default: 30000)
-  retries?: number; // Number of retry attempts for failed requests (default: 2)
+  concurrency?: number; // Maximum number of concurrent requests (default: 3)
+  batchSize?: number; // Number of items to process in a single batch (default: 20)
+  timeout?: number; // Request timeout in milliseconds (default: 10000)
+  retries?: number; // Number of retry attempts for failed requests (default: 1)
 
   // Provider-specific authentication (can be overridden in provider-specific options)
   apiKey?: string; // Optional API key for providers that require authentication

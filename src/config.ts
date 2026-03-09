@@ -83,7 +83,7 @@ export async function resolveConfig(
     defaults,
     defaultConfig: options.defaults || undefined,
     overrides: options.overrides || undefined,
-    envName: options.envName || process.env.NODE_ENV,
+    envName: options.envName ?? process.env.NODE_ENV,
     cwd: options.cwd,
     configFile: options.configFile,
     rcFile: options.rcFile === undefined ? ".omnichron" : options.rcFile,
