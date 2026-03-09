@@ -1,11 +1,11 @@
-import type { ArchiveOptions, ArchiveProvider } from '../types'
-import type { 
-  WaybackOptions, 
-  ArchiveTodayOptions, 
-  PermaccOptions, 
-  CommonCrawlOptions, 
-  WebCiteOptions 
-} from '../_providers'
+import type { ArchiveOptions, ArchiveProvider } from "../types";
+import type {
+  WaybackOptions,
+  ArchiveTodayOptions,
+  PermaccOptions,
+  CommonCrawlOptions,
+  WebCiteOptions,
+} from "../_providers";
 
 /**
  * Provider factory with lazy-loading for optimized tree-shaking.
@@ -22,10 +22,10 @@ export const providers = {
    * ```
    */
   async wayback(options?: WaybackOptions): Promise<ArchiveProvider> {
-    const { default: create } = await import('./wayback')
-    return create(options)
+    const { default: create } = await import("./wayback");
+    return create(options);
   },
-  
+
   /**
    * Creates an Archive.today provider.
    * @param options - Configuration options for the Archive.today provider
@@ -36,10 +36,10 @@ export const providers = {
    * ```
    */
   async archiveToday(options?: ArchiveTodayOptions): Promise<ArchiveProvider> {
-    const { default: create } = await import('./archive-today')
-    return create(options)
+    const { default: create } = await import("./archive-today");
+    return create(options);
   },
-  
+
   /**
    * Creates a Perma.cc provider.
    * @param options - Configuration options for the Perma.cc provider (requires apiKey)
@@ -50,10 +50,10 @@ export const providers = {
    * ```
    */
   async permacc(options?: PermaccOptions): Promise<ArchiveProvider> {
-    const { default: create } = await import('./permacc')
-    return create(options)
+    const { default: create } = await import("./permacc");
+    return create(options);
   },
-  
+
   /**
    * Creates a Common Crawl provider.
    * @param options - Configuration options for the Common Crawl provider
@@ -64,10 +64,10 @@ export const providers = {
    * ```
    */
   async commoncrawl(options?: CommonCrawlOptions): Promise<ArchiveProvider> {
-    const { default: create } = await import('./commoncrawl')
-    return create(options)
+    const { default: create } = await import("./commoncrawl");
+    return create(options);
   },
-  
+
   /**
    * Creates a WebCite provider.
    * @param options - Configuration options for the WebCite provider
@@ -78,8 +78,8 @@ export const providers = {
    * ```
    */
   async webcite(options?: WebCiteOptions): Promise<ArchiveProvider> {
-    const { default: create } = await import('./webcite')
-    return create(options)
+    const { default: create } = await import("./webcite");
+    return create(options);
   },
 
   /**
@@ -98,11 +98,11 @@ export const providers = {
       this.wayback(options),
       this.archiveToday(options),
       this.commoncrawl(options),
-      this.webcite(options)
+      this.webcite(options),
       // permacc excluded as it requires API key
-    ])
-  }
-}
+    ]);
+  },
+};
 
 // Export provider types
-export type * from '../_providers'
+export type * from "../_providers";

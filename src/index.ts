@@ -1,4 +1,4 @@
-export type * from './types'
+export type * from "./types";
 export { createArchive } from "./archive";
 export { providers } from "./providers";
 export { configureStorage, clearProviderStorage, storage } from "./storage";

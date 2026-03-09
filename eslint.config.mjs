@@ -6,7 +6,7 @@ export default unjs({
   ],
   rules: {
     // rule overrides
-    "unicorn/numeric-separators-style": "off"
+    "unicorn/numeric-separators-style": "off",
   },
   markdown: {
     rules: {
