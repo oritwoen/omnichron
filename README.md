@@ -1,4 +1,5 @@
 # omnichron
+
 [![npm version](https://img.shields.io/npm/v/omnichron?style=flat&colorA=130f40&colorB=474787)](https://npmjs.com/package/omnichron)
 [![npm downloads](https://img.shields.io/npm/dm/omnichron?style=flat&colorA=130f40&colorB=474787)](https://npm.chart.dev/omnichron)
 [![license](https://img.shields.io/github/license/oritwoen/omnichron?style=flat&colorA=130f40&colorB=474787)](https://github.com/oritwoen/omnichron/blob/main/LICENSE)
@@ -24,14 +25,14 @@ pnpm add omnichron
 ## Usage
 
 ```ts
-import { createArchive, providers } from 'omnichron'
+import { createArchive, providers } from "omnichron";
 
-const archive = createArchive(providers.wayback())
-const response = await archive.snapshots('example.com', { limit: 100 })
+const archive = createArchive(providers.wayback());
+const response = await archive.snapshots("example.com", { limit: 100 });
 
 if (response.success) {
   for (const page of response.pages) {
-    console.log(page.url, page.timestamp, page.snapshot)
+    console.log(page.url, page.timestamp, page.snapshot);
   }
 }
 ```
@@ -39,20 +40,16 @@ if (response.success) {
 Query all providers at once with `providers.all()` (excludes Perma.cc since it needs an API key):
 
 ```ts
-const archive = createArchive(providers.all())
-const response = await archive.snapshots('example.com')
+const archive = createArchive(providers.all());
+const response = await archive.snapshots("example.com");
 ```
 
 To pick specific providers, wrap them in `Promise.all`:
 
 ```ts
 const archive = createArchive(
-  Promise.all([
-    providers.wayback(),
-    providers.archiveToday(),
-    providers.commoncrawl()
-  ])
-)
+  Promise.all([providers.wayback(), providers.archiveToday(), providers.commoncrawl()]),
+);
 ```
 
 ### Perma.cc
@@ -60,7 +57,7 @@ const archive = createArchive(
 Perma.cc requires an API key:
 
 ```ts
-const archive = createArchive(providers.permacc({ apiKey: 'YOUR_API_KEY' }))
+const archive = createArchive(providers.permacc({ apiKey: "YOUR_API_KEY" }));
 ```
 
 ### Error handling
@@ -69,29 +66,29 @@ const archive = createArchive(providers.permacc({ apiKey: 'YOUR_API_KEY' }))
 
 ```ts
 // safe - check success flag yourself
-const response = await archive.snapshots('example.com')
+const response = await archive.snapshots("example.com");
 
 // throws on failure, returns pages array directly
-const pages = await archive.getPages('example.com')
+const pages = await archive.getPages("example.com");
 ```
 
 ## Providers
 
-| Provider | Factory | Notes |
-|----------|---------|-------|
-| Wayback Machine | `providers.wayback()` | web.archive.org CDX API |
-| Archive.today | `providers.archiveToday()` | archive.ph via Memento timemap |
-| Common Crawl | `providers.commoncrawl()` | Defaults to latest collection |
-| Perma.cc | `providers.permacc()` | Requires `apiKey` |
-| WebCite | `providers.webcite()` | Read-only, no longer accepts new archives |
-| All | `providers.all()` | All of the above except Perma.cc |
+| Provider        | Factory                    | Notes                                     |
+| --------------- | -------------------------- | ----------------------------------------- |
+| Wayback Machine | `providers.wayback()`      | web.archive.org CDX API                   |
+| Archive.today   | `providers.archiveToday()` | archive.ph via Memento timemap            |
+| Common Crawl    | `providers.commoncrawl()`  | Defaults to latest collection             |
+| Perma.cc        | `providers.permacc()`      | Requires `apiKey`                         |
+| WebCite         | `providers.webcite()`      | Read-only, no longer accepts new archives |
+| All             | `providers.all()`          | All of the above except Perma.cc          |
 
 You can add providers dynamically after creation:
 
 ```ts
-const archive = createArchive(providers.wayback())
-await archive.use(providers.archiveToday())
-await archive.useAll([providers.commoncrawl(), providers.webcite()])
+const archive = createArchive(providers.wayback());
+await archive.use(providers.archiveToday());
+await archive.useAll([providers.commoncrawl(), providers.webcite()]);
 ```
 
 ## Response format
@@ -100,18 +97,18 @@ Every provider normalizes its output to the same shape:
 
 ```ts
 interface ArchiveResponse {
-  success: boolean
-  pages: ArchivedPage[]
-  error?: string
-  _meta?: ResponseMetadata
-  fromCache?: boolean
+  success: boolean;
+  pages: ArchivedPage[];
+  error?: string;
+  _meta?: ResponseMetadata;
+  fromCache?: boolean;
 }
 
 interface ArchivedPage {
-  url: string        // original URL
-  timestamp: string  // ISO 8601
-  snapshot: string   // direct link to the archived version
-  _meta: Record<string, unknown>
+  url: string; // original URL
+  timestamp: string; // ISO 8601
+  snapshot: string; // direct link to the archived version
+  _meta: Record<string, unknown>;
 }
 ```
 
@@ -127,15 +124,15 @@ export default {
   storage: {
     cache: true,
     ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
-    prefix: 'omnichron'
+    prefix: "omnichron",
   },
   performance: {
     concurrency: 3,
     batchSize: 20,
     timeout: 10_000,
-    retries: 1
-  }
-}
+    retries: 1,
+  },
+};
 ```
 
 Environment-specific overrides work with `$development`, `$production`, and `$test` keys.
@@ -145,20 +142,20 @@ Environment-specific overrides work with `$development`, `$production`, and `$te
 The caching layer is backed by [unstorage](https://github.com/unjs/unstorage), so any unstorage driver works:
 
 ```ts
-import { configureStorage } from 'omnichron'
-import fsDriver from 'unstorage/drivers/fs'
+import { configureStorage } from "omnichron";
+import fsDriver from "unstorage/drivers/fs";
 
 await configureStorage({
-  driver: fsDriver({ base: './cache' }),
-  ttl: 24 * 60 * 60 * 1000 // 1 day
-})
+  driver: fsDriver({ base: "./cache" }),
+  ttl: 24 * 60 * 60 * 1000, // 1 day
+});
 ```
 
 Per-request cache control is also supported:
 
 ```ts
 // skip cache for this request
-await archive.snapshots('example.com', { cache: false })
+await archive.snapshots("example.com", { cache: false });
 ```
 
 ## API
@@ -178,16 +175,16 @@ Returns:
 
 All methods accept `ArchiveOptions`:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `limit` | `number` | `1000` | Maximum results to return |
-| `cache` | `boolean` | `true` | Enable/disable caching |
-| `ttl` | `number` | `604800000` | Cache TTL in milliseconds (7 days) |
-| `concurrency` | `number` | `3` | Max parallel requests |
-| `batchSize` | `number` | `20` | Items per processing batch |
-| `timeout` | `number` | `10000` | Request timeout in ms |
-| `retries` | `number` | `1` | Retry attempts on failure |
-| `apiKey` | `string` | - | API key for providers that need auth |
+| Option        | Type      | Default     | Description                          |
+| ------------- | --------- | ----------- | ------------------------------------ |
+| `limit`       | `number`  | `1000`      | Maximum results to return            |
+| `cache`       | `boolean` | `true`      | Enable/disable caching               |
+| `ttl`         | `number`  | `604800000` | Cache TTL in milliseconds (7 days)   |
+| `concurrency` | `number`  | `3`         | Max parallel requests                |
+| `batchSize`   | `number`  | `20`        | Items per processing batch           |
+| `timeout`     | `number`  | `10000`     | Request timeout in ms                |
+| `retries`     | `number`  | `1`         | Retry attempts on failure            |
+| `apiKey`      | `string`  | -           | API key for providers that need auth |
 
 Options can be set at three levels: config file (global defaults), `createArchive` call (instance defaults), and individual method calls (per-request). Each level overrides the previous one.
 
