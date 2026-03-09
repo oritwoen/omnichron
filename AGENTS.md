@@ -28,33 +28,33 @@ omnichron/
 
 ## WHERE TO LOOK
 
-| Task | Location | Notes |
-|------|----------|-------|
-| Add a provider | `src/providers/` + register in `src/providers/index.ts` | Copy wayback.ts as template. Default export factory fn returning `ArchiveProvider` |
-| Provider-specific options | `src/_providers.ts` | Extend `ArchiveOptions`, add to `ProviderOptions` map |
-| Change public API | `src/index.ts` | Barrel re-exports only. Types via `export type *` |
-| Modify caching | `src/storage.ts` | Key format: `{prefix}:{providerSlug}:{domain}:{limit?}` |
-| Config defaults | `src/config.ts` → `getDefaultConfig()` | c12 loads from `.omnichron`, `omnichron.config.ts`, `package.json` |
-| Response helpers | `src/utils/_utils.ts` | `createSuccessResponse`, `createErrorResponse`, `mergeOptions` |
-| Parallel processing | `src/utils/_utils.ts` → `processInParallel` | Concurrency + batch control |
-| CDX row mapping | `src/utils/_utils.ts` → `mapCdxRows` | Wayback/CommonCrawl share CDX format |
-| Test a provider | `test/{provider}.test.ts` | Uses vitest, mocks with `vi.fn()` |
-| Manual testing | `playground/server/api/snapshots/` | One Nuxt endpoint per provider |
-| Integration test | `test.sh` | Builds lib, then builds playground against it |
+| Task                      | Location                                                | Notes                                                                              |
+| ------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Add a provider            | `src/providers/` + register in `src/providers/index.ts` | Copy wayback.ts as template. Default export factory fn returning `ArchiveProvider` |
+| Provider-specific options | `src/_providers.ts`                                     | Extend `ArchiveOptions`, add to `ProviderOptions` map                              |
+| Change public API         | `src/index.ts`                                          | Barrel re-exports only. Types via `export type *`                                  |
+| Modify caching            | `src/storage.ts`                                        | Key format: `{prefix}:{providerSlug}:{domain}:{limit?}`                            |
+| Config defaults           | `src/config.ts` → `getDefaultConfig()`                  | c12 loads from `.omnichron`, `omnichron.config.ts`, `package.json`                 |
+| Response helpers          | `src/utils/_utils.ts`                                   | `createSuccessResponse`, `createErrorResponse`, `mergeOptions`                     |
+| Parallel processing       | `src/utils/_utils.ts` → `processInParallel`             | Concurrency + batch control                                                        |
+| CDX row mapping           | `src/utils/_utils.ts` → `mapCdxRows`                    | Wayback/CommonCrawl share CDX format                                               |
+| Test a provider           | `test/{provider}.test.ts`                               | Uses vitest, mocks with `vi.fn()`                                                  |
+| Manual testing            | `playground/server/api/snapshots/`                      | One Nuxt endpoint per provider                                                     |
+| Integration test          | `test.sh`                                               | Builds lib, then builds playground against it                                      |
 
 ## CODE MAP
 
-| Symbol | Type | Location | Role |
-|--------|------|----------|------|
-| `createArchive` | function | archive.ts:34 | Core factory. Accepts provider(s) + options, returns `ArchiveInterface` |
-| `providers` | object | providers/index.ts:14 | Lazy-loading factory. Each method returns `Promise<ArchiveProvider>` |
-| `ArchiveInterface` | interface | types.ts:135 | Public API: `snapshots()`, `getPages()`, `use()`, `useAll()` |
-| `ArchiveProvider` | interface | types.ts:121 | Provider contract: `name`, `slug?`, `snapshots()` |
-| `ArchiveResponse` | interface | types.ts:104 | `{ success, pages, error?, _meta?, fromCache? }` |
-| `ArchivedPage` | interface | types.ts:73 | `{ url, timestamp, snapshot, _meta }` |
-| `OmnichronConfig` | interface | config.ts:8 | Config shape: `storage` + `performance` + env overrides |
-| `processInParallel` | function | utils/_utils.ts:8 | Generic parallel executor with concurrency + batching |
-| `configureStorage` | function | storage.ts:165 | **@deprecated** - use config files or createArchive options |
+| Symbol              | Type      | Location              | Role                                                                    |
+| ------------------- | --------- | --------------------- | ----------------------------------------------------------------------- |
+| `createArchive`     | function  | archive.ts:34         | Core factory. Accepts provider(s) + options, returns `ArchiveInterface` |
+| `providers`         | object    | providers/index.ts:14 | Lazy-loading factory. Each method returns `Promise<ArchiveProvider>`    |
+| `ArchiveInterface`  | interface | types.ts:135          | Public API: `snapshots()`, `getPages()`, `use()`, `useAll()`            |
+| `ArchiveProvider`   | interface | types.ts:121          | Provider contract: `name`, `slug?`, `snapshots()`                       |
+| `ArchiveResponse`   | interface | types.ts:104          | `{ success, pages, error?, _meta?, fromCache? }`                        |
+| `ArchivedPage`      | interface | types.ts:73           | `{ url, timestamp, snapshot, _meta }`                                   |
+| `OmnichronConfig`   | interface | config.ts:8           | Config shape: `storage` + `performance` + env overrides                 |
+| `processInParallel` | function  | utils/_utils.ts:8     | Generic parallel executor with concurrency + batching                   |
+| `configureStorage`  | function  | storage.ts:165        | **@deprecated** - use config files or createArchive options             |
 
 ## CONVENTIONS
 

@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## v0.4.0
 
 [compare changes](https://github.com/oritwoen/omnichron/compare/v0.3.1...v0.4.0)
@@ -12,7 +11,7 @@
 
 ### 💅 Refactors
 
-- ⚠️  Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
+- ⚠️ Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
 - Improve type safety across codebase ([e5ff2b1](https://github.com/oritwoen/omnichron/commit/e5ff2b1))
 
 ### 📖 Documentation
@@ -22,7 +21,7 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
+- ⚠️ Rename `getSnapshots` to `snapshots` across the codebase for consistency ([ebe318c](https://github.com/oritwoen/omnichron/commit/ebe318c))
 
 ### ❤️ Contributors
 
@@ -54,7 +53,7 @@
 
 ### 🚀 Enhancements
 
-- ⚠️  Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
+- ⚠️ Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
 
 ### 💅 Refactors
 
@@ -68,7 +67,7 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
+- ⚠️ Implement lazy-loading ([961643e](https://github.com/oritwoen/omnichron/commit/961643e))
 
 ### ❤️ Contributors
 
@@ -246,14 +245,14 @@
 
 ### 💅 Refactors
 
-- ⚠️  Rename platform to provider ([48d8cd3](https://github.com/oritwoen/omnichron/commit/48d8cd3))
+- ⚠️ Rename platform to provider ([48d8cd3](https://github.com/oritwoen/omnichron/commit/48d8cd3))
 - Update terminology from platforms to providers in README ([e8f5a5b](https://github.com/oritwoen/omnichron/commit/e8f5a5b))
 - Streamline response handling and utility functions across providers ([161b2d9](https://github.com/oritwoen/omnichron/commit/161b2d9))
 - Update terminology from platforms to providers and restructure provider exports ([3c99380](https://github.com/oritwoen/omnichron/commit/3c99380))
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Rename platform to provider ([48d8cd3](https://github.com/oritwoen/omnichron/commit/48d8cd3))
+- ⚠️ Rename platform to provider ([48d8cd3](https://github.com/oritwoen/omnichron/commit/48d8cd3))
 
 ### ❤️ Contributors
 
@@ -273,7 +272,6 @@
 
 ## v0.1.1
 
-
 ### 💅 Refactors
 
 - Replace listPages with getSnapshots in test files ([e6e19d3](https://github.com/oritwoen/omnichron/commit/e6e19d3))
@@ -281,4 +279,3 @@
 ### ❤️ Contributors
 
 - Dominik Opyd <dominik.opyd@gmail.com>
-

@@ -1,13 +1,13 @@
-import { createArchive, providers } from 'omnichron'
+import { createArchive, providers } from "omnichron";
 
 const archive = createArchive(
   providers.webcite({
-    timeout: 60 * 10
-  })
-)
+    timeout: 60_000,
+  }),
+);
 
 export default defineEventHandler(async () => {
-  const snapshots = await archive.snapshots('example.com')
+  const snapshots = await archive.snapshots("example.com");
 
-  return snapshots
-})
+  return snapshots;
+});
