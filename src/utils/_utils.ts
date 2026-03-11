@@ -76,8 +76,10 @@ export async function processInParallel<T, R>(
 
 /**
  * Converts a Wayback Machine timestamp to ISO8601 format
- * @param timestamp Wayback timestamp (YYYYMMDDhhmmss)
- * @returns ISO8601 formatted timestamp
+ * Supports CDX precisions: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDhh,
+ * YYYYMMDDhhmm, YYYYMMDDhhmmss.
+ * @param timestamp Wayback timestamp
+ * @returns ISO8601 formatted timestamp, or empty string if invalid
  */
 export function waybackTimestampToISO(timestamp: string): string {
   const value = timestamp.trim();
@@ -284,7 +286,9 @@ export async function mapCdxRows(
 
   // For small datasets, process directly without batching
   if (dataRows.length <= batchSize) {
-    return dataRows.map((row) => rowToArchivedPage(row));
+    return dataRows
+      .map((row) => rowToArchivedPage(row))
+      .filter((page): page is ArchivedPage => page !== undefined);
   }
 
   // For larger datasets, process in batches for better memory usage
@@ -292,16 +296,29 @@ export async function mapCdxRows(
 
   for (let i = 0; i < dataRows.length; i += batchSize) {
     const batch = dataRows.slice(i, i + batchSize);
-    results.push(...batch.map((row) => rowToArchivedPage(row)));
+    results.push(
+      ...batch
+        .map((row) => rowToArchivedPage(row))
+        .filter((page): page is ArchivedPage => page !== undefined),
+    );
   }
 
   return results;
 
   // Helper function to convert a row to an ArchivedPage
-  function rowToArchivedPage([rawUrl, rawTimestamp, rawStatus]: string[]): ArchivedPage {
+  function rowToArchivedPage([rawUrl, rawTimestamp, rawStatus]: string[]): ArchivedPage | undefined {
     const originalUrl = cleanDoubleSlashes(rawUrl ?? "");
     const timestampRaw = rawTimestamp ?? "";
     const isoTimestamp = waybackTimestampToISO(timestampRaw);
+    if (!isoTimestamp) {
+      consola.debug("[cdx] Dropping row with invalid timestamp", {
+        provider: providerSlug,
+        timestamp: timestampRaw,
+        url: originalUrl,
+      });
+      return undefined;
+    }
+
     const snapUrl = `${snapshotBaseUrl}/${timestampRaw}/${originalUrl}`;
     return {
       url: originalUrl,

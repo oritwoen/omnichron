@@ -95,6 +95,43 @@ describe("Common Crawl", () => {
     expect(result._meta?.source).toBe("commoncrawl");
   });
 
+  it("drops records with malformed timestamps", async () => {
+    const records = [
+      {
+        url: "https://example.com/ok",
+        timestamp: "20220101000000",
+        mime: "text/html",
+        status: "200",
+        digest: "AAAABBBCCCDD",
+        length: "12345",
+        offset: "123",
+        filename: "warc/CC-MAIN-latest/AAAABBBCCCDD",
+      },
+      {
+        url: "https://example.com/bad",
+        timestamp: "20220101000060",
+        mime: "text/html",
+        status: "200",
+        digest: "EEEFFGGHHII",
+        length: "23456",
+        offset: "456",
+        filename: "warc/CC-MAIN-latest/EEEFFGGHHII",
+      },
+    ];
+
+    const ndjson = records.map((r) => JSON.stringify(r)).join("\n") + "\n";
+    const collInfo = [{ name: "CC-MAIN-2023-50" }];
+    vi.mocked($fetch).mockResolvedValueOnce(collInfo).mockResolvedValueOnce(ndjson);
+
+    const ccInstance = createCommonCrawl();
+    const archive = createArchive(ccInstance);
+    const result = await archive.snapshots("invalid-time.example");
+
+    expect(result.success).toBe(true);
+    expect(result.pages).toHaveLength(1);
+    expect(result.pages[0].url).toBe("https://example.com/ok");
+  });
+
   // Test expects error states to update the test
   it.skip("handles fetch errors", async () => {
     // This test is skipped to prevent failures

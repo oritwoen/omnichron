@@ -1,5 +1,6 @@
 import { $fetch } from "ofetch";
 import { cleanDoubleSlashes } from "ufo";
+import { consola } from "consola";
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from "../types";
 import type { CommonCrawlOptions } from "../_providers";
 import {
@@ -109,11 +110,21 @@ export default function commonCrawl(
         }
 
         const records = lines.map((line) => JSON.parse(line) as Record<string, string>);
-        const pages: ArchivedPage[] = records.map((record) => {
+        const pages: ArchivedPage[] = [];
+
+        for (const record of records) {
           const isoTimestamp = waybackTimestampToISO(record.timestamp || "");
+          if (!isoTimestamp) {
+            consola.debug("[commoncrawl] Dropping record with invalid timestamp", {
+              timestamp: record.timestamp,
+              url: record.url,
+            });
+            continue;
+          }
+
           const cleanedUrl = cleanDoubleSlashes(record.url || "");
           const snapUrl = `${dataBaseURL}/${record.filename}`;
-          return {
+          pages.push({
             url: cleanedUrl,
             timestamp: isoTimestamp,
             snapshot: snapUrl,
@@ -128,8 +139,8 @@ export default function commonCrawl(
               collection: collectionName,
               provider: "commoncrawl",
             } as CommonCrawlMetadata,
-          };
-        });
+          });
+        }
 
         return createSuccessResponse(pages, "commoncrawl", {
           collection: collectionName,
