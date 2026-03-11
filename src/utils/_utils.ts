@@ -10,6 +10,8 @@ import type {
 } from "../types";
 import { getConfig } from "../config";
 
+const ALLOWED_WAYBACK_TIMESTAMP_LENGTHS = new Set([4, 6, 8, 10, 12, 14]);
+
 // Utility for parallel processing with concurrency control
 export async function processInParallel<T, R>(
   items: T[],
@@ -78,9 +80,52 @@ export async function processInParallel<T, R>(
  * @returns ISO8601 formatted timestamp
  */
 export function waybackTimestampToISO(timestamp: string): string {
-  return timestamp.length >= 14
-    ? `${timestamp.slice(0, 4)}-${timestamp.slice(4, 6)}-${timestamp.slice(6, 8)}T${timestamp.slice(8, 10)}:${timestamp.slice(10, 12)}:${timestamp.slice(12, 14)}Z`
-    : new Date().toISOString(); // fallback to current date if format not recognized
+  const value = timestamp.trim();
+
+  if (!/^\d+$/.test(value)) {
+    return "";
+  }
+
+  if (!ALLOWED_WAYBACK_TIMESTAMP_LENGTHS.has(value.length)) {
+    return "";
+  }
+
+  const month = value.length >= 6 ? value.slice(4, 6) : "01";
+  const day = value.length >= 8 ? value.slice(6, 8) : "01";
+  const hour = value.length >= 10 ? value.slice(8, 10) : "00";
+  const minute = value.length >= 12 ? value.slice(10, 12) : "00";
+  const second = value.length >= 14 ? value.slice(12, 14) : "00";
+
+  const yearNum = Number.parseInt(value.slice(0, 4), 10);
+  const monthNum = Number.parseInt(month, 10);
+  const dayNum = Number.parseInt(day, 10);
+  const hourNum = Number.parseInt(hour, 10);
+  const minuteNum = Number.parseInt(minute, 10);
+  const secondNum = Number.parseInt(second, 10);
+
+  if (
+    monthNum < 1 ||
+    monthNum > 12 ||
+    dayNum < 1 ||
+    dayNum > 31 ||
+    hourNum > 23 ||
+    minuteNum > 59 ||
+    secondNum > 59
+  ) {
+    return "";
+  }
+
+  const iso = `${value.slice(0, 4)}-${month}-${day}T${hour}:${minute}:${second}Z`;
+  const parsed = new Date(Date.UTC(yearNum, monthNum - 1, dayNum, hourNum, minuteNum, secondNum));
+  const isSameDateParts =
+    parsed.getUTCFullYear() === yearNum &&
+    parsed.getUTCMonth() + 1 === monthNum &&
+    parsed.getUTCDate() === dayNum &&
+    parsed.getUTCHours() === hourNum &&
+    parsed.getUTCMinutes() === minuteNum &&
+    parsed.getUTCSeconds() === secondNum;
+
+  return isSameDateParts ? iso : "";
 }
 
 /**
