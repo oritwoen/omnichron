@@ -34,16 +34,14 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
     async snapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
-      // Merge options, preferring request options over init options
-      const options = await mergeOptions(initOptions, reqOptions);
-
-      // Use default values
-      const baseURL = "https://archive.is";
-
-      // Clean domain by removing protocol
       const cleanDomain = normalizeDomain(domain, false);
 
       try {
+        // Merge options, preferring request options over init options
+        const options = await mergeOptions(initOptions, reqOptions);
+
+        // Use default values
+        const baseURL = "https://archive.is";
         // Using Memento API to get timemap directly with the domain
         // Format: https://archive.is/timemap/http://example.com
         const fullUrl = cleanDomain.includes("://") ? cleanDomain : `http://${cleanDomain}`;
