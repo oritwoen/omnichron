@@ -34,27 +34,25 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
       domain: string,
       reqOptions: Partial<WebCiteOptions> = {},
     ): Promise<ArchiveResponse> {
-      // Merge options, preferring request options over init options
-      const options = await mergeOptions(initOptions, reqOptions);
-
-      // Use default values
-      const baseUrl = "https://www.webcitation.org";
-
-      // Normalize domain for search
       const cleanDomain = normalizeDomain(domain, false);
 
-      // Prepare fetch options using common utility
-      const fetchOptions = await createFetchOptions(
-        baseUrl,
-        {
-          url: encodeURIComponent(cleanDomain), // Query parameter for retrieval - must be properly encoded
-        },
-        {
-          timeout: options.timeout ?? 30000,
-        },
-      );
-
       try {
+        // Merge options, preferring request options over init options
+        const options = await mergeOptions(initOptions, reqOptions);
+
+        // Use default values
+        const baseUrl = "https://www.webcitation.org";
+
+        // Prepare fetch options using common utility
+        const fetchOptions = await createFetchOptions(
+          baseUrl,
+          {
+            url: encodeURIComponent(cleanDomain), // Query parameter for retrieval - must be properly encoded
+          },
+          {
+            timeout: options.timeout ?? 30000,
+          },
+        );
         // WebCite currently does not accept new archiving requests
         // The query API path to access archived content
         const queryPath = "/query";
