@@ -40,13 +40,20 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         const urlPattern = normalizeDomain(domain);
 
         // Prepare fetch options using common utility
-        const fetchOptions = await createFetchOptions(baseUrl, {
-          url: urlPattern,
-          output: "json",
-          fl: "original,timestamp,statuscode",
-          collapse: "timestamp:4", // Collapse by year to reduce results
-          limit: String(options?.limit ?? 1000), // Configurable limit with nullish coalescing
-        });
+        const fetchOptions = await createFetchOptions(
+          baseUrl,
+          {
+            url: urlPattern,
+            output: "json",
+            fl: "original,timestamp,statuscode",
+            collapse: "timestamp:4", // Collapse by year to reduce results
+            limit: String(options.limit ?? 1000), // Configurable limit with nullish coalescing
+          },
+          {
+            retries: options.retries,
+            timeout: options.timeout,
+          },
+        );
         // Use ofetch with CDX Server API path
         // TypeScript type assertion for the response
         type WaybackResponse = [string[], ...string[][]];

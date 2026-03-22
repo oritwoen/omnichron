@@ -50,6 +50,7 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
             url: encodeURIComponent(cleanDomain), // Query parameter for retrieval - must be properly encoded
           },
           {
+            retries: options.retries,
             timeout: options.timeout ?? 30000,
           },
         );

@@ -61,6 +61,8 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
             headers: {
               Authorization: `ApiKey ${apiKey}`,
             },
+            retries: options.retries,
+            timeout: options.timeout,
           },
         );
         // Fetch archives from Perma.cc API

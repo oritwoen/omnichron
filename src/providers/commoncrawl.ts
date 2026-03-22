@@ -50,7 +50,10 @@ export default function commonCrawl(
             const collinfoOpts = await createFetchOptions(
               baseURL,
               {},
-              { timeout: options.timeout ?? 60_000 },
+              {
+                retries: options.retries,
+                timeout: options.timeout ?? 60_000,
+              },
             );
             const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
             if (Array.isArray(collinfo) && collinfo.length > 0) {
@@ -94,6 +97,7 @@ export default function commonCrawl(
         };
 
         const fetchOptions = await createFetchOptions(baseURL, params, {
+          retries: options.retries,
           timeout: options.timeout ?? 60_000,
           responseType: "text",
         });
