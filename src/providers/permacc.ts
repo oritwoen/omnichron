@@ -32,38 +32,39 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
       domain: string,
       reqOptions: Partial<PermaccOptions> = {},
     ): Promise<ArchiveResponse> {
-      // Merge options, preserving apiKey from initOptions if not provided in reqOptions
-      const options = await mergeOptions<PermaccOptions>(initOptions, reqOptions);
-
-      // Ensure API key is provided
-      if (!options.apiKey) {
-        throw new Error("API key is required for Perma.cc");
-      }
-
-      // Use default values and required apiKey
-      const baseUrl = "https://api.perma.cc";
-      const snapshotUrl = "https://perma.cc";
-      const { apiKey } = options;
-
-      // Clean domain for search
-      const cleanDomain = normalizeDomain(domain, false);
-
-      // Prepare fetch options using common utility with specific headers for Perma.cc
-      const fetchOptions = await createFetchOptions(
-        baseUrl,
-        {
-          // Perma.cc pagination and filtering
-          limit: options?.limit ?? 100,
-          url: cleanDomain, // Search by URL
-        },
-        {
-          headers: {
-            Authorization: `ApiKey ${apiKey}`,
-          },
-        },
-      );
-
       try {
+        // Merge options, preserving apiKey from initOptions if not provided in reqOptions
+        const options = await mergeOptions<PermaccOptions>(initOptions, reqOptions);
+
+        // Ensure API key is provided
+        if (!options.apiKey) {
+          throw new Error("API key is required for Perma.cc");
+        }
+
+        // Use default values and required apiKey
+        const baseUrl = "https://api.perma.cc";
+        const snapshotUrl = "https://perma.cc";
+        const { apiKey } = options;
+
+        // Clean domain for search
+        const cleanDomain = normalizeDomain(domain, false);
+
+        // Prepare fetch options using common utility with specific headers for Perma.cc
+        const fetchOptions = await createFetchOptions(
+          baseUrl,
+          {
+            // Perma.cc pagination and filtering
+            limit: options.limit ?? 100,
+            url: cleanDomain, // Search by URL
+          },
+          {
+            headers: {
+              Authorization: `ApiKey ${apiKey}`,
+            },
+            retries: options.retries,
+            timeout: options.timeout,
+          },
+        );
         // Fetch archives from Perma.cc API
         // Define TypeScript interface for type safety
         interface PermaccArchive {

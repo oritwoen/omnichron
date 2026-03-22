@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { $fetch } from "ofetch";
 import { cleanDoubleSlashes } from "ufo";
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from "../types";
@@ -35,68 +36,73 @@ export default function commonCrawl(
       domain: string,
       reqOptions: Partial<CommonCrawlOptions> = {},
     ): Promise<ArchiveResponse> {
-      const options = await mergeOptions(initOptions, reqOptions);
-
       const baseURL = "https://index.commoncrawl.org";
       const dataBaseURL = "https://data.commoncrawl.org";
-      // Determine collection and CDX index path: use explicit or fetch latest via collinfo.json
-      let collectionName = options.collection as string | undefined;
-      let indexName: string;
-      if (!collectionName || collectionName === "CC-MAIN-latest") {
-        let apiPath: string | undefined;
-        try {
-          const collinfoOpts = await createFetchOptions(
-            baseURL,
-            {},
-            { timeout: options.timeout ?? 60_000 },
-          );
-          const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
-          if (Array.isArray(collinfo) && collinfo.length > 0) {
-            const first = collinfo[0];
-            const cdxApiProp = first["cdx-api"] || first.cdxApi;
-            if (typeof cdxApiProp === "string") {
-              // Extract path from URL or use as-is
-              let raw = cdxApiProp.startsWith("http") ? new URL(cdxApiProp).pathname : cdxApiProp;
-              raw = raw.startsWith("/") ? raw.slice(1) : raw;
-              apiPath = raw;
-              // Derive collection name without '-index'
-              collectionName = raw.endsWith("-index") ? raw.slice(0, -"-index".length) : raw;
-            } else if (typeof first.name === "string") {
-              collectionName = first.name;
-              apiPath = collectionName.endsWith("-index")
-                ? collectionName
-                : `${collectionName}-index`;
-            }
-          }
-        } catch {
-          // ignore and fallback
-        }
-        // Fallback defaults if collinfo failed or missing
-        if (!collectionName) collectionName = "CC-MAIN-latest";
-        if (!apiPath) {
-          apiPath = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
-        }
-        indexName = apiPath;
-      } else {
-        // Explicit collection provided by user
-        indexName = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
-      }
-
-      const urlPattern = normalizeDomain(domain);
-      const params: Record<string, string> = {
-        url: urlPattern,
-        output: "json",
-        fl: "url,timestamp,status,mime,length,offset,filename,digest",
-        collapse: "digest",
-        limit: String(options.limit ?? 1000),
-      };
-
-      const fetchOptions = await createFetchOptions(baseURL, params, {
-        timeout: options.timeout ?? 60_000,
-        responseType: "text",
-      });
+      let collectionName: string | undefined;
 
       try {
+        const options = await mergeOptions(initOptions, reqOptions);
+
+        // Determine collection and CDX index path: use explicit or fetch latest via collinfo.json
+        collectionName = options.collection as string | undefined;
+        let indexName: string;
+        if (!collectionName || collectionName === "CC-MAIN-latest") {
+          let apiPath: string | undefined;
+          try {
+            const collinfoOpts = await createFetchOptions(
+              baseURL,
+              {},
+              {
+                retries: options.retries,
+                timeout: options.timeout ?? 60_000,
+              },
+            );
+            const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
+            if (Array.isArray(collinfo) && collinfo.length > 0) {
+              const first = collinfo[0];
+              const cdxApiProp = first["cdx-api"] || first.cdxApi;
+              if (typeof cdxApiProp === "string") {
+                // Extract path from URL or use as-is
+                let raw = cdxApiProp.startsWith("http") ? new URL(cdxApiProp).pathname : cdxApiProp;
+                raw = raw.startsWith("/") ? raw.slice(1) : raw;
+                apiPath = raw;
+                // Derive collection name without '-index'
+                collectionName = raw.endsWith("-index") ? raw.slice(0, -"-index".length) : raw;
+              } else if (typeof first.name === "string") {
+                collectionName = first.name;
+                apiPath = collectionName.endsWith("-index")
+                  ? collectionName
+                  : `${collectionName}-index`;
+              }
+            }
+          } catch (collinfoError) {
+            consola.debug("[commoncrawl] collinfo.json fetch failed, using fallback:", collinfoError);
+          }
+          // Fallback defaults if collinfo failed or missing
+          if (!collectionName) collectionName = "CC-MAIN-latest";
+          if (!apiPath) {
+            apiPath = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+          }
+          indexName = apiPath;
+        } else {
+          // Explicit collection provided by user
+          indexName = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+        }
+
+        const urlPattern = normalizeDomain(domain);
+        const params: Record<string, string> = {
+          url: urlPattern,
+          output: "json",
+          fl: "url,timestamp,status,mime,length,offset,filename,digest",
+          collapse: "digest",
+          limit: String(options.limit ?? 1000),
+        };
+
+        const fetchOptions = await createFetchOptions(baseURL, params, {
+          retries: options.retries,
+          timeout: options.timeout ?? 60_000,
+          responseType: "text",
+        });
         const raw = await $fetch(`/${indexName}`, fetchOptions);
         const text = typeof raw === "string" ? raw : String(raw);
         const lines = text.split("\n").filter((line) => line.trim());
