@@ -1,7 +1,6 @@
 import { consola } from "consola";
 import { $fetch } from "ofetch";
 import { cleanDoubleSlashes } from "ufo";
-import { consola } from "consola";
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from "../types";
 import type { CommonCrawlOptions } from "../_providers";
 import {
