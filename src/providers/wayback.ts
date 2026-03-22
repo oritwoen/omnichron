@@ -28,26 +28,32 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
      * @returns Promise resolving to ArchiveResponse containing pages and metadata.
      */
     async snapshots(domain: string, reqOptions: ArchiveOptions = {}): Promise<ArchiveResponse> {
-      // Merge options, preferring request options over init options
-      const options = mergeOptions(initOptions, reqOptions);
-
-      // Use default values
-      const baseUrl = "https://web.archive.org";
-      const snapshotUrl = "https://web.archive.org/web";
-
-      // Normalize domain and create URL pattern for search
-      const urlPattern = normalizeDomain(domain);
-
-      // Prepare fetch options using common utility
-      const fetchOptions = await createFetchOptions(baseUrl, {
-        url: urlPattern,
-        output: "json",
-        fl: "original,timestamp,statuscode",
-        collapse: "timestamp:4", // Collapse by year to reduce results
-        limit: String((await options)?.limit ?? 1000), // Configurable limit with nullish coalescing
-      });
-
       try {
+        // Merge options, preferring request options over init options
+        const options = await mergeOptions(initOptions, reqOptions);
+
+        // Use default values
+        const baseUrl = "https://web.archive.org";
+        const snapshotUrl = "https://web.archive.org/web";
+
+        // Normalize domain and create URL pattern for search
+        const urlPattern = normalizeDomain(domain);
+
+        // Prepare fetch options using common utility
+        const fetchOptions = await createFetchOptions(
+          baseUrl,
+          {
+            url: urlPattern,
+            output: "json",
+            fl: "original,timestamp,statuscode",
+            collapse: "timestamp:4", // Collapse by year to reduce results
+            limit: String(options.limit ?? 1000), // Configurable limit with nullish coalescing
+          },
+          {
+            retries: options.retries,
+            timeout: options.timeout,
+          },
+        );
         // Use ofetch with CDX Server API path
         // TypeScript type assertion for the response
         type WaybackResponse = [string[], ...string[][]];
@@ -65,7 +71,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
           dataRows,
           snapshotUrl,
           "wayback",
-          await options,
+          options,
         );
 
         return createSuccessResponse(pages, "wayback", { queryParams: fetchOptions.params || {} });
