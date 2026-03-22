@@ -110,6 +110,7 @@ describe("mapCdxRows", () => {
     expect(pages).toHaveLength(1);
     expect(pages[0].url).toBe("https://example.com/ok");
     expect(pages[0].timestamp).toBe("2022-01-01T15:30:45Z");
+    expect(pages[0]._meta.timestamp).toBe("20220101153045");
   });
 
   it("keeps valid leap day rows and drops invalid leap day rows", async () => {
