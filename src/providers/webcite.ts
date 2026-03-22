@@ -34,11 +34,12 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
       domain: string,
       reqOptions: Partial<WebCiteOptions> = {},
     ): Promise<ArchiveResponse> {
-      const cleanDomain = normalizeDomain(domain, false);
-
       try {
         // Merge options, preferring request options over init options
         const options = await mergeOptions(initOptions, reqOptions);
+
+        // Clean domain for search
+        const cleanDomain = normalizeDomain(domain, false);
 
         // Use default values
         const baseUrl = "https://www.webcitation.org";
@@ -104,9 +105,9 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
           });
         }
       } catch (error) {
-        // Handle any other unexpected errors
+        // Handle any other unexpected errors (including normalizeDomain failures)
         return createErrorResponse(error, "webcite", {
-          domain: cleanDomain,
+          domain,
         });
       }
     },

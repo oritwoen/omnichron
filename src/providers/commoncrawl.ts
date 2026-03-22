@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { $fetch } from "ofetch";
 import { cleanDoubleSlashes } from "ufo";
 import type { ArchiveProvider, ArchiveResponse, ArchivedPage, CommonCrawlMetadata } from "../types";
@@ -37,12 +38,13 @@ export default function commonCrawl(
     ): Promise<ArchiveResponse> {
       const baseURL = "https://index.commoncrawl.org";
       const dataBaseURL = "https://data.commoncrawl.org";
+      let collectionName: string | undefined;
 
       try {
         const options = await mergeOptions(initOptions, reqOptions);
 
         // Determine collection and CDX index path: use explicit or fetch latest via collinfo.json
-        let collectionName = options.collection as string | undefined;
+        collectionName = options.collection as string | undefined;
         let indexName: string;
         if (!collectionName || collectionName === "CC-MAIN-latest") {
           let apiPath: string | undefined;
@@ -73,8 +75,8 @@ export default function commonCrawl(
                   : `${collectionName}-index`;
               }
             }
-          } catch {
-            // ignore and fallback
+          } catch (collinfoError) {
+            consola.debug("[commoncrawl] collinfo.json fetch failed, using fallback:", collinfoError);
           }
           // Fallback defaults if collinfo failed or missing
           if (!collectionName) collectionName = "CC-MAIN-latest";
@@ -141,7 +143,7 @@ export default function commonCrawl(
           queryParams: fetchOptions.params,
         });
       } catch (error) {
-        return createErrorResponse(error, "commoncrawl");
+        return createErrorResponse(error, "commoncrawl", { collection: collectionName });
       }
     },
   };

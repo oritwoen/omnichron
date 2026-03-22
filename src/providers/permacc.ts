@@ -54,7 +54,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
           baseUrl,
           {
             // Perma.cc pagination and filtering
-            limit: options?.limit ?? 100,
+            limit: options.limit ?? 100,
             url: cleanDomain, // Search by URL
           },
           {
