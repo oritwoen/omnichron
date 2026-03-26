@@ -269,8 +269,10 @@ export async function createFetchOptions(
     ...options,
   };
 
-  // Inject proxy dispatcher if configured (options.proxy overrides config.proxy)
-  const proxyUrl = resolveProxyUrl(options.proxy ?? config.proxy);
+  // Inject proxy dispatcher if configured (options.proxy overrides config.proxy).
+  // options.proxy === false explicitly disables proxy even when config.proxy is set.
+  const effectiveProxy = options.proxy === undefined ? config.proxy : options.proxy;
+  const proxyUrl = resolveProxyUrl(effectiveProxy);
   if (proxyUrl) {
     fetchOpts.dispatcher = createProxyDispatcher(proxyUrl);
   }

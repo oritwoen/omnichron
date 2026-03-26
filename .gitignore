@@ -4,3 +4,6 @@ node_modules
 
 .nuxt
 .output
+
+.claude/
+CLAUDE.md

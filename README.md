@@ -167,14 +167,18 @@ Route requests through HTTP/HTTPS proxies for rate limit management, geo-routing
 const archive = createArchive(providers.commoncrawl(), {
   proxy: "http://user:pass@proxy.example.com:8080",
 });
+```
 
+```ts
 // Rotating proxy pool
 const proxies = ["http://proxy1:8080", "http://proxy2:8080", "http://proxy3:8080"];
 let i = 0;
 const archive = createArchive(providers.commoncrawl(), {
   proxy: { rotate: () => proxies[i++ % proxies.length] },
 });
+```
 
+```ts
 // Per-request proxy
 await archive.getPages("example.com", {
   proxy: "http://proxy.example.com:8080",

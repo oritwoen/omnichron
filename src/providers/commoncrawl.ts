@@ -55,6 +55,7 @@ export default function commonCrawl(
               {
                 retries: options.retries,
                 timeout: options.timeout ?? 60_000,
+                proxy: options.proxy,
               },
             );
             const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
@@ -109,6 +110,7 @@ export default function commonCrawl(
           retries: options.retries,
           timeout: options.timeout ?? 60_000,
           responseType: "text",
+          proxy: options.proxy,
         });
         const raw = await $fetch(`/${indexName}`, fetchOptions);
         const text = typeof raw === "string" ? raw : String(raw);

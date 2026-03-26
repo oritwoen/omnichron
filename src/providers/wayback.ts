@@ -52,6 +52,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
           {
             retries: options.retries,
             timeout: options.timeout,
+            proxy: options.proxy,
           },
         );
         // Use ofetch with CDX Server API path
