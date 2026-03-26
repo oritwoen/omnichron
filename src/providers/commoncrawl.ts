@@ -55,6 +55,7 @@ export default function commonCrawl(
               {
                 retries: options.retries,
                 timeout: options.timeout ?? 60_000,
+                proxy: options.proxy,
               },
             );
             const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
@@ -76,17 +77,24 @@ export default function commonCrawl(
               }
             }
           } catch (collinfoError) {
-            consola.debug("[commoncrawl] collinfo.json fetch failed, using fallback:", collinfoError);
+            consola.debug(
+              "[commoncrawl] collinfo.json fetch failed, using fallback:",
+              collinfoError,
+            );
           }
           // Fallback defaults if collinfo failed or missing
           if (!collectionName) collectionName = "CC-MAIN-latest";
           if (!apiPath) {
-            apiPath = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+            apiPath = collectionName.endsWith("-index")
+              ? collectionName
+              : `${collectionName}-index`;
           }
           indexName = apiPath;
         } else {
           // Explicit collection provided by user
-          indexName = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+          indexName = collectionName.endsWith("-index")
+            ? collectionName
+            : `${collectionName}-index`;
         }
 
         const urlPattern = normalizeDomain(domain);
@@ -102,6 +110,7 @@ export default function commonCrawl(
           retries: options.retries,
           timeout: options.timeout ?? 60_000,
           responseType: "text",
+          proxy: options.proxy,
         });
         const raw = await $fetch(`/${indexName}`, fetchOptions);
         const text = typeof raw === "string" ? raw : String(raw);

@@ -63,6 +63,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
             },
             retries: options.retries,
             timeout: options.timeout,
+            proxy: options.proxy,
           },
         );
         // Fetch archives from Perma.cc API

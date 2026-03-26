@@ -1,3 +1,18 @@
+/**
+ * Proxy configuration for routing requests through HTTP/HTTPS proxies.
+ * - `string`: Static proxy URL (e.g., "http://user:pass@proxy:8080")
+ * - `{ url: string }`: Object form of static proxy URL
+ * - `{ rotate: () => string }`: Rotation function called per fetch for proxy pools
+ * - `false`: Explicitly disable proxy (overrides config-level proxy)
+ * - `undefined`: No proxy (default), falls back to config-level proxy
+ */
+export type ProxyConfig =
+  | string
+  | { url: string; rotate?: never }
+  | { rotate: () => string; url?: never }
+  | false
+  | undefined;
+
 export interface ArchiveOptions {
   // Pagination option
   limit?: number; // Maximum number of results to return
@@ -14,6 +29,9 @@ export interface ArchiveOptions {
 
   // Provider-specific authentication (can be overridden in provider-specific options)
   apiKey?: string; // Optional API key for providers that require authentication
+
+  // Proxy configuration
+  proxy?: ProxyConfig; // Route requests through an HTTP/HTTPS proxy
 }
 
 // Base metadata interface with common properties

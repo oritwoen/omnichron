@@ -52,6 +52,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
           {
             retries: options.retries,
             timeout: options.timeout,
+            proxy: options.proxy,
           },
         );
         // Use ofetch with CDX Server API path
@@ -67,12 +68,7 @@ export default function wayback(initOptions: ArchiveOptions = {}): ArchiveProvid
         const dataRows = response.slice(1);
 
         // Map CDX rows to ArchivedPage objects with typed metadata
-        const pages: ArchivedPage[] = await mapCdxRows(
-          dataRows,
-          snapshotUrl,
-          "wayback",
-          options,
-        );
+        const pages: ArchivedPage[] = await mapCdxRows(dataRows, snapshotUrl, "wayback", options);
 
         return createSuccessResponse(pages, "wayback", { queryParams: fetchOptions.params || {} });
       } catch (error) {

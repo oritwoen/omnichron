@@ -11,6 +11,7 @@ import type {
 import {
   createSuccessResponse,
   createErrorResponse,
+  createFetchOptions,
   mergeOptions,
   normalizeDomain,
 } from "../utils";
@@ -47,12 +48,17 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
         const fullUrl = cleanDomain.includes("://") ? cleanDomain : `http://${cleanDomain}`;
         const timemapUrl = `/timemap/${fullUrl}`;
 
-        const timemapResponse = await $fetch(timemapUrl, {
+        const fetchOptions = await createFetchOptions(
           baseURL,
-          retry: options.retries ?? 5,
-          timeout: options.timeout ?? 60000,
-          responseType: "text",
-        });
+          {},
+          {
+            retries: options.retries ?? 5,
+            timeout: options.timeout ?? 60000,
+            responseType: "text",
+            proxy: options.proxy,
+          },
+        );
+        const timemapResponse = await $fetch(timemapUrl, fetchOptions);
 
         // Parse the Memento API response
         // Format: <http://archive.md/20140101030405/https://example.com/>; rel="memento"; datetime="Wed, 01 Jan 2014 03:04:05 GMT"

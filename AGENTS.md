@@ -53,7 +53,7 @@ omnichron/
 | `ArchiveResponse`   | interface | types.ts:104          | `{ success, pages, error?, _meta?, fromCache? }`                        |
 | `ArchivedPage`      | interface | types.ts:73           | `{ url, timestamp, snapshot, _meta }`                                   |
 | `OmnichronConfig`   | interface | config.ts:8           | Config shape: `storage` + `performance` + env overrides                 |
-| `processInParallel` | function  | utils/_utils.ts:8     | Generic parallel executor with concurrency + batching                   |
+| `processInParallel` | function  | utils/\_utils.ts:8    | Generic parallel executor with concurrency + batching                   |
 | `configureStorage`  | function  | storage.ts:165        | **@deprecated** - use config files or createArchive options             |
 
 ## CONVENTIONS

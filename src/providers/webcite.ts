@@ -53,6 +53,7 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
           {
             retries: options.retries,
             timeout: options.timeout ?? 30000,
+            proxy: options.proxy,
           },
         );
         // WebCite currently does not accept new archiving requests

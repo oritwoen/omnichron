@@ -1,6 +1,7 @@
 import { loadConfig } from "c12";
 import type { Driver } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
+import type { ProxyConfig } from "./types";
 
 /**
  * Configuration options for Omnichron
@@ -29,6 +30,9 @@ export interface OmnichronConfig {
     // Number of retries (default: 1)
     retries?: number;
   };
+
+  // Proxy configuration for routing requests through HTTP/HTTPS proxies
+  proxy?: ProxyConfig;
 
   // Environment-specific configurations
   $env?: Record<string, OmnichronConfig>;
