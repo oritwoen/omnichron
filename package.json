@@ -50,6 +50,7 @@
     "defu": "6.1.4",
     "ofetch": "1.4.1",
     "ufo": "1.6.1",
+    "undici": "^7.24.6",
     "unstorage": "1.15.0"
   },
   "devDependencies": {

@@ -1,12 +1,14 @@
 import { FetchOptions } from "ofetch";
 import { hasProtocol, withTrailingSlash, withoutProtocol, cleanDoubleSlashes } from "ufo";
 import { consola } from "consola";
+import { ProxyAgent } from "undici";
 import type {
   ArchiveOptions,
   ArchiveResponse,
   ArchivedPage,
   WaybackMetadata,
   ResponseMetadata,
+  ProxyConfig,
 } from "../types";
 import { getConfig } from "../config";
 
@@ -207,6 +209,29 @@ export function createErrorResponse(
 }
 
 /**
+ * Resolves a ProxyConfig to a proxy URL string.
+ * For rotate functions, the function is called each time to support proxy pools.
+ * @param proxy Proxy configuration
+ * @returns Resolved proxy URL, or undefined if no proxy
+ */
+export function resolveProxyUrl(proxy: ProxyConfig): string | undefined {
+  if (!proxy) return undefined;
+  if (typeof proxy === "string") return proxy;
+  if ("url" in proxy) return proxy.url;
+  if ("rotate" in proxy) return proxy.rotate();
+  return undefined;
+}
+
+/**
+ * Creates an undici ProxyAgent dispatcher for the given proxy URL.
+ * @param proxyUrl HTTP/HTTPS proxy URL
+ * @returns ProxyAgent instance compatible with ofetch's dispatcher option
+ */
+export function createProxyDispatcher(proxyUrl: string): InstanceType<typeof ProxyAgent> {
+  return new ProxyAgent(proxyUrl);
+}
+
+/**
  * Creates common fetch options with standard defaults
  * @param baseURL Base URL for the API
  * @param params Query parameters
@@ -220,7 +245,7 @@ export async function createFetchOptions(
 ): Promise<FetchOptions> {
   const config = await getConfig();
 
-  return {
+  const fetchOpts: Record<string, unknown> = {
     method: "GET",
     baseURL,
     params,
@@ -228,13 +253,29 @@ export async function createFetchOptions(
     timeout: options.timeout ?? config.performance.timeout,
     retryDelay: 300, // Add delay between retries
     retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504], // Standard retry status codes
-    onResponseError: ({ request, response, options }) => {
+    onResponseError: ({
+      request,
+      response,
+      options,
+    }: {
+      request: unknown;
+      response: { status: number };
+      options: { method?: string };
+    }) => {
       consola.error(
         `[fetch error] ${options.method} ${request} failed with status ${response.status}`,
       );
     },
     ...options,
   };
+
+  // Inject proxy dispatcher if configured (options.proxy overrides config.proxy)
+  const proxyUrl = resolveProxyUrl(options.proxy ?? config.proxy);
+  if (proxyUrl) {
+    fetchOpts.dispatcher = createProxyDispatcher(proxyUrl);
+  }
+
+  return fetchOpts as FetchOptions;
 }
 
 /**
@@ -306,7 +347,9 @@ export async function mapCdxRows(
   return results;
 
   // Helper function to convert a row to an ArchivedPage
-  function rowToArchivedPage([rawUrl, rawTimestamp, rawStatus]: string[]): ArchivedPage | undefined {
+  function rowToArchivedPage([rawUrl, rawTimestamp, rawStatus]: string[]):
+    | ArchivedPage
+    | undefined {
     const originalUrl = cleanDoubleSlashes(rawUrl ?? "");
     const timestampRaw = rawTimestamp ?? "";
     const isoTimestamp = waybackTimestampToISO(timestampRaw);

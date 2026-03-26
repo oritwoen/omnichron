@@ -76,17 +76,24 @@ export default function commonCrawl(
               }
             }
           } catch (collinfoError) {
-            consola.debug("[commoncrawl] collinfo.json fetch failed, using fallback:", collinfoError);
+            consola.debug(
+              "[commoncrawl] collinfo.json fetch failed, using fallback:",
+              collinfoError,
+            );
           }
           // Fallback defaults if collinfo failed or missing
           if (!collectionName) collectionName = "CC-MAIN-latest";
           if (!apiPath) {
-            apiPath = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+            apiPath = collectionName.endsWith("-index")
+              ? collectionName
+              : `${collectionName}-index`;
           }
           indexName = apiPath;
         } else {
           // Explicit collection provided by user
-          indexName = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
+          indexName = collectionName.endsWith("-index")
+            ? collectionName
+            : `${collectionName}-index`;
         }
 
         const urlPattern = normalizeDomain(domain);

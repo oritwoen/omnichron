@@ -158,6 +158,42 @@ Per-request cache control is also supported:
 await archive.snapshots("example.com", { cache: false });
 ```
 
+### Proxy support
+
+Route requests through HTTP/HTTPS proxies for rate limit management, geo-routing, or IP rotation:
+
+```ts
+// Static proxy
+const archive = createArchive(providers.commoncrawl(), {
+  proxy: "http://user:pass@proxy.example.com:8080",
+});
+
+// Rotating proxy pool
+const proxies = ["http://proxy1:8080", "http://proxy2:8080", "http://proxy3:8080"];
+let i = 0;
+const archive = createArchive(providers.commoncrawl(), {
+  proxy: { rotate: () => proxies[i++ % proxies.length] },
+});
+
+// Per-request proxy
+await archive.getPages("example.com", {
+  proxy: "http://proxy.example.com:8080",
+});
+```
+
+Proxy can also be set in a config file:
+
+```ts
+// omnichron.config.ts
+export default {
+  proxy: {
+    url: "http://user:pass@proxy.example.com:8080",
+  },
+};
+```
+
+Proxy support uses `undici.ProxyAgent` under the hood. Supported protocols: `http://`, `https://`.
+
 ## API
 
 ### `createArchive(providers, options?)`
@@ -175,16 +211,17 @@ Returns:
 
 All methods accept `ArchiveOptions`:
 
-| Option        | Type      | Default     | Description                          |
-| ------------- | --------- | ----------- | ------------------------------------ |
-| `limit`       | `number`  | `1000`      | Maximum results to return            |
-| `cache`       | `boolean` | `true`      | Enable/disable caching               |
-| `ttl`         | `number`  | `604800000` | Cache TTL in milliseconds (7 days)   |
-| `concurrency` | `number`  | `3`         | Max parallel requests                |
-| `batchSize`   | `number`  | `20`        | Items per processing batch           |
-| `timeout`     | `number`  | `10000`     | Request timeout in ms                |
-| `retries`     | `number`  | `1`         | Retry attempts on failure            |
-| `apiKey`      | `string`  | -           | API key for providers that need auth |
+| Option        | Type          | Default     | Description                                    |
+| ------------- | ------------- | ----------- | ---------------------------------------------- |
+| `limit`       | `number`      | `1000`      | Maximum results to return                      |
+| `cache`       | `boolean`     | `true`      | Enable/disable caching                         |
+| `ttl`         | `number`      | `604800000` | Cache TTL in milliseconds (7 days)             |
+| `concurrency` | `number`      | `3`         | Max parallel requests                          |
+| `batchSize`   | `number`      | `20`        | Items per processing batch                     |
+| `timeout`     | `number`      | `10000`     | Request timeout in ms                          |
+| `retries`     | `number`      | `1`         | Retry attempts on failure                      |
+| `apiKey`      | `string`      | -           | API key for providers that need auth           |
+| `proxy`       | `ProxyConfig` | -           | Proxy URL, `{ url }`, or `{ rotate }` function |
 
 Options can be set at three levels: config file (global defaults), `createArchive` call (instance defaults), and individual method calls (per-request). Each level overrides the previous one.
 
