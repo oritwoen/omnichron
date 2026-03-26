@@ -33,6 +33,18 @@ describe("createProxyDispatcher", () => {
     const dispatcher = createProxyDispatcher("http://proxy:8080");
     expect(dispatcher).toBeInstanceOf(ProxyAgent);
   });
+
+  it("returns the same instance for the same proxy URL", () => {
+    const a = createProxyDispatcher("http://cached-proxy:9090");
+    const b = createProxyDispatcher("http://cached-proxy:9090");
+    expect(a).toBe(b);
+  });
+
+  it("returns different instances for different proxy URLs", () => {
+    const a = createProxyDispatcher("http://proxy-a:8080");
+    const b = createProxyDispatcher("http://proxy-b:8080");
+    expect(a).not.toBe(b);
+  });
 });
 
 describe("createFetchOptions proxy injection", () => {
@@ -59,7 +71,6 @@ describe("createFetchOptions proxy injection", () => {
   });
 
   it("falls back to config-level proxy when options.proxy is not set", async () => {
-    resetConfig();
     await resolveConfig({
       overrides: { proxy: "http://config-proxy:8080" },
     });
@@ -70,7 +81,6 @@ describe("createFetchOptions proxy injection", () => {
   });
 
   it("allows per-request opt-out via proxy: false when config proxy is set", async () => {
-    resetConfig();
     await resolveConfig({
       overrides: { proxy: "http://config-proxy:8080" },
     });

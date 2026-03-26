@@ -222,13 +222,23 @@ export function resolveProxyUrl(proxy: ProxyConfig): string | undefined {
   return undefined;
 }
 
+// Cache ProxyAgent instances by URL to enable undici connection pooling.
+// Rotating proxies naturally get separate agents since each URL is a distinct key.
+const proxyAgentCache = new Map<string, InstanceType<typeof ProxyAgent>>();
+
 /**
- * Creates an undici ProxyAgent dispatcher for the given proxy URL.
+ * Returns a cached undici ProxyAgent dispatcher for the given proxy URL.
+ * Reuses existing agents to preserve connection pools across requests.
  * @param proxyUrl HTTP/HTTPS proxy URL
  * @returns ProxyAgent instance compatible with ofetch's dispatcher option
  */
 export function createProxyDispatcher(proxyUrl: string): InstanceType<typeof ProxyAgent> {
-  return new ProxyAgent(proxyUrl);
+  const cached = proxyAgentCache.get(proxyUrl);
+  if (cached) return cached;
+
+  const agent = new ProxyAgent(proxyUrl);
+  proxyAgentCache.set(proxyUrl, agent);
+  return agent;
 }
 
 /**
