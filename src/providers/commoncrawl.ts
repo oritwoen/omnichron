@@ -43,7 +43,7 @@ export default function commonCrawl(
       try {
         const options = await mergeOptions(initOptions, reqOptions);
 
-        // Determine collection and CDX index path: use explicit or fetch latest via collinfo.json
+        // resolve collection: explicit option, or latest via collinfo.json
         collectionName = options.collection as string | undefined;
         let indexName: string;
         if (!collectionName || collectionName === "CC-MAIN-latest") {
@@ -62,11 +62,9 @@ export default function commonCrawl(
               const first = collinfo[0];
               const cdxApiProp = first["cdx-api"] || first.cdxApi;
               if (typeof cdxApiProp === "string") {
-                // Extract path from URL or use as-is
                 let raw = cdxApiProp.startsWith("http") ? new URL(cdxApiProp).pathname : cdxApiProp;
                 raw = raw.startsWith("/") ? raw.slice(1) : raw;
                 apiPath = raw;
-                // Derive collection name without '-index'
                 collectionName = raw.endsWith("-index") ? raw.slice(0, -"-index".length) : raw;
               } else if (typeof first.name === "string") {
                 collectionName = first.name;
@@ -78,14 +76,12 @@ export default function commonCrawl(
           } catch (collinfoError) {
             consola.debug("[commoncrawl] collinfo.json fetch failed, using fallback:", collinfoError);
           }
-          // Fallback defaults if collinfo failed or missing
           if (!collectionName) collectionName = "CC-MAIN-latest";
           if (!apiPath) {
             apiPath = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
           }
           indexName = apiPath;
         } else {
-          // Explicit collection provided by user
           indexName = collectionName.endsWith("-index") ? collectionName : `${collectionName}-index`;
         }
 

@@ -37,13 +37,9 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
       const cleanDomain = normalizeDomain(domain, false);
 
       try {
-        // Merge options, preferring request options over init options
         const options = await mergeOptions(initOptions, reqOptions);
-
-        // Use default values
         const baseURL = "https://archive.is";
-        // Using Memento API to get timemap directly with the domain
-        // Format: https://archive.is/timemap/http://example.com
+        // Memento timemap: https://archive.is/timemap/http://example.com
         const fullUrl = cleanDomain.includes("://") ? cleanDomain : `http://${cleanDomain}`;
         const timemapUrl = `/timemap/${fullUrl}`;
 
@@ -54,8 +50,8 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
           responseType: "text",
         });
 
-        // Parse the Memento API response
-        // Format: <http://archive.md/20140101030405/https://example.com/>; rel="memento"; datetime="Wed, 01 Jan 2014 03:04:05 GMT"
+        // Memento link header format:
+        // <http://archive.md/20140101030405/https://example.com/>; rel="memento"; datetime="Wed, 01 Jan 2014 03:04:05 GMT"
         const pages: ArchivedPage[] = [];
         const mementoRegex =
           /<(https?:\/\/archive\.(?:is|today|md|ph)\/([0-9]{8,14})\/(?:https?:\/\/)?([^>]+))>;\s*rel="(?:first\s+)?memento";\s*datetime="([^"]+)"/g;
@@ -66,24 +62,19 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
         while ((mementoMatch = mementoRegex.exec(timemapResponse)) !== null) {
           const [, snapshotUrl, timestamp, origUrl, datetime] = mementoMatch;
 
-          // Check if the URL belongs to our domain
           if (origUrl.includes(cleanDomain)) {
             try {
-              // Parse the ISO timestamp
               const parsedDate = new Date(datetime);
               const isoTimestamp = Number.isNaN(parsedDate.getTime())
                 ? new Date().toISOString()
                 : parsedDate.toISOString();
 
-              // Create cleaned URL
               let cleanedUrl = cleanDoubleSlashes(
                 origUrl.includes("://") ? origUrl : `https://${origUrl}`,
               );
-
-              // Remove trailing slash for test compatibility
+              // strip trailing slash for test compatibility
               cleanedUrl = cleanedUrl.endsWith("/") ? cleanedUrl.slice(0, -1) : cleanedUrl;
 
-              // Clean snapshot URL as well
               let cleanedSnapshotUrl = snapshotUrl;
               cleanedSnapshotUrl = cleanedSnapshotUrl.endsWith("/")
                 ? cleanedSnapshotUrl.slice(0, -1)
@@ -94,9 +85,9 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
                 timestamp: isoTimestamp,
                 snapshot: cleanedSnapshotUrl,
                 _meta: {
-                  hash: timestamp, // Timestamp from URL
-                  raw_date: datetime, // Original date format
-                  position: index, // Position in results list
+                  hash: timestamp,
+                  raw_date: datetime,
+                  position: index,
                 } as ArchiveTodayMetadata,
               });
 
@@ -107,11 +98,9 @@ export default function archiveToday(initOptions: ArchiveOptions = {}): ArchiveP
           }
         }
 
-        // Apply limit if specified
         const limitedPages =
           typeof options.limit === "number" ? pages.slice(0, Math.max(0, options.limit)) : pages;
 
-        // Return response
         return createSuccessResponse(limitedPages, "archive-today", {
           domain: cleanDomain,
           page: 1,

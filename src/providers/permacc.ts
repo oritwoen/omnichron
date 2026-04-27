@@ -33,29 +33,22 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
       reqOptions: Partial<PermaccOptions> = {},
     ): Promise<ArchiveResponse> {
       try {
-        // Merge options, preserving apiKey from initOptions if not provided in reqOptions
         const options = await mergeOptions<PermaccOptions>(initOptions, reqOptions);
 
-        // Ensure API key is provided
         if (!options.apiKey) {
           throw new Error("API key is required for Perma.cc");
         }
 
-        // Use default values and required apiKey
         const baseUrl = "https://api.perma.cc";
         const snapshotUrl = "https://perma.cc";
         const { apiKey } = options;
-
-        // Clean domain for search
         const cleanDomain = normalizeDomain(domain, false);
 
-        // Prepare fetch options using common utility with specific headers for Perma.cc
         const fetchOptions = await createFetchOptions(
           baseUrl,
           {
-            // Perma.cc pagination and filtering
             limit: options.limit ?? 100,
-            url: cleanDomain, // Search by URL
+            url: cleanDomain,
           },
           {
             headers: {
@@ -65,8 +58,7 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
             timeout: options.timeout,
           },
         );
-        // Fetch archives from Perma.cc API
-        // Define TypeScript interface for type safety
+
         interface PermaccArchive {
           guid: string;
           url: string;
@@ -87,30 +79,19 @@ export default function permacc(initOptions: Partial<PermaccOptions> = {}): Arch
           };
         }
 
-        // Type assertion instead of generic to avoid type conflicts
         const response = (await $fetch("/v1/public/archives/", fetchOptions)) as PermaccResponse;
 
         if (!response.objects || response.objects.length === 0) {
           return createSuccessResponse([], "permacc", { queryParams: fetchOptions.params });
         }
 
-        // Map the data to our ArchivedPage interface
         const pages: ArchivedPage[] = response.objects
-          .filter((item) => {
-            // Only include archives that match our domain
-            return item.url && item.url.includes(cleanDomain);
-          })
+          .filter((item) => item.url && item.url.includes(cleanDomain))
           .map((item) => {
-            // Clean URL
             const cleanedUrl = cleanDoubleSlashes(item.url);
-
-            // Create direct link to archived version
             const snapUrl = `${snapshotUrl}/${item.guid}`;
-
-            // Parse timestamp to ISO format
             const timestamp = item.creation_timestamp ?? new Date().toISOString();
 
-            // Create page with properly typed metadata
             const page: ArchivedPage = {
               url: cleanedUrl,
               timestamp,

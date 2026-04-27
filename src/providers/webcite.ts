@@ -35,58 +35,42 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
       reqOptions: Partial<WebCiteOptions> = {},
     ): Promise<ArchiveResponse> {
       try {
-        // Merge options, preferring request options over init options
         const options = await mergeOptions(initOptions, reqOptions);
-
-        // Clean domain for search
         const cleanDomain = normalizeDomain(domain, false);
-
-        // Use default values
         const baseUrl = "https://www.webcitation.org";
 
-        // Prepare fetch options using common utility
         const fetchOptions = await createFetchOptions(
           baseUrl,
           {
-            url: encodeURIComponent(cleanDomain), // Query parameter for retrieval - must be properly encoded
+            url: encodeURIComponent(cleanDomain),
           },
           {
             retries: options.retries,
             timeout: options.timeout ?? 30000,
           },
         );
-        // WebCite currently does not accept new archiving requests
-        // The query API path to access archived content
         const queryPath = "/query";
 
         try {
-          // Try to access the specific archived URL directly
           const response = await $fetch(queryPath, fetchOptions);
 
-          // WebCite is read-only now, only return what we can find for the specific URL
-          // Format of snapshot URLs: https://www.webcitation.org/[ID]
-          // If we get a successful response, extract the ID and create an ArchivedPage object
-
-          // Extract response meta text to check if we found archived content or just the notice
+          // WebCite is read-only; the query endpoint returns either an archived
+          // page snapshot or a static "not accepting requests" notice.
           const isNotFound =
             typeof response === "string" &&
             response.includes("We are currently not accepting archiving requests");
 
           const pages: ArchivedPage[] = [];
 
-          // Only add an entry if we found real content (not the generic notice)
           if (!isNotFound && response) {
-            // Since WebCite doesn't have a proper API, we're handling a simple case
-            // The format is simplified to match what WebCite offers today
-
-            // Create ArchivedPage with available data - timestamp is estimation as
-            // WebCite doesn't explicitly provide it in API responses
+            // WebCite has no public listing API, so timestamp is a placeholder
+            // and requestId is generic.
             pages.push({
               url: cleanDomain,
-              timestamp: new Date().toISOString(), // Placeholder timestamp
+              timestamp: new Date().toISOString(),
               snapshot: `${baseUrl}/query?url=${encodeURIComponent(cleanDomain)}`,
               _meta: {
-                requestId: "webcite-archive", // Generic ID since we can't extract it
+                requestId: "webcite-archive",
                 provider: "webcite",
               },
             });
@@ -99,13 +83,11 @@ export default function webcite(initOptions: Partial<WebCiteOptions> = {}): Arch
             isAvailable: !isNotFound,
           });
         } catch (fetchError) {
-          // Handle fetch error specially to ensure correct error response
           return createErrorResponse(fetchError, "webcite", {
             domain: cleanDomain,
           });
         }
       } catch (error) {
-        // Handle any other unexpected errors (including normalizeDomain failures)
         return createErrorResponse(error, "webcite", {
           domain,
         });
