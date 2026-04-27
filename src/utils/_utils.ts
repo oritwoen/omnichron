@@ -172,6 +172,34 @@ export function createSuccessResponse(
 }
 
 /**
+ * Creates a standardized response object signalling that the provider does
+ * not implement the requested operation. Use when the operation is outside
+ * the provider's API surface (e.g. WebCite has no list-by-domain endpoint),
+ * not when the operation failed at runtime.
+ *
+ * @param reason - Human-readable explanation of why the operation is unsupported.
+ * @param source - Provider slug (mirrored to `_meta.source` and `_meta.provider`).
+ * @param metadata - Extra fields merged into `_meta`.
+ */
+export function createUnsupportedResponse(
+  reason: string,
+  source: string,
+  metadata: Record<string, unknown> = {},
+): ArchiveResponse {
+  return {
+    success: false,
+    pages: [],
+    unsupported: true,
+    unsupportedReason: reason,
+    _meta: {
+      source,
+      provider: source,
+      ...metadata,
+    } as ResponseMetadata,
+  };
+}
+
+/**
  * Creates a standardized error response object
  * @param error Error object, message, or unknown value
  * @param source Source identifier for the provider

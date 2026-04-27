@@ -5,9 +5,25 @@ import type {
   ArchiveProvider,
   ArchivedPage,
   ArchiveInterface,
+  UnsupportedProviderRecord,
 } from "./types";
 import { getStoredResponse, storeResponse } from "./storage";
 import { mergeOptions, processInParallel } from "./utils";
+
+/**
+ * Thrown by `archive.getPages()` when the only-or-all-queried providers do not
+ * implement the requested operation. Lets callers distinguish a structural
+ * "this provider has no such API" from a runtime fetch failure.
+ */
+export class UnsupportedOperationError extends Error {
+  readonly providers: UnsupportedProviderRecord[];
+
+  constructor(reason: string, providers: UnsupportedProviderRecord[] = []) {
+    super(reason);
+    this.name = "UnsupportedOperationError";
+    this.providers = providers;
+  }
+}
 
 /**
  * Create a unified archive client that wraps one or multiple providers.
@@ -125,39 +141,57 @@ export function createArchive(
   function combineResults(responses: ArchiveResponse[], limit?: number): ArchiveResponse {
     const allPages: ArchivedPage[] = [];
     const errors: string[] = [];
+    const unsupportedProviders: UnsupportedProviderRecord[] = [];
     let anySuccess = false;
 
-    // Extract pages and errors
     for (const response of responses) {
+      const providerSlug = response._meta?.provider ?? "unknown";
       if (response.success) {
         anySuccess = true;
         allPages.push(...response.pages);
+      } else if (response.unsupported) {
+        unsupportedProviders.push({
+          provider: providerSlug,
+          reason: response.unsupportedReason ?? "operation not supported",
+        });
       } else if (response.error) {
         errors.push(response.error);
       }
     }
 
-    // Sort pages by timestamp (newest first)
-    allPages.sort((a, b) => {
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    });
+    // newest first
+    allPages.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Apply limit if specified
-    const limitedPages = typeof limit === "number" && Number.isFinite(limit) ? allPages.slice(0, Math.max(0, limit)) : allPages;
+    const limitedPages =
+      typeof limit === "number" && Number.isFinite(limit)
+        ? allPages.slice(0, Math.max(0, limit))
+        : allPages;
 
-    // Providers list for metadata
     const providersList = responses.map((r) => r._meta?.provider || "unknown").filter(Boolean);
 
-    // Create combined response
+    // Combined response is unsupported only when every queried provider was
+    // unsupported and none produced pages or errors.
+    const allUnsupported =
+      responses.length > 0 &&
+      unsupportedProviders.length === responses.length &&
+      !anySuccess &&
+      errors.length === 0;
+
     return {
       success: anySuccess,
       pages: limitedPages,
-      error: anySuccess ? undefined : errors.join("; "),
+      error: anySuccess || allUnsupported ? undefined : errors.join("; ") || undefined,
+      unsupported: allUnsupported || undefined,
+      unsupportedReason: allUnsupported
+        ? unsupportedProviders.map((u) => `${u.provider}: ${u.reason}`).join("; ")
+        : undefined,
       _meta: {
         source: "multiple",
         provider: providersList.join(","),
         providerCount: providersList.length,
         errors: errors.length > 0 ? errors : undefined,
+        unsupportedProviders:
+          unsupportedProviders.length > 0 ? unsupportedProviders : undefined,
       },
     };
   }
@@ -233,10 +267,47 @@ export function createArchive(
      */
     async getPages(domain: string, listOptions?: ArchiveOptions): Promise<ArchivedPage[]> {
       const res = await this.snapshots(domain, listOptions);
-      if (!res.success) {
-        throw new Error(res.error ?? "Failed to fetch archive snapshots");
+      if (res.success) {
+        return res.pages;
       }
-      return res.pages;
+
+      // Whole call was structurally unsupported: throw the dedicated subclass.
+      // Synthesize `.providers` from the raw single-provider response when
+      // `combineResults` was bypassed (`_meta.unsupportedProviders` only exists
+      // for multi-provider runs).
+      if (res.unsupported) {
+        const providers =
+          res._meta?.unsupportedProviders ??
+          (res._meta?.provider
+            ? [
+                {
+                  provider: res._meta.provider,
+                  reason: res.unsupportedReason ?? "operation not supported",
+                },
+              ]
+            : []);
+        throw new UnsupportedOperationError(
+          res.unsupportedReason ?? "operation not supported by any queried provider",
+          providers,
+        );
+      }
+
+      // Mixed runtime error + partial unsupported, or pure runtime error.
+      // Surface both layers in the message so callers see the full picture
+      // even though the throw type is generic Error.
+      const messageParts: string[] = [];
+      if (res.error) messageParts.push(res.error);
+      if (res._meta?.unsupportedProviders?.length) {
+        messageParts.push(
+          "unsupported: " +
+            res._meta.unsupportedProviders
+              .map((u) => `${u.provider} (${u.reason})`)
+              .join(", "),
+        );
+      }
+      throw new Error(
+        messageParts.length > 0 ? messageParts.join("; ") : "Failed to fetch archive snapshots",
+      );
     },
 
     /**

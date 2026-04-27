@@ -79,6 +79,13 @@ export interface ArchivedPageMetadata {
   [key: string]: unknown;
 }
 
+// Per-provider record surfaced in combined responses when a provider does not
+// implement the requested operation.
+export interface UnsupportedProviderRecord {
+  provider: string;
+  reason: string;
+}
+
 // Type for response metadata
 export interface ResponseMetadata {
   source: string;
@@ -86,6 +93,7 @@ export interface ResponseMetadata {
   errorDetails?: unknown;
   errorName?: string;
   queryParams?: Record<string, string>;
+  unsupportedProviders?: UnsupportedProviderRecord[];
   [key: string]: unknown;
 }
 
@@ -93,6 +101,11 @@ export interface ArchiveResponse {
   success: boolean;
   pages: ArchivedPage[];
   error?: string;
+
+  // Set when the provider does not implement the requested operation
+  // (e.g. WebCite has no list-by-domain API).
+  unsupported?: boolean;
+  unsupportedReason?: string;
 
   // Provider-specific metadata
   _meta?: ResponseMetadata;

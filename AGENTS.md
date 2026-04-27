@@ -1,8 +1,9 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-03-09
-**Commit:** 6e40870
+**Last reviewed:** 2026-04-27
 **Branch:** main
+
+> Verify against current HEAD: `git rev-parse HEAD`. Code map line numbers reflect the snapshot above; rerun `grep -n` if they look stale.
 
 ## OVERVIEW
 
@@ -14,8 +15,8 @@ Unified TypeScript interface for querying web archive providers (Wayback Machine
 omnichron/
 ├── src/
 │   ├── index.ts          # barrel - public API surface
-│   ├── archive.ts        # createArchive factory (core logic)
-│   ├── types.ts          # all interfaces/types (150 lines, 30+ symbols)
+│   ├── archive.ts        # createArchive factory + combineResults
+│   ├── types.ts          # all public interfaces/types
 │   ├── _providers.ts     # provider-specific option types (internal)
 │   ├── config.ts         # c12-based config loading with caching
 │   ├── storage.ts        # unstorage caching layer
@@ -44,24 +45,30 @@ omnichron/
 
 ## CODE MAP
 
-| Symbol              | Type      | Location              | Role                                                                    |
-| ------------------- | --------- | --------------------- | ----------------------------------------------------------------------- |
-| `createArchive`     | function  | archive.ts:34         | Core factory. Accepts provider(s) + options, returns `ArchiveInterface` |
-| `providers`         | object    | providers/index.ts:14 | Lazy-loading factory. Each method returns `Promise<ArchiveProvider>`    |
-| `ArchiveInterface`  | interface | types.ts:135          | Public API: `snapshots()`, `getPages()`, `use()`, `useAll()`            |
-| `ArchiveProvider`   | interface | types.ts:121          | Provider contract: `name`, `slug?`, `snapshots()`                       |
-| `ArchiveResponse`   | interface | types.ts:104          | `{ success, pages, error?, _meta?, fromCache? }`                        |
-| `ArchivedPage`      | interface | types.ts:73           | `{ url, timestamp, snapshot, _meta }`                                   |
-| `OmnichronConfig`   | interface | config.ts:8           | Config shape: `storage` + `performance` + env overrides                 |
-| `processInParallel` | function  | utils/_utils.ts:8     | Generic parallel executor with concurrency + batching                   |
-| `configureStorage`  | function  | storage.ts:165        | **@deprecated** - use config files or createArchive options             |
+| Symbol                      | Type      | Location              | Role                                                                                        |
+| --------------------------- | --------- | --------------------- | ------------------------------------------------------------------------------------------- |
+| `createArchive`             | function  | archive.ts:56         | Core factory. Accepts provider(s) + options, returns `ArchiveInterface`.                    |
+| `UnsupportedOperationError` | class     | archive.ts:18         | Thrown by `getPages()` when every queried provider is unsupported. Carries `providers` list. |
+| `providers`                 | object    | providers/index.ts:14 | Lazy-loading factory. Each method returns `Promise<ArchiveProvider>`.                       |
+| `ArchiveInterface`          | interface | types.ts:127          | Public API: `snapshots()`, `getPages()`, `use()`, `useAll()`.                               |
+| `ArchiveProvider`           | interface | types.ts:117          | Provider contract: `name`, `slug?`, `snapshots()`.                                          |
+| `ArchiveResponse`           | interface | types.ts:100          | `{ success, pages, error?, unsupported?, unsupportedReason?, _meta?, fromCache? }`.         |
+| `ArchivedPage`              | interface | types.ts:61           | `{ url, timestamp, snapshot, _meta }`.                                                      |
+| `UnsupportedProviderRecord` | interface | types.ts:84           | `{ provider, reason }` row used in `_meta.unsupportedProviders`.                            |
+| `OmnichronConfig`           | interface | config.ts:8           | Config shape: `storage` + `performance` + env overrides.                                    |
+| `processInParallel`         | function  | utils/_utils.ts:16    | Generic parallel executor with concurrency + batching.                                      |
+| `createSuccessResponse`     | function  | utils/_utils.ts       | Build a normalized success `ArchiveResponse`.                                               |
+| `createErrorResponse`       | function  | utils/_utils.ts       | Build a normalized runtime-error `ArchiveResponse`.                                         |
+| `createUnsupportedResponse` | function  | utils/_utils.ts:184   | Build a response signalling the operation is outside the provider's API surface.            |
+| `configureStorage`          | function  | storage.ts:147        | **@deprecated** – use config files or `createArchive` options.                              |
 
 ## CONVENTIONS
 
 - **Underscore prefix** = internal module (`_utils.ts`, `_providers.ts`). Not for direct import by consumers.
 - **Provider pattern**: default export factory fn → returns `{ name, slug, snapshots() }`. Always async via `Promise<ArchiveProvider>`.
 - **Lazy loading**: providers loaded via `await import('./provider')` in `providers/index.ts`. Enables tree-shaking.
-- **Response normalization**: all providers must return `ArchiveResponse` via `createSuccessResponse`/`createErrorResponse` helpers.
+- **Response normalization**: all providers must return `ArchiveResponse` via `createSuccessResponse` / `createErrorResponse` / `createUnsupportedResponse` helpers — never construct a raw object.
+- **Unsupported operations are first-class**: when an operation is outside a provider's API surface (e.g. WebCite has no list-by-domain endpoint), return `createUnsupportedResponse(reason, slug)`, not a fake page or a fake error. `combineResults` propagates these into `_meta.unsupportedProviders`. `getPages()` throws `UnsupportedOperationError` (with `.providers`) when the whole call is unsupported, so callers can distinguish structural mismatches from runtime failures.
 - **Timestamp format**: providers convert native timestamps to ISO 8601. Raw format preserved in `_meta`.
 - **Option merging**: three-level cascade: config defaults → init options → request options. Via `mergeOptions()`.
 - **ESLint**: `eslint-config-unjs` preset. Only override: `unicorn/numeric-separators-style: off`.
@@ -94,7 +101,7 @@ bash test.sh          # build lib + build playground (integration)
 
 - **Config is async**: `getConfig()`, `resolveConfig()`, `mergeOptions()`, `createFetchOptions()` are all async because c12 config loading is async. This propagates throughout.
 - **Defaults**: concurrency=3, batchSize=20, timeout=10000ms, retries=1, cache TTL=7 days. README and code must match.
-- **WebCite is read-only**: no longer accepts new archives. Provider returns placeholder timestamps.
+- **WebCite has no list-by-domain API**: `webcite.snapshots(domain)` returns `unsupported: true` with a `unsupportedReason`. Direct snapshot retrieval (`webcitation.org/<id>`) is planned via a future `getById` API. New archives have not been accepted since ~2019.
 - **Archive.today uses Memento API**: parses timemap link headers with regex. Fragile if format changes.
 - **Playground targets Cloudflare**: `nitro.preset = 'cloudflare_module'` with `nodeCompat: true`.
 - **CI runs coverage separately**: `pnpm vitest --coverage` as its own step, not via `pnpm test`.

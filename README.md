@@ -72,6 +72,22 @@ const response = await archive.snapshots("example.com");
 const pages = await archive.getPages("example.com");
 ```
 
+`getPages()` distinguishes runtime failures from structural ones. When every queried provider is *unsupported* for the operation (see below), it throws `UnsupportedOperationError` with the per-provider reasons attached:
+
+```ts
+import { UnsupportedOperationError } from "omnichron";
+
+try {
+  const pages = await archive.getPages("example.com");
+} catch (error) {
+  if (error instanceof UnsupportedOperationError) {
+    // error.providers: [{ provider, reason }, ...]
+  } else {
+    // generic Error: network failure, parse error, etc.
+  }
+}
+```
+
 ## Providers
 
 | Provider        | Factory                    | Notes                                     |
@@ -80,7 +96,7 @@ const pages = await archive.getPages("example.com");
 | Archive.today   | `providers.archiveToday()` | archive.ph via Memento timemap            |
 | Common Crawl    | `providers.commoncrawl()`  | Defaults to latest collection             |
 | Perma.cc        | `providers.permacc()`      | Requires `apiKey`                         |
-| WebCite         | `providers.webcite()`      | Read-only, no longer accepts new archives |
+| WebCite         | `providers.webcite()`      | No list-by-domain API; `snapshots()` returns unsupported. New archives no longer accepted (~2019). |
 | All             | `providers.all()`          | All of the above except Perma.cc          |
 
 You can add providers dynamically after creation:
@@ -100,6 +116,8 @@ interface ArchiveResponse {
   success: boolean;
   pages: ArchivedPage[];
   error?: string;
+  unsupported?: boolean; // provider does not implement this operation
+  unsupportedReason?: string;
   _meta?: ResponseMetadata;
   fromCache?: boolean;
 }
@@ -113,6 +131,31 @@ interface ArchivedPage {
 ```
 
 The `_meta` object on each page carries provider-specific fields. Wayback includes `status` and `timestamp` in its raw format. Common Crawl adds `digest`, `mime`, `collection`. Perma.cc has `guid`, `title`, `created_by`. Archive.today provides `hash` and `raw_date`.
+
+### Unsupported operations
+
+Not every provider implements every operation. WebCite, for example, exposes no list-by-domain API — it only resolves snapshots by ID. When a provider cannot answer a call, it returns `success: false` with `unsupported: true` and a human-readable `unsupportedReason`, instead of fabricating data.
+
+For multi-provider calls, the combined response surfaces unsupported providers under `_meta.unsupportedProviders` regardless of how the rest behaved. The top-level `unsupported` flag has stricter semantics:
+
+| Scenario                                                  | `success` | `error`        | `unsupported` | `_meta.unsupportedProviders` |
+| --------------------------------------------------------- | --------- | -------------- | ------------- | ---------------------------- |
+| Some providers succeed, others are unsupported            | `true`    | —              | —             | populated                    |
+| Some providers error, others are unsupported, none succeed | `false`   | joined errors  | —             | populated                    |
+| Every queried provider is unsupported                     | `false`   | —              | `true`         | populated                    |
+
+Example:
+
+```ts
+const archive = createArchive(providers.all());
+const response = await archive.snapshots("example.com");
+
+response.pages; // results from Wayback, Archive.today, Common Crawl
+response._meta?.unsupportedProviders;
+// [{ provider: "webcite", reason: "WebCite has no list-by-domain API. ..." }]
+```
+
+To treat unsupported providers as a *whole-call* failure, check the top-level flag explicitly: `if (!response.success && response.unsupported) { ... }`.
 
 ## Configuration
 

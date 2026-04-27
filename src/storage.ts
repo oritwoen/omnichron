@@ -96,6 +96,9 @@ export async function storeResponse(
   response: ArchiveResponse,
   options?: ArchiveOptions,
 ): Promise<void> {
+  // Skip caching when caching is opted out or the response is not a success.
+  // The success filter naturally excludes both runtime errors and unsupported
+  // operations, which the providers signal via success=false.
   if (options?.cache === false || !response.success) {
     return;
   }
