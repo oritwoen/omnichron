@@ -1,14 +1,15 @@
-import { createStorage } from "unstorage";
+import { createStorage, type Storage, type Driver } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { consola } from "consola";
 import type { ArchiveOptions, ArchiveResponse } from "./types";
 import { getConfig } from "./config";
 
-// Create a memory storage driver as default
-// Using type assertion to add options property that createStorage doesn't include in type definition
-export const storage = createStorage({
+export const storage: Storage = createStorage({
   driver: memoryDriver(),
-}) as unknown as Storage & { options?: { prefix?: string } };
+});
+
+let storagePrefix = "omnichron";
+let storageInitialized = false;
 
 /**
  * Initialize storage with configuration values
@@ -25,6 +26,12 @@ export async function initStorage(): Promise<void> {
       }),
     );
   }
+
+  if (config.storage.prefix) {
+    storagePrefix = config.storage.prefix;
+  }
+
+  storageInitialized = true;
 }
 
 /**
@@ -35,18 +42,9 @@ export function generateStorageKey(
   domain: string,
   options?: Pick<ArchiveOptions, "limit">,
 ): string {
-  // Use slug if available, otherwise use name
   const providerKey = provider.slug ?? provider.name;
-  const prefix = getStoragePrefix();
-  const baseKey = `${prefix}:${providerKey}:${domain}`;
+  const baseKey = `${storagePrefix}:${providerKey}:${domain}`;
   return options?.limit ? `${baseKey}:${options.limit}` : baseKey;
-}
-
-/**
- * Get the current storage prefix
- */
-function getStoragePrefix(): string {
-  return storage.options?.prefix || "omnichron";
 }
 
 /**
@@ -57,13 +55,11 @@ export async function getStoredResponse(
   domain: string,
   options?: ArchiveOptions,
 ): Promise<ArchiveResponse | undefined> {
-  // Skip if cache is explicitly disabled
   if (options?.cache === false) {
     return undefined;
   }
 
-  // Ensure storage is initialized
-  if (!storage.options) {
+  if (!storageInitialized) {
     await initStorage();
   }
 
@@ -74,11 +70,10 @@ export async function getStoredResponse(
 
     if (cachedData) {
       try {
-        // Add fromCache flag to response
         const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
 
         return {
-          ...parsedData,
+          ...(parsedData as ArchiveResponse),
           fromCache: true,
         };
       } catch (parseError) {
@@ -86,7 +81,6 @@ export async function getStoredResponse(
       }
     }
   } catch (error) {
-    // Silently fail on storage errors
     consola.error(`Storage read error for ${key}:`, error);
   }
 
@@ -102,28 +96,20 @@ export async function storeResponse(
   response: ArchiveResponse,
   options?: ArchiveOptions,
 ): Promise<void> {
-  // Skip if cache is explicitly disabled or response was unsuccessful
   if (options?.cache === false || !response.success) {
     return;
   }
 
-  // Ensure storage is initialized
-  if (!storage.options) {
+  if (!storageInitialized) {
     await initStorage();
   }
 
   const key = generateStorageKey(provider, domain, options);
-  // ttl is configured at the driver level
 
   try {
-    // Remove fromCache flag before storing
     const { fromCache: _fromCache, ...storableResponse } = response;
-
-    // Store stringified data
-    // TTL will be handled by the storage driver's configuration
     await storage.setItem(key, JSON.stringify(storableResponse));
   } catch (error) {
-    // Silently fail on storage errors
     consola.error(`Storage write error for ${key}:`, error);
   }
 }
@@ -135,16 +121,11 @@ export async function clearProviderStorage(
   provider: string | { name: string; slug?: string },
 ): Promise<void> {
   try {
-    // Ensure storage is initialized
-    if (!storage.options) {
+    if (!storageInitialized) {
       await initStorage();
     }
 
-    // Convert provider to string key (either slug or name)
     const providerKey = typeof provider === "string" ? provider : (provider.slug ?? provider.name);
-
-    // Get all keys and filter by provider prefix
-    const storagePrefix = getStoragePrefix();
     const providerPrefix = `${storagePrefix}:${providerKey}:`;
     const keys = await storage.getKeys();
 
@@ -165,16 +146,14 @@ export async function clearProviderStorage(
  */
 export async function configureStorage(
   options: {
-    driver?: any;
+    driver?: Driver;
     ttl?: number;
     cache?: boolean;
     prefix?: string;
   } = {},
 ): Promise<void> {
-  // Get current config to update
   const config = await getConfig();
 
-  // Update config with provided options
   if (options.driver) {
     config.storage.driver = options.driver;
   }
@@ -188,20 +167,17 @@ export async function configureStorage(
   }
 
   if (options.prefix !== undefined) {
-    storage.options = storage.options || {};
-    storage.options.prefix = options.prefix;
+    storagePrefix = options.prefix;
   }
 
-  // Update storage with new driver if provided
   if (options.driver) {
-    const newStorage = createStorage({
-      driver: options.driver,
-    }) as unknown as Storage & { options?: { prefix?: string } };
-
-    newStorage.options = newStorage.options || {};
-    newStorage.options.prefix = storage.options?.prefix || config.storage.prefix;
-
-    // Replace the storage instance
-    Object.assign(storage, newStorage);
+    Object.assign(
+      storage,
+      createStorage({
+        driver: options.driver,
+      }),
+    );
   }
+
+  storageInitialized = true;
 }

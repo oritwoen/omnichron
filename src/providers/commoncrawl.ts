@@ -57,7 +57,12 @@ export default function commonCrawl(
                 timeout: options.timeout ?? 60_000,
               },
             );
-            const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as Array<any>;
+            interface CollinfoEntry {
+              name?: string;
+              "cdx-api"?: string;
+              cdxApi?: string;
+            }
+            const collinfo = (await $fetch("/collinfo.json", collinfoOpts)) as CollinfoEntry[];
             if (Array.isArray(collinfo) && collinfo.length > 0) {
               const first = collinfo[0];
               const cdxApiProp = first["cdx-api"] || first.cdxApi;
