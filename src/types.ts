@@ -58,18 +58,6 @@ export interface WebCiteMetadata extends ArchiveMetadata {
   position?: number;
 }
 
-export interface UkWebArchiveMetadata extends ArchiveMetadata {
-  timestamp: string;
-  status: number;
-}
-
-export interface MementoTimeMetadata extends ArchiveMetadata {
-  originalTimestamp: string;
-  source: string;
-  position?: number;
-  provider: string;
-}
-
 export interface ArchivedPage {
   // Common fields for all providers
   url: string; // Original URL of the page
@@ -113,26 +101,11 @@ export interface ArchiveResponse {
   fromCache?: boolean;
 }
 
-// Discriminated union for typed responses
-export type ArchiveResult =
-  | { success: true; pages: ArchivedPage[]; _meta?: ResponseMetadata; fromCache?: boolean }
-  | {
-      success: false;
-      error: string;
-      pages: never[];
-      _meta?: ResponseMetadata;
-      fromCache?: boolean;
-    };
-
 export interface ArchiveProvider {
   name: string;
   slug?: string;
   snapshots: (domain: string, options?: ArchiveOptions) => Promise<ArchiveResponse>;
 }
-
-// Read-only types for immutable data
-export type ReadonlyArchivedPage = Readonly<ArchivedPage>;
-export type ReadonlyArchiveResponse = Readonly<ArchiveResponse>;
 
 /**
  * Interface for Archive instances
@@ -149,8 +122,4 @@ export interface ArchiveInterface {
   // Provider management
   use(provider: ArchiveProvider | Promise<ArchiveProvider>): Promise<ArchiveInterface>;
   useAll(providers: (ArchiveProvider | Promise<ArchiveProvider>)[]): Promise<ArchiveInterface>;
-
-  // Event hooks (for plugins)
-  onBeforeRequest?(domain: string, options: ArchiveOptions): Promise<void>;
-  onAfterResponse?(response: ArchiveResponse): Promise<void>;
 }

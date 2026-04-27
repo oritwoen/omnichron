@@ -1,7 +1,5 @@
 import type { ArchiveOptions } from "./types";
 
-export type ProviderName = "wayback" | "archive-today" | "permacc" | "commoncrawl" | "webcite";
-
 export interface WaybackOptions extends ArchiveOptions {
   collapse?: string;
   filter?: string;
@@ -20,11 +18,3 @@ export interface CommonCrawlOptions extends ArchiveOptions {
 }
 
 export type WebCiteOptions = ArchiveOptions;
-
-export type ProviderOptions = {
-  wayback: WaybackOptions;
-  "archive-today": ArchiveTodayOptions;
-  permacc: PermaccOptions;
-  commoncrawl: CommonCrawlOptions;
-  webcite: WebCiteOptions;
-};
